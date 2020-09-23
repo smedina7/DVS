@@ -1,7 +1,8 @@
 import logging
 import sys
 from GUI.Widgets.HomeWindow import MainGUI
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from src.fileDirectory import FileDirectory
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox
 from PyQt5.uic import loadUi
 
 
@@ -12,7 +13,10 @@ class DVSstartUpPage(QMainWindow):
 
         self.CreateNew_pushButton = self.findChild(QPushButton, 'CreateNew_pushButton')
         self.CreateNew_pushButton.clicked.connect(self.openMain)
-
+        self.CurrentProject_PushButton = self.findChild(QPushButton, 'CurrentProject_PushButton')
+        self.CurrentProject_PushButton.clicked.connect(self.openDir)
+        self.Settings_pushButton = self.findChild(QPushButton, 'Settings_pushButton')
+        self.Settings_pushButton.clicked.connect(self.openSettings)
         self.show()
 
     def openMain(self):
@@ -20,6 +24,14 @@ class DVSstartUpPage(QMainWindow):
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
         self.close()
+
+    def openDir(self):
+        self.window = FileDirectory()
+        self.window.show()
+        self.close()
+
+    def openSettings(self):
+        QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
         
 if __name__ == "__main__":
     if len(sys.argv) > 2:
