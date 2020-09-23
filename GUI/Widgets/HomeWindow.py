@@ -1,18 +1,33 @@
 import logging
 
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 class MainGUI(QMainWindow):
-    def __init__(self):
+    def __init__(self, parent = None):
         logging.debug("MainGUI(): Instantiated")
-        super(MainGUI, self).__init__()
+        super(MainGUI, self).__init__(parent)
+
+        self.mdi = QMdiArea()
+        self.setCentralWidget(self.mdi)
+        bar = self.menuBar()
+
+        file = bar.addMenu("File")
+        file.addAction("New Window")
+        file.addAction("Tiled")
+        file.triggered[QAction].connect(self.windowaction)
+
         self.setWindowTitle("Timeline View")
-        self.setFixedSize(670,565)
 
-        self.mainWidget = QWidget()
-        mainlayout = QVBoxLayout()
+    def windowaction(self, q):
+        print("triggered")
 
-        self.mainWidget.setLayout(mainlayout)
-
+        if q.text() == "New Window":
+            sub = QMdiSubWindow()
+            sub.setWidget(QTextEdit())
+            self.mdi.addSubWindow(sub)
+            sub.show()
+        if q.text() =="Tiled":
+            self.mdi.tileSubWindows()
 
