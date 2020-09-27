@@ -9,20 +9,22 @@ class MainGUI(QMainWindow):
         logging.debug("MainGUI(): Instantiated")
         super(MainGUI, self).__init__(parent)
 
+        #Home Window Widget Configuration
+        self.setFixedSize(620,565)
+        self.setWindowTitle("Timeline View")
+
+        #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
-        bar = self.menuBar()
 
+        #Add menu bar
+        bar = self.menuBar()
         file = bar.addMenu("File")
         file.addAction("New Window")
         file.addAction("Tiled")
         file.triggered[QAction].connect(self.windowaction)
 
-        self.setWindowTitle("Timeline View")
-
     def windowaction(self, q):
-        print("triggered")
-
         if q.text() == "New Window":
             sub = QMdiSubWindow()
             sub.setWidget(QTextEdit())
