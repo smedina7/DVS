@@ -4,6 +4,7 @@ import os
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from PyQt5 import QtWidgets
 from GUI.Widgets.AbstractTable import pandasModel
 import pandas as pd
 
@@ -16,15 +17,18 @@ class MainGUI(QMainWindow):
         #Set File Paths
         self.key_json = os.path.join(JSON_FILE_DIR, "Keypresses.JSON")
         self.sys_json = os.path.join(JSON_FILE_DIR, "SystemCalls.JSON")
-        #mouse_json = os.path.join("src/Data", "MouseClicks.JSON")
+        self.mouse_json = os.path.join(JSON_FILE_DIR, "MouseClicks.JSON")
 
         #Home Window Widget Configuration
-        self.setFixedSize(700,565)
+        self.setFixedSize(710,565)
         self.setWindowTitle("Timeline View")
 
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
+
+        #add scrollbar
+        self.mdi.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         #Add menu bar
         bar = self.menuBar()
@@ -37,7 +41,7 @@ class MainGUI(QMainWindow):
         add_dataline.addAction("New Window")
         add_dataline.addAction("Keypresses")
         add_dataline.addAction("System Calls")
-        #add_dataline.addAction("Mouse Clicks")
+        add_dataline.addAction("Mouse Clicks")
 
         #dataline windows actions
         add_dataline.triggered[QAction].connect(self.windowaction)
@@ -98,13 +102,13 @@ class MainGUI(QMainWindow):
             view.show()
             sub.show()
 
-        """ if q.text() == "Mouse Clicks":
+        if q.text() == "Mouse Clicks":
             sub = QMdiSubWindow()
             sub.resize(700,150)
             sub.setWindowTitle("Mouse Clicks")
             sub.setWidget(QTextEdit())
             
-            df = pd.read_json (r'MouseClicks.JSON')
+            df = pd.read_json (self.mouse_json)
 
             model = pandasModel(df)
             view = QTableView()
@@ -115,11 +119,11 @@ class MainGUI(QMainWindow):
             header = view.horizontalHeader()
             view.setColumnWidth(1, 210)
             view.setColumnWidth(2, 50)
-            header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
 
             view.show()
-            sub.show() """
+            sub.show()
 
         if q.text() =="Tile Layout":
             self.mdi.tileSubWindows()
