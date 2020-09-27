@@ -11,6 +11,8 @@ class DVSstartUpPage(QMainWindow):
         super(DVSstartUpPage, self).__init__()
         loadUi('GUI/src/DVSstartUpPage.ui', self)
 
+        self.setFixedSize(620,565)
+        self.setGeometry(500, 300, 500, 100)
         self.CreateNew_pushButton = self.findChild(QPushButton, 'CreateNew_pushButton')
         self.CreateNew_pushButton.clicked.connect(self.openMain)
         self.CurrentProject_PushButton = self.findChild(QPushButton, 'CurrentProject_PushButton')
