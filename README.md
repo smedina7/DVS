@@ -25,7 +25,7 @@ To run in a Windows virtual environment:
 
 `cd dvs`
 
-Install Python’s Virtual Environment Builder 
+Install Python’s Virtual Environment Builder:
 
 `pip install virtualenv`
 
