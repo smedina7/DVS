@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+prompt_accepted_Yn() {
+    read -r -p "$1 [Y/n] " yn
+    case $yn in
+        [nN]*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+ECEL_NETSYS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ "$EUID" -ne 0 ]; then
+echo "DVS must be run as root"
+exit 1
+fi
+
+venv/bin/python3 main.py
