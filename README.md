@@ -36,6 +36,7 @@ Create and activate virtual environment:
 `dvs-venv\Scripts\activate`
 
 Install required dependencies:
+
 `pip install -r requirements.txt`
 
 Start the DVS GUI:
