@@ -74,6 +74,7 @@ Start the DVS GUI:
 Clone the repo to your desired destination and go into the DVS folder: 
 
 `git clone https://github.com/smedina7/DVS`
+
 `cd dvs`
 
 Install dependencies:
