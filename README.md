@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-* Data Visualization System (RES)
+* Data Visualization System (DVS)
   * [Description](https://github.com/smedina7/DVS#description)
   * [Installation](https://github.com/smedina7/DVS#installation)
     * [System Requirements](https://github.com/smedina7/DVS#system-requirements)
@@ -36,16 +36,54 @@ Create and activate virtual environment:
 `dvs-venv\Scripts\activate`
 
 Install required dependencies:
+
 `pip install -r requirements.txt`
 
 Start the DVS GUI:
 
 `main.py`
 
-
 #### Linux
+##### To run in a Python virtual environment:
 
+Clone the repo to your desired destination and go into the DVS folder: 
 
+`git clone https://github.com/smedina7/DVS`
+`cd dvs`
+
+Install Python’s Virtual Environment Builder:
+
+`pip install virtualenv`
+
+Create and activate virtual environment:
+
+`virtualenv dvs-venv`
+
+`source dvs-venv/bin/activate`
+
+Install required dependencies:
+
+`pip install -r requirements.txt`
+
+Start the DVS GUI:
+
+`python3 main.py`
+
+##### To run on your machine:
+
+Clone the repo to your desired destination and go into the DVS folder: 
+
+`git clone https://github.com/smedina7/DVS`
+
+`cd dvs`
+
+Install dependencies:
+
+`sudo ./installDeb.sh`
+
+Start the DVS GUI:
+
+`python3 main.py`
 
 ## Team Collaborators
   * Bianca Alvarez
