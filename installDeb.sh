@@ -13,7 +13,7 @@ apt-get -y update
 ### Install dependencies
 #
 REQUIRED_PROGRAMS="python3-pip python3-venv git"
-REQUIRED_PYTHON_PACKAGES="PyQt5 plotly dash Flask pandas"
+REQUIRED_PYTHON_PACKAGES="PyQt5 plotly dash Flask pandas virtualenv"
 
 echo "+++++++++++++++++++++++++++++++++"
 echo "installing REQUIRED_PROGRAMS"
