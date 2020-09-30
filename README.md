@@ -43,7 +43,7 @@ Start the DVS GUI:
 `main.py`
 
 #### Linux
-## To run in a Python virtual environment:
+##### To run in a Python virtual environment:
 
 Clone the repo to your desired destination and go into the DVS folder: 
 `git clone https://github.com/smedina7/DVS`
@@ -66,7 +66,7 @@ Start the DVS GUI:
 
 `python3 main.py`
 
-## To run on your machine:
+##### To run on your machine:
 
 Clone the repo to your desired destination and go into the DVS folder: 
 `git clone https://github.com/smedina7/DVS`
