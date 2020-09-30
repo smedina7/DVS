@@ -2,7 +2,7 @@ import logging
 import sys
 from GUI.Widgets.HomeWindow import MainGUI
 from src.fileDirectory import FileDirectory
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.uic import loadUi
 
 
@@ -28,7 +28,16 @@ class DVSstartUpPage(QMainWindow):
         self.close()
 
     def openDir(self):
-        self.window = FileDirectory()
+        self.folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
+
+        if self.folder_chosen == "":
+            logging.debug("File choose cancelled")
+            return
+
+        if len(self.folder_chosen) > 0:
+            QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
+            return
+
         self.window.show()
         self.close()
 
