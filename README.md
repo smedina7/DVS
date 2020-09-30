@@ -57,9 +57,9 @@ Install Python’s Virtual Environment Builder:
 
 Create and activate virtual environment:
 
-`virtualenv venv`
+`virtualenv dvs-venv`
 
-`source venv/bin/activate`
+`source dvs-venv/bin/activate`
 
 Install required dependencies:
 
@@ -79,7 +79,7 @@ Clone the repo to your desired destination and go into the DVS folder:
 
 Install dependencies:
 
-`sudo installDeb.sh`
+`sudo ./installDeb.sh`
 
 Start the DVS GUI:
 
