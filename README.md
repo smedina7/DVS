@@ -49,15 +49,17 @@ Start the DVS GUI:
 Clone the repo to your desired destination and go into the DVS folder: 
 
 `git clone https://github.com/smedina7/DVS`
+
+
 `cd dvs`
 
 Install Python’s Virtual Environment Builder:
 
-`pip install virtualenv`
+`sudo pip install virtualenv`
 
 Create and activate virtual environment:
 
-`virtualenv dvs-venv`
+`python3 -m venv dvs-venv`
 
 `source dvs-venv/bin/activate`
 
