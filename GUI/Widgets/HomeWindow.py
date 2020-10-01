@@ -35,10 +35,7 @@ class MainGUI(QMainWindow):
         file = bar.addMenu("File")
         #file.addAction("Save")
         file.triggered[QAction].connect(self.windowaction)
-        #Add sync checkbox
-        file.addAction(QAction("Synchronize", file, checkable=True))
-        file.triggered.connect(self.selectCheckboxSync)
-
+        
         #add default datalines
         add_dataline = bar.addMenu("Add Dataline")
         add_dataline.addAction("New Window")
@@ -51,6 +48,11 @@ class MainGUI(QMainWindow):
         adjust = bar.addMenu("Adjust Subwindows")
         adjust.addAction("Tile Layout")
         adjust.triggered[QAction].connect(self.windowaction)
+
+        #Add sync checkbox
+        sync = bar.addMenu("Synchronize")
+        sync.addAction(QAction("Synchronize", sync, checkable=True))
+        sync.triggered.connect(self.selectCheckboxSync)
 
     #Sync state
     def selectCheckboxSync(self, state):
