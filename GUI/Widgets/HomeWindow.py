@@ -23,6 +23,14 @@ class MainGUI(QMainWindow):
         self.setFixedSize(710,565)
         self.setWindowTitle("Timeline View")
 
+        #Create toolbar and sync button widgets
+        self.tb = self.addToolBar("")
+        self.sync_button = QPushButton(self.tb)
+        self.sync_button.setCheckable(True)
+        self.sync_button.setText("Unsyncronized")
+        self.tb.addWidget(self.sync_button)
+        self.sync_button.clicked.connect(self.buttonaction)
+
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
@@ -49,17 +57,13 @@ class MainGUI(QMainWindow):
         adjust.addAction("Tile Layout")
         adjust.triggered[QAction].connect(self.windowaction)
 
-        #Add sync checkbox
-        sync = bar.addMenu("Synchronize")
-        sync.addAction(QAction("Synchronize", sync, checkable=True))
-        sync.triggered.connect(self.selectCheckboxSync)
 
     #Sync state
-    def selectCheckboxSync(self, state):
-        if state.isChecked() == True:
-            print("Synchronized")
+    def buttonaction(self, b):
+        if b == True:
+            self.sync_button.setText("Synchronized")
         else:
-            print("Unsynchronized")
+            self.sync_button.setText("Unsynchronized")
 
     def windowaction(self, q):
         if q.text() == "New Window":
