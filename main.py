@@ -1,6 +1,8 @@
 import logging
 import sys
+import os
 from GUI.Widgets.HomeWindow import MainGUI
+from PacketView.Manager import PacketManager
 from src.fileDirectory import FileDirectory
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.uic import loadUi
@@ -22,6 +24,16 @@ class DVSstartUpPage(QMainWindow):
         self.show()
 
     def openMain(self):
+        self.folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Project Directory you want to analyze"))
+
+        if self.folder_chosen == "":
+            logging.debug("File choose cancelled")
+            return
+
+        if len(self.folder_chosen) > 0:
+            project_path_chosen = os.path.abspath(self.folder_chosen)
+            
+        self.manager = PacketManager(project_path_chosen)
         self.window = MainGUI()
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
