@@ -1,5 +1,0 @@
-PyQt5
-pandas
-plotly
-Flask
-cachetools
