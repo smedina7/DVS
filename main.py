@@ -18,20 +18,19 @@ class DVSstartUpPage(QMainWindow):
 
         #Dark theme
         darkpalette = QPalette()
-        darkpalette.setColor(QPalette.Window, QColor(41,44,51))
-        darkpalette.setColor(QPalette.WindowText, Qt.white)
-        darkpalette.setColor(QPalette.Base, QColor(15,15,15))
-        darkpalette.setColor(QPalette.AlternateBase, QColor(41,44,51))
-        darkpalette.setColor(QPalette.ToolTipBase, Qt.white)
-        darkpalette.setColor(QPalette.ToolTipText, Qt.white)
-        darkpalette.setColor(QPalette.Text, Qt.white)
-        darkpalette.setColor(QPalette.Button, QColor(41,44,51))
-        darkpalette.setColor(QPalette.ButtonText, Qt.white)
-        darkpalette.setColor(QPalette.BrightText, Qt.red)
-        darkpalette.setColor(QPalette.Highlight, QColor(100,100,225))
-        darkpalette.setColor(QPalette.HighlightedText, Qt.black)
+        darkpalette.setColor(QPalette.Window, QColor(60,60,60)) #main window background color
+        #darkpalette.setColor(QPalette.WindowText, Qt.red) #i dont know what this is
+        darkpalette.setColor(QPalette.Base, QColor(60,60,60)) #background of the data lines
+        #darkpalette.setColor(QPalette.AlternateBase, Qt.red) # i donw know this is
+        #darkpalette.setColor(QPalette.ToolTipBase, Qt.red) # i dont know what this is
+        #darkpalette.setColor(QPalette.ToolTipText, Qt.red) # i dont know what this is
+        darkpalette.setColor(QPalette.Text, Qt.white) #text for the data lines and &drop menu
+        #darkpalette.setColor(QPalette.Button, Qt.red) # i dont know what this is for
+        darkpalette.setColor(QPalette.ButtonText, Qt.black) #text of start up buttons and tabs
+        #darkpalette.setColor(QPalette.BrightText, Qt.red) #idk
+        darkpalette.setColor(QPalette.Highlight, QColor(80,80,80)) #selected color, or highlight
+        #darkpalette.setColor(QPalette.HighlightedText, Qt.red) #selected, highlighted text color
         app.setPalette(darkpalette)
-
         self.setFixedSize(620,565)
         self.setGeometry(500, 300, 500, 100)
         self.CreateNew_pushButton = self.findChild(QPushButton, 'CreateNew_pushButton')
