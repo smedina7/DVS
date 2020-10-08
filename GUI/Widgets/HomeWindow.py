@@ -6,18 +6,18 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from GUI.Widgets.AbstractTable import pandasModel
+from PacketView.Manager import PacketManager
 import pandas as pd
 
 class MainGUI(QMainWindow):
-    def __init__(self, parent = None):
+    def __init__(self, json_files, parent = None):
         logging.debug("MainGUI(): Instantiated")
         super(MainGUI, self).__init__(parent)
-        JSON_FILE_DIR = "GUI/src/Data"
+        json_file_list = json_files
 
-        #Set File Paths
-        self.key_json = os.path.join(JSON_FILE_DIR, "Keypresses.JSON")
-        self.sys_json = os.path.join(JSON_FILE_DIR, "SystemCalls.JSON")
-        self.mouse_json = os.path.join(JSON_FILE_DIR, "MouseClicks.JSON")
+        self.key_json = ''
+        self.sys_json = ''
+        self.mouse_json = ''
 
         #Home Window Widget Configuration
         self.setFixedSize(710,565)
@@ -57,6 +57,24 @@ class MainGUI(QMainWindow):
         adjust.addAction("Tile Layout")
         adjust.triggered[QAction].connect(self.windowaction)
 
+        #Get JSON Files
+        print(json_file_list)
+        
+        #get path for each file
+        for file in json_file_list:
+            print(file)
+            if "Keypresses.JSON" in file:
+                self.key_json = file
+            
+            if "SystemCalls.JSON" in file:
+                self.sys_json = file
+            
+            if "MouseClicks.JSON" in file:
+                self.mouse_json = file
+
+        print(self.key_json)
+        print(self.sys_json)
+        print(self.mouse_json)
 
     #Sync state
     def buttonaction(self, b):
@@ -80,21 +98,23 @@ class MainGUI(QMainWindow):
             sub.setWindowTitle("Keypresses")
             sub.setWidget(QTextEdit())
 
-            df = pd.read_json (self.key_json)
+            if os.path.exists(self.key_json):
+                df = pd.read_json (self.key_json)
+                model = pandasModel(df)
+                view = QTableView()
+                view.setModel(model)
 
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
+                sub.setWidget(view)
 
-            sub.setWidget(view)
+                header = view.horizontalHeader()
+                view.setColumnWidth(1, 210)
+                header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+                self.mdi.addSubWindow(sub)
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
-
-            view.show()
-            sub.show()
+                view.show()
+                sub.show()
+            else:
+                print("NO KEYPRESS JSON FOUND")
 
         if q.text() == "System Calls":
             sub = QMdiSubWindow()
@@ -102,21 +122,23 @@ class MainGUI(QMainWindow):
             sub.setWindowTitle("System Calls")
             sub.setWidget(QTextEdit())
             
-            df = pd.read_json(self.sys_json)
+            if os.path.exists(self.sys_json):
+                df = pd.read_json(self.sys_json)
+                model = pandasModel(df)
+                view = QTableView()
+                view.setModel(model)
 
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
+                sub.setWidget(view)
 
-            sub.setWidget(view)
+                header = view.horizontalHeader()
+                view.setColumnWidth(1, 210)
+                header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+                self.mdi.addSubWindow(sub)
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
-
-            view.show()
-            sub.show()
+                view.show()
+                sub.show()
+            else:
+                print("NO SYSCALLS JSON FOUND")
 
         if q.text() == "Mouse Clicks":
             sub = QMdiSubWindow()
@@ -124,22 +146,24 @@ class MainGUI(QMainWindow):
             sub.setWindowTitle("Mouse Clicks")
             sub.setWidget(QTextEdit())
             
-            df = pd.read_json (self.mouse_json)
+            if os.path.exists(self.mouse_json):
+                df = pd.read_json (self.mouse_json)
+                model = pandasModel(df)
+                view = QTableView()
+                view.setModel(model)
 
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
+                sub.setWidget(view)
 
-            sub.setWidget(view)
+                header = view.horizontalHeader()
+                view.setColumnWidth(1, 210)
+                view.setColumnWidth(2, 50)
+                header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+                self.mdi.addSubWindow(sub)
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            view.setColumnWidth(2, 50)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
-
-            view.show()
-            sub.show()
+                view.show()
+                sub.show()
+            else:
+                print("NO MOUSECLICKS JSON FOUND")
 
         if q.text() =="Tile Layout":
             self.mdi.tileSubWindows()

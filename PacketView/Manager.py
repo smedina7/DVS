@@ -3,7 +3,8 @@ import subprocess
 import shlex
 import sys, traceback
 import os
-from PyQt5.QtCore import QThread
+from PyQt5 import QtCore
+from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QMessageBox
 from PacketView.WiresharkRunner import WiresharkRunner
 
@@ -12,13 +13,28 @@ class PacketManager():
         logging.debug('Manager(): Instantiated')
         self.project_path = os.path.abspath(project_path)
         self.filelist = list()
+        self.filelist2 = list()
         self.wireshark_thread = QThread()
 
         print(self.project_path)
 
         #get dissector files path
+        json_path = os.path.join(self.project_path, "ParsedLogs")
+        print(json_path + " JSON PATH")
+        if not os.path.exists(json_path):
+            print("NO JSON")
+            return
+        else:
+            for r, d, f in os.walk(json_path):
+                    for file in f:
+                        if '.JSON' in file:
+                            self.filelist2.append(os.path.join(r, file))
+
+        self.runWireshark()
+        
+    def runWireshark(self):
+        #get dissector files path
         dissector_path = os.path.join(self.project_path, "GeneratedDissectors")
-        print(dissector_path + " DISSECTOR PATH")
         if not os.path.exists(dissector_path):
             print("NO DISSECTORS")
             return
@@ -27,11 +43,9 @@ class PacketManager():
                     for file in f:
                         if '.lua' in file:
                             self.filelist.append(os.path.join(r, file))
-                            print(os.path.join(r, file))
-
+                            
         #get pcap file path
         pcap_path = os.path.join(self.project_path, "PCAP/AnnotatedPCAP.pcapng")
-        print(pcap_path)
         if not os.path.exists(pcap_path):
             print("NO PCAP")
             return
@@ -43,5 +57,6 @@ class PacketManager():
 
         self.wireshark_thread.start()
 
-
+    def getJSON(self):
+        return self.filelist2
     

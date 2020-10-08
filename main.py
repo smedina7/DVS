@@ -34,7 +34,8 @@ class DVSstartUpPage(QMainWindow):
             project_path_chosen = os.path.abspath(self.folder_chosen)
             
         self.manager = PacketManager(project_path_chosen)
-        self.window = MainGUI()
+        json_files = self.manager.getJSON()
+        self.window = MainGUI(json_files)
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
         self.close()
