@@ -18,6 +18,7 @@ class PacketManager():
 
         #get dissector files path
         dissector_path = os.path.join(self.project_path, "GeneratedDissectors")
+        print(dissector_path + " DISSECTOR PATH")
         if not os.path.exists(dissector_path):
             print("NO DISSECTORS")
             return
@@ -26,6 +27,7 @@ class PacketManager():
                     for file in f:
                         if '.lua' in file:
                             self.filelist.append(os.path.join(r, file))
+                            print(os.path.join(r, file))
 
         #get pcap file path
         pcap_path = os.path.join(self.project_path, "PCAP/AnnotatedPCAP.pcapng")
@@ -35,7 +37,7 @@ class PacketManager():
             return
 
         if len(self.filelist) != 0:
-            self.wireshark_thread = WiresharkRunner(lua_scripts = dissector_path, pcap_filename=pcap_path)
+            self.wireshark_thread = WiresharkRunner(lua_scripts =self.filelist, pcap_filename=pcap_path)
         else:
             self.wireshark_thread = WiresharkRunner(pcap_filename=pcap_path)
 
