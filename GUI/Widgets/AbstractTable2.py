@@ -30,21 +30,18 @@ class pandasModel2(QAbstractTableModel):
                     # self.setIcon(QIcon("test3/Clicks/1602036122.2287035_main.py_root.png"))
                     path = self._data.iloc[index.row(), index.column()]
                     # return QtGui.QColor('red')
-                    return str (path)
+                    # return str (path)
                 else: 
                     return str(self._data.iloc[index.row(), index.column()])
 
-            if role == Qt.BackgroundRole and index.column() == 1:
+            #if role == Qt.BackgroundRole and index.column() == 1:
                 # See below for the data structure.
-                return QtGui.QColor('blue')
+              #  return QtGui.QColor('blue')
             
             if role == Qt.DecorationRole and index.column() == 1:
                 return QtGui.QIcon("test3/Clicks/1602036122.2287035_main.py_root.png")
-
-            return None
-
             
-
+            return None
 
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:

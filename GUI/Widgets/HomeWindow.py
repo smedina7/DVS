@@ -136,7 +136,16 @@ class MainGUI(QMainWindow):
  
             header = view.horizontalHeader()
             view.setColumnWidth(1, 210)
-            view.setColumnWidth(2, 50)
+
+            #change 7 to #rows 
+            for x in range(7):
+                #print(x)
+                view.setRowHeight(x,100)
+            
+            view.setColumnWidth(2, 50) 
+            view.setIconSize(QSize(256, 256))
+
+            
             #############################
             # button = QPushButton('PyQt5 button', sub)
             # button.setToolTip('This is an example button')

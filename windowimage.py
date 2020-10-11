@@ -2,7 +2,7 @@ import cv2
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QPixmap, QImage
-
+ 
 
 class NewImage(QWidget):
 
