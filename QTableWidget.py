@@ -35,7 +35,7 @@ class Window(QWidget):
 
  
     def creatingTables(self):
-        self.tableWidget = QTableWidget()
+        self.tableWidget = QTableWidget() 
         self.tableWidget.setRowCount(5)
         self.tableWidget.setColumnCount(4)
  

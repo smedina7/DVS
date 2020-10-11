@@ -6,6 +6,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from GUI.Widgets.AbstractTable import pandasModel
+from GUI.Widgets.AbstractTable2 import pandasModel2
 import pandas as pd
 
 class MainGUI(QMainWindow):
@@ -124,17 +125,24 @@ class MainGUI(QMainWindow):
             sub.setWindowTitle("Mouse Clicks")
             sub.setWidget(QTextEdit())
             
+            
             df = pd.read_json (self.mouse_json)
 
-            model = pandasModel(df)
+            model = pandasModel2(df)
             view = QTableView()
             view.setModel(model)
 
             sub.setWidget(view)
-
+ 
             header = view.horizontalHeader()
             view.setColumnWidth(1, 210)
             view.setColumnWidth(2, 50)
+            #############################
+            # button = QPushButton('PyQt5 button', sub)
+            # button.setToolTip('This is an example button')
+            # button.move(100,70)
+            #sub.show() 
+            #############################
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
 
