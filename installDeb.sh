@@ -13,7 +13,7 @@ apt-get -y update
 ### Install dependencies
 #
 REQUIRED_PROGRAMS="python3-pip python3-venv git"
-REQUIRED_PYTHON_PACKAGES="PyQt5 plotly dash Flask pandas virtualenv"
+REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 plotly dash Flask pandas flask_caching PyQtWebEngine virtualenv"
 
 echo "+++++++++++++++++++++++++++++++++"
 echo "installing REQUIRED_PROGRAMS"
@@ -32,7 +32,6 @@ fi
 echo "+++++++++++++++++++++++++++++++++"
 echo "installing REQUIRED_PYTHON_PACKAGES"
 pip install pip --upgrade
-pip install $REQUIRED_PYTHON_PACKAGES
-
-pip3 install pip --upgrade
-pip3 install $REQUIRED_PYTHON_PACKAGES
+pip install $REQUIRED_PYTHON_PACKAGES --use-feature=2020-resolver
+#pip3 install pip3 --upgrade
+#pip3 install $REQUIRED_PYTHON_PACKAGES
