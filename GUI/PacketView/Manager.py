@@ -14,6 +14,7 @@ class PacketManager():
         self.project_path = os.path.abspath(project_path)
         self.filelist = list()
         self.filelist2 = list()
+        self.throughput_path = ''
         self.wireshark_thread = QThread()
 
         print(self.project_path)
@@ -31,6 +32,18 @@ class PacketManager():
                             self.filelist2.append(os.path.join(r, file))
 
         self.runWireshark()
+
+        #get throughput data
+        for r, d, f in os.walk(self.project_path):
+            for dir in d:
+                #print(dir) 
+                if "ecel-export" in dir:
+                    #convert name to string
+                    dir = str(dir)
+                    self.throughput_path = os.path.join(r, dir)
+                    break
+
+        print(self.throughput_path + " In MANAGER")
         
     def runWireshark(self):
         #get dissector files path
@@ -59,4 +72,6 @@ class PacketManager():
 
     def getJSON(self):
         return self.filelist2
-    
+        
+    def getThroughput(self):
+        return self.throughput_path

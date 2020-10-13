@@ -9,7 +9,11 @@ class WiresharkRunner(QThread):
         logging.debug('WiresharkRunner(): Instantiated')
         QThread.__init__(self)
         try:
-            WIRESHARK_FILENAME = "/usr/local/bin/wireshark"
+            if sys.platform == "linux" or sys.platform == "linux2":
+
+                WIRESHARK_FILENAME = "/usr/local/bin/wireshark"
+            else:
+                WIRESHARK_FILENAME = "C:\\Program Files\\Wireshark\\Wireshark.exe"
 
             self.cmd = WIRESHARK_FILENAME
 
