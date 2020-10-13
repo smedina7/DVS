@@ -24,13 +24,17 @@ class pandasModel2(QAbstractTableModel):
         return self._data.shape[1]
 
     def data(self, index, role=Qt.DisplayRole):
+        pathclicks = ""
         if index.isValid():
             if role == Qt.DisplayRole:
                 if index.column() == 1:
                     # self.setIcon(QIcon("test3/Clicks/1602036122.2287035_main.py_root.png"))
                     path = self._data.iloc[index.row(), index.column()]
                     # return QtGui.QColor('red')
-                    # return str (path)
+                    last = path.split('/')[-1]
+                    pathclicks = "GUI/src/Data/test3/Clicks/" + last 
+
+                    # return str (pathclicks)
                 else: 
                     return str(self._data.iloc[index.row(), index.column()])
 
@@ -39,7 +43,55 @@ class pandasModel2(QAbstractTableModel):
               #  return QtGui.QColor('blue')
             
             if role == Qt.DecorationRole and index.column() == 1:
-                return QtGui.QIcon("test3/Clicks/1602036122.2287035_main.py_root.png")
+                # pathclicks = "GUI/src/Data/test3/Clicks/" + last 
+                # return QtGui.QIcon("GUI/src/Data/test3/Clicks/1602036122.2287035_main.py_root.png")
+                path = self._data.iloc[index.row(), index.column()]
+                    # return QtGui.QColor('red')
+                last = path.split('/')[-1]
+                pathclicks = "GUI/src/Data/test3/Clicks/" + last 
+                return QtGui.QIcon(pathclicks)
+            
+            return None
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self._data.columns[col]
+        return None
+
+
+class pandasModel3(QAbstractTableModel):
+
+    def __init__(self, data):
+        QAbstractTableModel.__init__(self)
+        self._data = data
+
+
+    def rowCount(self, parent=None):
+        #the return is an int num of rows found in json file
+        return self._data.shape[0]
+
+    def columnCount(self, parent=None):
+        return self._data.shape[1]
+
+    def data(self, index, role=Qt.DisplayRole):
+        pathclicks = ""
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                if index.column() == 3:
+                    path = self._data.iloc[index.row(), index.column()]
+                    last = path.split('/')[-1]
+                    pathclicks = "GUI/src/Data/test3/Timed/" + last 
+
+                    # return str (pathclicks)
+                else: 
+                    return str(self._data.iloc[index.row(), index.column()])
+
+            
+            if role == Qt.DecorationRole and index.column() == 3:
+                path = self._data.iloc[index.row(), index.column()]
+                last = path.split('/')[-1]
+                pathclicks = "GUI/src/Data/test3/Timed/" + last 
+                return QtGui.QIcon(pathclicks)
             
             return None
 

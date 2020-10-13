@@ -7,18 +7,20 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.AbstractTable2 import pandasModel2
+from GUI.Widgets.AbstractTable2 import pandasModel3
 import pandas as pd
 
 class MainGUI(QMainWindow):
     def __init__(self, parent = None):
         logging.debug("MainGUI(): Instantiated")
         super(MainGUI, self).__init__(parent)
-        JSON_FILE_DIR = "GUI/src/Data"
+        JSON_FILE_DIR = "GUI/src/Data/test3/ParsedLogs"
 
         #Set File Paths
         self.key_json = os.path.join(JSON_FILE_DIR, "Keypresses.JSON")
         self.sys_json = os.path.join(JSON_FILE_DIR, "SystemCalls.JSON")
         self.mouse_json = os.path.join(JSON_FILE_DIR, "MouseClicks.JSON")
+        self.timed_json = os.path.join(JSON_FILE_DIR, "TimedScreenshots.JSON")
 
         #Home Window Widget Configuration
         self.setFixedSize(710,565)
@@ -51,6 +53,9 @@ class MainGUI(QMainWindow):
         add_dataline.addAction("Keypresses")
         add_dataline.addAction("System Calls")
         add_dataline.addAction("Mouse Clicks")
+        add_dataline.addAction("Timed Screenshots")
+
+        
 
         #dataline windows actions
         add_dataline.triggered[QAction].connect(self.windowaction)
@@ -121,7 +126,7 @@ class MainGUI(QMainWindow):
 
         if q.text() == "Mouse Clicks":
             sub = QMdiSubWindow()
-            sub.resize(700,150)
+            sub.resize(700,450)
             sub.setWindowTitle("Mouse Clicks")
             sub.setWidget(QTextEdit())
             
@@ -138,8 +143,7 @@ class MainGUI(QMainWindow):
             view.setColumnWidth(1, 210)
 
             #change 7 to #rows 
-            for x in range(7):
-                #print(x)
+            for x in range(32):
                 view.setRowHeight(x,100)
             
             view.setColumnWidth(2, 50) 
@@ -152,6 +156,33 @@ class MainGUI(QMainWindow):
             # button.move(100,70)
             #sub.show() 
             #############################
+            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+            self.mdi.addSubWindow(sub)
+
+            view.show()
+            sub.show()
+        
+        if q.text() == "Timed Screenshots":
+            sub = QMdiSubWindow()
+            sub.resize(700,450)
+            sub.setWindowTitle("Timed Screenshots")
+            sub.setWidget(QTextEdit())
+            
+            
+            df = pd.read_json (self.timed_json)
+
+            model = pandasModel3(df)
+            view = QTableView()
+            view.setModel(model)
+
+            sub.setWidget(view)
+ 
+            header = view.horizontalHeader()
+            view.setColumnWidth(4, 210)
+
+            view.setColumnWidth(2, 50) 
+            view.setIconSize(QSize(256, 256))
+
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
 
