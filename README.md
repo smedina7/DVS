@@ -19,6 +19,12 @@ The purpose of the Data Visualization System is to provide the user with an inte
 DVS runs on both Windows and Linux
 
 #### Windows
+DVS installation steps:
+
+``` bash
+> git clone https://github.com/smedina7/DVS
+> cd dvs
+```
 
 Install eceld-wireshark using the installer provided do the following in the command prompt.
 
@@ -26,14 +32,6 @@ Install eceld-wireshark using the installer provided do the following in the com
 > eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
 ```
 You will get a prompt to install wireshark. Install using default settings provided.
-
-
-DVS installation steps:
-
-``` bash
-> git clone https://github.com/smedina7/DVS
-> cd dvs
-```
 
 - Install Python’s Virtual Environment Builder:
 - Create and activate virtual environment:
