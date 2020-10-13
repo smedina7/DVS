@@ -19,29 +19,35 @@ The purpose of the Data Visualization System is to provide the user with an inte
 DVS runs on both Windows and Linux
 
 #### Windows
-To run in a Windows virtual environment:
 
-`git clone https://github.com/smedina7/DVS`
+Install eceld-wireshark using the installer provided:
+```bash
+> eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
+```
+You will get a prompt to install wireshark. Install using default settings provided. 
 
-`cd dvs`
+DVS installation steps:
 
-Install Python’s Virtual Environment Builder:
+``` bash
+> git clone https://github.com/smedina7/DVS
+> cd dvs
+```
 
-`pip install virtualenv`
-
-Create and activate virtual environment:
-
-`python -m venv dvs-venv`
-
-`dvs-venv\Scripts\activate`
-
-Install required dependencies:
-
-`pip install -r requirements.txt`
+- Install Python’s Virtual Environment Builder:
+- Create and activate virtual environment:
+- Install required dependencies:
+``` bash
+> pip install virtualenv
+> python -m venv dvs-venv
+> dvs-venv\Scripts\activate
+(dvs-venv) > pip install -r requirements.txt
+```
 
 Start the DVS GUI:
 
-`main.py`
+``` bash 
+(dvs-venv) > main.py 
+```
 
 #### Linux
 ##### To run in a Python virtual environment:
