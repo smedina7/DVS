@@ -20,11 +20,11 @@ DVS runs on both Windows and Linux
 
 #### Windows
 
-Install eceld-wireshark using the installer provided:
+Install eceld-wireshark using the installer provided do the following in the command prompt:
+You will get a prompt to install wireshark. Install using default settings provided. 
 ```bash
 > eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
 ```
-You will get a prompt to install wireshark. Install using default settings provided. 
 
 DVS installation steps:
 
