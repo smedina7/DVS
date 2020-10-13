@@ -26,7 +26,7 @@ DVS installation steps:
 > cd dvs
 ```
 
-Install eceld-wireshark using the installer provided do the following in the command prompt.
+Install eceld-wireshark using the installer provided. Type the following in the command prompt.
 
 ```bash
 > eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
