@@ -52,9 +52,9 @@ for eceld_dep in $ECELD_DEPS; do
         exit 1
     fi
 done
+##needs to be implemented
 
 ### Install dependencies
-#
 REQUIRED_PROGRAMS="python3-pip python3-venv git"
 REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 plotly dash Flask pandas flask_caching PyQtWebEngine virtualenv"
 
