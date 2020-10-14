@@ -50,42 +50,17 @@ Clone the repo to your desired destination and go into the DVS folder:
 
 `git clone https://github.com/smedina7/DVS`
 
-
 `cd dvs`
 
-Install Python’s Virtual Environment Builder:
-
-`sudo pip install virtualenv`
-
-Create and activate virtual environment:
-
-`python3 -m venv dvs-venv`
-
-`source dvs-venv/bin/activate`
-
-Install required dependencies:
-
-`pip install -r requirements.txt`
-
-Start the DVS GUI:
-
-`python3 main.py`
-
-##### To run on your machine:
-
-Clone the repo to your desired destination and go into the DVS folder: 
-
-`git clone https://github.com/smedina7/DVS`
-
-`cd dvs`
-
-Install dependencies:
-
+Install ECELD-Wireshark & Python3 dependencies into environment:
 `sudo ./installDeb.sh`
 
-Start the DVS GUI:
+Activate Environment:
+`source venv/bin/activate`
 
-`python3 main.py`
+Run DVS:
+`bash run-dvs.sh`
+
 
 ## Team Collaborators
   * Bianca Alvarez
