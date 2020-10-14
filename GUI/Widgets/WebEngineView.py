@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import subprocess
 from PyQt5.QtCore import QThread, pyqtSignal
 import time
@@ -30,11 +31,6 @@ class WebEngine():
         #can add more dcc objects here for displaying other dataline info
         
         ])
-        
-        #app.run_server(debug=False)
-
-    # def load(self, url):
-    #     self.load(QUrl(url))
 
     def throughput_dataframe(self):
         return pd.read_json(self.file) 
@@ -87,9 +83,12 @@ class WebEngine():
                 'yaxis': {'showgrid': False, 'zeroline': False}
             }
         }
+
+    def closeProcess(self):
+        sys.exit()
     
     #This callback can be used for caching later
     #@cache.memoize(timeout=60)
     #def query_throughput_data():
     if __name__ == '__main__':
-       app.run_server(debug=False)
+       app.run_server(debug=True)

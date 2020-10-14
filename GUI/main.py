@@ -2,8 +2,10 @@ import logging
 import subprocess
 import os
 import sys
+import Widgets.WebEngineView
 from Widgets.HomeWindow import MainGUI
 from PacketView.Manager import PacketManager
+from Widgets.WebEngineView import WebEngine
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.uic import loadUi
 
@@ -30,16 +32,24 @@ class DVSstartUpPage(QMainWindow):
 
         if len(self.folder_chosen) > 0:
             project_path_chosen = os.path.abspath(self.folder_chosen)
-            
+
         self.manager = PacketManager(project_path_chosen)
         json_files = self.manager.getJSON()
         throughput = self.manager.getThroughput()
+        throughput = self.setThroughput(throughput)
         clicks = self.manager.getClicks()
         timed = self.manager.getTimed()
-        self.window = MainGUI(json_files, throughput, clicks, timed)
+        self.web = WebEngine(throughput)
+        self.window = MainGUI(json_files, clicks, timed, self.web)
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
         self.hide()
+
+    def setThroughput(self, throughput_files):
+        #for throughput
+        throughput_files = os.path.join(throughput_files, "parsed/tshark")
+        throughput_json = os.path.join(throughput_files, "networkDataXY.JSON")
+        return throughput_json
 
     def openDir(self):
         self.folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
@@ -83,3 +93,6 @@ if __name__ == "__main__":
 
     ui = DVSstartUpPage()
     app.exec_()
+
+    
+    
