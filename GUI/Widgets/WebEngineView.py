@@ -31,7 +31,7 @@ class WebEngine():
         
         ])
         
-        app.run_server(debug=False)
+        #app.run_server(debug=False)
 
     # def load(self, url):
     #     self.load(QUrl(url))
@@ -91,5 +91,5 @@ class WebEngine():
     #This callback can be used for caching later
     #@cache.memoize(timeout=60)
     #def query_throughput_data():
-    #if __name__ == '__main__':
-     #   app.run_server(debug=False)
+    if __name__ == '__main__':
+       app.run_server(debug=False)

@@ -43,7 +43,21 @@ class PacketManager():
                     self.throughput_path = os.path.join(r, dir)
                     break
 
-        print(self.throughput_path + " In MANAGER")
+        #print(self.throughput_path + " In MANAGER")
+
+        #getting screenshots
+        #CLICKS
+        self.clicks_path = os.path.join(self.project_path, "Clicks")
+        if not os.path.exists(self.clicks_path):
+            print("NO SCREENSHOTS")
+            return
+
+        #Timed
+        self.timed_path = os.path.join(self.project_path, "Timed")
+        if not os.path.exists(self.timed_path):
+            print("NO Timed SCREENSHOTS")
+            return
+
         
     def runWireshark(self):
         #get dissector files path
@@ -75,3 +89,9 @@ class PacketManager():
         
     def getThroughput(self):
         return self.throughput_path
+
+    def getClicks(self):
+        return self.clicks_path
+
+    def getTimed(self):
+        return self.timed_path

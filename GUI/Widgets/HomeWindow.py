@@ -8,28 +8,32 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWebEngineWidgets import *
 from Widgets.WebEngineView import WebEngine
 from Widgets.AbstractTable import pandasModel
+from Widgets.AbstractTable2 import pandasModel2
+from Widgets.AbstractTable2 import pandasModel3
 
 import pandas as pd
 
 class MainGUI(QMainWindow):
-    def __init__(self, json_files, throughput_path, parent = None):
+    def __init__(self, json_files, throughput_path, clicks, timed, parent = None):
         logging.debug("MainGUI(): Instantiated")
         super(MainGUI, self).__init__(parent)
         json_file_list = json_files
         throughput_files = throughput_path
+        self.clicks_path = clicks
+        self.timed_path = timed
 
         self.key_json = ''
         self.sys_json = ''
         self.mouse_json = ''
         self.throughput_json = ''
-        #need self.net_json for reading throughput file
+        self.timed_json = ''
 
         #Get JSON Files
         #print(json_file_list)
         
         #get path for each file
         for file in json_file_list:
-            print(file)
+            #print(file)
 
             if "Keypresses.JSON" in file:
                 self.key_json = file
@@ -39,21 +43,19 @@ class MainGUI(QMainWindow):
             
             if "MouseClicks.JSON" in file:
                 self.mouse_json = file
+            
+            if "TimedScreenshots.JSON" in file:
+                self.timed_json = file
 
         #for throughput
         throughput_files = os.path.join(throughput_files, "parsed/tshark")
         self.throughput_json = os.path.join(throughput_files, "networkDataXY.JSON")
 
         #need throughput file
-        print(self.key_json)
-        print(self.sys_json)
-        print(self.mouse_json)
-        print(self.throughput_json)
-
-
-        #Home Window Widget Configuration
-        self.setFixedSize(710,565)
-        self.setWindowTitle("Timeline View")
+        # print(self.key_json)
+        # print(self.sys_json)
+        # print(self.mouse_json)
+        # print(self.throughput_json)
 
         #Create toolbar and sync button widgets
         self.tb = self.addToolBar("")
@@ -78,17 +80,23 @@ class MainGUI(QMainWindow):
 
         #add default datalines
         add_dataline = bar.addMenu("Add Dataline")
-        add_dataline.addAction("New Window")
+        #add_dataline.addAction("New Window")
         add_dataline.addAction("Throughput")
         add_dataline.addAction("Keypresses")
         add_dataline.addAction("System Calls")
         add_dataline.addAction("Mouse Clicks")
+        add_dataline.addAction("Timed Screenshots")
         
         #dataline windows actions
         add_dataline.triggered[QAction].connect(self.windowaction)
+        self.resizeEvent(add_dataline.triggered[QAction])
         adjust = bar.addMenu("Adjust Subwindows")
         adjust.addAction("Tile Layout")
         adjust.triggered[QAction].connect(self.windowaction)
+
+        #Home Window Widget Configuration
+        #self.setFixedSize(710,565)
+        self.setWindowTitle("Timeline View")
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
@@ -101,22 +109,17 @@ class MainGUI(QMainWindow):
         else:
             event.ignore()
 
-
     def buttonaction(self, b):
         if b == True:
             self.sync_button.setText("Synchronized")
         else:
             self.sync_button.setText("Unsynchronized")
 
-    def windowaction(self, q):
-        if q.text() == "New Window":
-            sub = QMdiSubWindow()
-            sub.resize(700,150)
-            sub.setWindowTitle("New Empty Window")
-            #sub.setWidget(QTextEdit())
-            self.mdi.addSubWindow(sub)
-            sub.show()
+    def resizeEvent(self, event):
+        #self.resize(710,565)
+        self.sizeHint()
 
+    def windowaction(self, q):
         if q.text() == "Throughput":
             sub = QMdiSubWindow()
             sub.resize(700,310)
@@ -182,11 +185,11 @@ class MainGUI(QMainWindow):
             sub = QMdiSubWindow()
             sub.resize(700,150)
             sub.setWindowTitle("Mouse Clicks")
-            #sub.setWidget(QTextEdit())
+            sub.setWidget(QTextEdit())
             
-            df = pd.read_json (self.mouse_json)
+            df = pd.read_json(self.mouse_json)
 
-            model = pandasModel(df)
+            model = pandasModel2(df, self.clicks_path)
             view = QTableView()
             view.setModel(model)
 
@@ -195,6 +198,33 @@ class MainGUI(QMainWindow):
             header = view.horizontalHeader()
             view.setColumnWidth(1, 210)
             view.setColumnWidth(2, 50)
+            view.setIconSize(QSize(256, 256))
+            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+            self.mdi.addSubWindow(sub)
+
+            view.show()
+            sub.show()
+
+        if q.text() == "Timed Screenshots":
+            sub = QMdiSubWindow()
+            sub.resize(700,450)
+            sub.setWindowTitle("Timed Screenshots")
+            sub.setWidget(QTextEdit())
+
+            df = pd.read_json(self.timed_json)
+
+            model = pandasModel3(df, self.timed_path)
+            view = QTableView()
+            view.setModel(model)
+
+            sub.setWidget(view)
+
+            header = view.horizontalHeader()
+            view.setColumnWidth(4, 210)
+
+            view.setColumnWidth(2, 50) 
+            view.setIconSize(QSize(256, 256))
+
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
 
