@@ -28,13 +28,9 @@ class MainGUI(QMainWindow):
         self.throughput_json = ''
         self.timed_json = ''
 
-        #Get JSON Files
-        #print(json_file_list)
-        
+        #Get JSON Files        
         #get path for each file
         for file in json_file_list:
-            #print(file)
-
             if "Keypresses.JSON" in file:
                 self.key_json = file
             
@@ -50,12 +46,6 @@ class MainGUI(QMainWindow):
         #for throughput
         throughput_files = os.path.join(throughput_files, "parsed/tshark")
         self.throughput_json = os.path.join(throughput_files, "networkDataXY.JSON")
-
-        #need throughput file
-        # print(self.key_json)
-        # print(self.sys_json)
-        # print(self.mouse_json)
-        # print(self.throughput_json)
 
         #Create toolbar and sync button widgets
         self.tb = self.addToolBar("")
@@ -80,7 +70,6 @@ class MainGUI(QMainWindow):
 
         #add default datalines
         add_dataline = bar.addMenu("Add Dataline")
-        #add_dataline.addAction("New Window")
         add_dataline.addAction("Throughput")
         add_dataline.addAction("Keypresses")
         add_dataline.addAction("System Calls")
@@ -95,8 +84,9 @@ class MainGUI(QMainWindow):
         adjust.triggered[QAction].connect(self.windowaction)
 
         #Home Window Widget Configuration
-        #self.setFixedSize(710,565)
         self.setWindowTitle("Timeline View")
+        self.setMinimumHeight(565)
+        self.setMinimumWidth(710)
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
@@ -116,7 +106,6 @@ class MainGUI(QMainWindow):
             self.sync_button.setText("Unsynchronized")
 
     def resizeEvent(self, event):
-        #self.resize(710,565)
         self.sizeHint()
 
     def windowaction(self, q):
@@ -127,7 +116,6 @@ class MainGUI(QMainWindow):
             loading_label = QLabel("Loading...")
             sub.setWidget(loading_label)
             #sub.setWidget(QTextEdit())
-            #web = QWebEngineView()
             web = QWebEngineView()
             w = WebEngine(self.throughput_json)
             #df = pd.read_json(self.throughput_json)

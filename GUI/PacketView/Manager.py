@@ -17,11 +17,8 @@ class PacketManager():
         self.throughput_path = ''
         self.wireshark_thread = QThread()
 
-        print(self.project_path)
-
         #get dissector files path
         json_path = os.path.join(self.project_path, "ParsedLogs")
-        print(json_path + " JSON PATH")
         if not os.path.exists(json_path):
             print("NO JSON")
             return
@@ -43,8 +40,6 @@ class PacketManager():
                     self.throughput_path = os.path.join(r, dir)
                     break
 
-        #print(self.throughput_path + " In MANAGER")
-
         #getting screenshots
         #CLICKS
         self.clicks_path = os.path.join(self.project_path, "Clicks")
@@ -58,7 +53,6 @@ class PacketManager():
             print("NO Timed SCREENSHOTS")
             return
 
-        
     def runWireshark(self):
         #get dissector files path
         dissector_path = os.path.join(self.project_path, "GeneratedDissectors")

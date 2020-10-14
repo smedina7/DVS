@@ -1,3 +1,2 @@
-kali       11009  1.7  3.6 341456 149244 pts/1   S+   15:21   0:00 python3 /home/kali/DVS/GUI/Widgets/WebEngineView.py
-kali       11375  0.0  0.0   2392   704 pts/1    S+   15:22   0:00 sh -c ps aux | grep WebEngineView >/home/kali/DVS/GUI/Dash/dash_pid.txt
-kali       11377  0.0  0.0   6216   896 pts/1    S+   15:22   0:00 grep WebEngineView
+kali       11743  0.0  0.0   2392   704 pts/3    S+   15:35   0:00 sh -c ps aux | grep WebEngineView >/home/kali/DVS/GUI/Dash/dash_pid.txt
+kali       11745  0.0  0.0   6216   904 pts/3    S+   15:35   0:00 grep WebEngineView
