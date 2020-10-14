@@ -53,12 +53,15 @@ Clone the repo to your desired destination and go into the DVS folder:
 `cd dvs`
 
 Install ECELD-Wireshark & Python3 dependencies into environment:
+
 `sudo ./installDeb.sh`
 
 Activate Environment:
+
 `source venv/bin/activate`
 
 Run DVS:
+
 `bash run-dvs.sh`
 
 
