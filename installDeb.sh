@@ -3,12 +3,55 @@
 # do we need to chmod manually of install.sh before running it?
 #chmod +x install.sh
 
+set -e
+
+ECEL_NETSYS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 #Update
 echo "Running apt-get update"
 apt-get -y update
 
+### Helper functions
+prompt_accepted_Yn() {
+    read -r -p "$1 [Y/n] " yn
+    case $yn in
+        [nN]*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
 
+#Installing Wireshark
+ECELD_DEPS="eceld-wireshark"
+for eceld_dep in $ECELD_DEPS; do
+    eceld_prompt="$eceld_dep found, remove it and reinstall?"
+    if [ -d $ECEL_NETSYS_DIR/$eceld_dep ]; then
+        if prompt_accepted_Yn "$eceld_prompt"; then
+            rm $ECEL_NETSYS_DIR/$eceld_dep -rf
+        git clone https://github.com/ARL-UTEP-OC/$eceld_dep "$ECEL_NETSYS_DIR"/$eceld_dep
+        pushd "$ECEL_NETSYS_DIR"/$eceld_dep
+        chmod +x install.sh
+        ./install.sh
+        popd
+        fi
+    else
+        eceld_prompt="$eceld_dep not found, download and install?"
+        if prompt_accepted_Yn "$eceld_prompt"; then
+            rm $ECEL_NETSYS_DIR/$eceld_dep -rf
+        git clone https://github.com/ARL-UTEP-OC/$eceld_dep "$ECEL_NETSYS_DIR"/$eceld_dep
+        pushd "$ECEL_NETSYS_DIR"/$eceld_dep
+        chmod +x install.sh
+        ./install.sh
+        popd
+        fi
+    fi
+done
 
+for eceld_dep in $ECELD_DEPS; do
+    if [ ! -d $ECEL_NETSYS_DIR/$eceld_dep ]; then
+        echo "Download and installation of $eceld_dep not successful (can't execute program) quitting..."
+        exit 1
+    fi
+done
 
 ### Install dependencies
 #
@@ -28,10 +71,14 @@ else
     exit 1
 fi
 
-### Installing python3 dependencies
+PYTHON_EXEC="python3"
+### Create virtualenv if it doesn't currently exist
 echo "+++++++++++++++++++++++++++++++++"
-echo "installing REQUIRED_PYTHON_PACKAGES"
+echo "$OUTPUT_PREFIX Installing python dependencies"
+if [ ! -d "venv" ]; then
+    $PYTHON_EXEC -m venv venv
+fi
+
+source venv/bin/activate
 pip install pip --upgrade
 pip install $REQUIRED_PYTHON_PACKAGES --use-feature=2020-resolver
-#pip3 install pip3 --upgrade
-#pip3 install $REQUIRED_PYTHON_PACKAGES
