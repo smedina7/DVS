@@ -31,5 +31,4 @@ class RunWebEngine(QThread):
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             logging.error('RunWebEngine(): Error during Web Engine execution')
-            print(e)
             traceback.print_exception(exc_type, exc_value, exc_traceback)

@@ -79,6 +79,7 @@ def update_live_graph(value):
             'yaxis': {'showgrid': False, 'zeroline': False}
         }
     }
+
 #This callback can be used for caching later
 #@cache.memoize(timeout=60)
 #def query_throughput_data():

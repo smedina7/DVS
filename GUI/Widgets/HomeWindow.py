@@ -7,9 +7,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from PyQt5.QtWebEngineWidgets import *
-from Widgets.AbstractTable import pandasModel
-from Widgets.AbstractTable2 import pandasModel2
-from Widgets.AbstractTable2 import pandasModel3
+from GUI.Widgets.AbstractTable import pandasModel
+from GUI.Widgets.AbstractTable2 import pandasModel2
+from GUI.Widgets.AbstractTable2 import pandasModel3
 
 import pandas as pd
 
@@ -95,6 +95,7 @@ class MainGUI(QMainWindow):
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
+            self.manager_instance.closeWebEngine()
             path = os.getcwd()
             os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
             print("Server Shutdown")
@@ -134,12 +135,8 @@ class MainGUI(QMainWindow):
             sub.setWindowTitle("Throughput")
             loading_label = QLabel("Loading...")
             sub.setWidget(loading_label)
-            #sub.setWidget(QTextEdit())
             web = QWebEngineView()
             self.manager_instance.runWebEngine()
-            #w = WebEngine(self.throughput_json)
-            #df = pd.read_json(self.throughput_json)
-
             web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser 
             self.mdi.addSubWindow(sub)
             sub.show()

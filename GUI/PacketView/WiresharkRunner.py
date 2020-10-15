@@ -41,6 +41,7 @@ class WiresharkRunner(QThread):
                 output = subprocess.check_output(self.cmd)
 
             logging.debug('WiresharkRunner.run(): Complete')
+            
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             logging.error('WiresharkRunner(): Error during Wireshark execution')

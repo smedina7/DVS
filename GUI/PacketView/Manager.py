@@ -6,8 +6,8 @@ import os
 from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QMessageBox
-from PacketView.WiresharkRunner import WiresharkRunner
-from Dash.RunWebEngine import RunWebEngine
+from GUI.PacketView.WiresharkRunner import WiresharkRunner
+from GUI.Dash.RunWebEngine import RunWebEngine
 
 class PacketManager():
     def __init__(self, project_path=None):
@@ -81,14 +81,11 @@ class PacketManager():
         self.wireshark_thread.start()
 
     def runWebEngine(self):
-        """ if not urllib2.urlopen("http://127.0.0.1:8050"):
-            print("here")
-            self.web_engine_thread = RunWebEngine(throughputfile=self.throughput_path)
-        else:
-            self.web_engine_thread = RunWebEngine() """
-
         self.web_engine_thread = RunWebEngine(throughputfile=self.throughput_path)
         self.web_engine_thread.start()
+
+    def closeWebEngine(self):
+        self.web_engine_thread.isFinished()
 
     def getJSON(self):
         return self.filelist2
