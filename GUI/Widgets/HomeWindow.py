@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 import subprocess
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -113,6 +114,23 @@ class MainGUI(QMainWindow):
         if q.text() == "Throughput":
             sub = QMdiSubWindow()
             sub.resize(700,310)
+            
+            progressBarWidget = QWidget()
+            layout = QVBoxLayout()
+
+            pbar = QProgressBar(self)
+            pbar.setGeometry(30, 40, 200, 25)
+            pbar.setValue(50)
+            pbar.setWindowTitle("Loading")
+
+            label = QLabel('Processing, please wait...')
+            label.setAlignment(Qt.AlignCenter)
+
+            layout.addWidget(label)
+            layout.addWidget(pbar)
+
+            progressBarWidget.setLayout(layout)
+            
             sub.setWindowTitle("Throughput")
             loading_label = QLabel("Loading...")
             sub.setWidget(loading_label)
@@ -121,11 +139,23 @@ class MainGUI(QMainWindow):
             self.manager_instance.runWebEngine()
             #w = WebEngine(self.throughput_json)
             #df = pd.read_json(self.throughput_json)
+
             web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser 
-            web.show()
-            sub.setWidget(web)
             self.mdi.addSubWindow(sub)
             sub.show()
+
+            sub.setWidget(progressBarWidget)
+
+            pbar.show()
+            for i in range(101): 
+                # slowing down the loop 
+                time.sleep(0.02) 
+                # setting value to progress bar 
+                pbar.setValue(i) 
+            
+            pbar.hide()
+            sub.setWidget(web)
+            web.show()
 
         if q.text() == "Keypresses":
             sub = QMdiSubWindow()
@@ -221,3 +251,4 @@ class MainGUI(QMainWindow):
 
         if q.text() =="Tile Layout":
             self.mdi.tileSubWindows()
+        
