@@ -6,7 +6,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 from PyQt5.QtWebEngineWidgets import *
-from Widgets.WebEngineView import WebEngine
 from Widgets.AbstractTable import pandasModel
 from Widgets.AbstractTable2 import pandasModel2
 from Widgets.AbstractTable2 import pandasModel3
@@ -14,14 +13,14 @@ from Widgets.AbstractTable2 import pandasModel3
 import pandas as pd
 
 class MainGUI(QMainWindow):
-    def __init__(self, json_files, clicks, timed, web_inst, parent = None):
+    def __init__(self, json_files, clicks, timed, manager_inst, parent = None):
         logging.debug("MainGUI(): Instantiated")
         super(MainGUI, self).__init__(parent)
         json_file_list = json_files
         #throughput_files = throughput_path
         self.clicks_path = clicks
         self.timed_path = timed
-        self.web_instance = web_inst
+        self.manager_instance = manager_inst
 
         self.key_json = ''
         self.sys_json = ''
@@ -95,10 +94,9 @@ class MainGUI(QMainWindow):
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
-            self.web_instance.closeProcess()
-            # path = os.getcwd()
-            # os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
-            # print("Server Shutdown")
+            path = os.getcwd()
+            os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
+            print("Server Shutdown")
         else:
             event.ignore()
 
@@ -120,6 +118,7 @@ class MainGUI(QMainWindow):
             sub.setWidget(loading_label)
             #sub.setWidget(QTextEdit())
             web = QWebEngineView()
+            self.manager_instance.runWebEngine()
             #w = WebEngine(self.throughput_json)
             #df = pd.read_json(self.throughput_json)
             web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser 
@@ -198,7 +197,7 @@ class MainGUI(QMainWindow):
 
         if q.text() == "Timed Screenshots":
             sub = QMdiSubWindow()
-            sub.resize(700,450)
+            sub.resize(700,150)
             sub.setWindowTitle("Timed Screenshots")
             sub.setWidget(QTextEdit())
 
@@ -212,10 +211,8 @@ class MainGUI(QMainWindow):
 
             header = view.horizontalHeader()
             view.setColumnWidth(4, 210)
-
             view.setColumnWidth(2, 50) 
             view.setIconSize(QSize(256, 256))
-
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
 

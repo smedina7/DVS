@@ -7,6 +7,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QMessageBox
 from PacketView.WiresharkRunner import WiresharkRunner
+from Dash.RunWebEngine import RunWebEngine
 
 class PacketManager():
     def __init__(self, project_path=None):
@@ -16,6 +17,7 @@ class PacketManager():
         self.filelist2 = list()
         self.throughput_path = ''
         self.wireshark_thread = QThread()
+        self.web_engine_thread = QThread()
 
         #get dissector files path
         json_path = os.path.join(self.project_path, "ParsedLogs")
@@ -77,6 +79,16 @@ class PacketManager():
             self.wireshark_thread = WiresharkRunner(pcap_filename=pcap_path)
 
         self.wireshark_thread.start()
+
+    def runWebEngine(self):
+        """ if not urllib2.urlopen("http://127.0.0.1:8050"):
+            print("here")
+            self.web_engine_thread = RunWebEngine(throughputfile=self.throughput_path)
+        else:
+            self.web_engine_thread = RunWebEngine() """
+
+        self.web_engine_thread = RunWebEngine(throughputfile=self.throughput_path)
+        self.web_engine_thread.start()
 
     def getJSON(self):
         return self.filelist2
