@@ -19,73 +19,89 @@ The purpose of the Data Visualization System is to provide the user with an inte
 DVS runs on both Windows and Linux
 
 #### Windows
-To run in a Windows virtual environment:
+DVS installation steps:
 
-`git clone https://github.com/smedina7/DVS`
+``` bash
+> git clone https://github.com/smedina7/DVS
+> cd dvs
+```
 
-`cd dvs`
+Install eceld-wireshark using the installer provided. Type the following in the command prompt.
 
-Install Python’s Virtual Environment Builder:
+```bash
+> eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
+```
+You will get a prompt to install wireshark. Install using default settings provided.
 
-`pip install virtualenv`
-
-Create and activate virtual environment:
-
-`python -m venv dvs-venv`
-
-`dvs-venv\Scripts\activate`
-
-Install required dependencies:
-
-`pip install -r requirements.txt`
+- Install Python’s Virtual Environment Builder:
+- Create and activate virtual environment:
+- Install required dependencies:
+``` bash
+> pip install virtualenv
+> virtualenv dvs-venv 
+> dvs-venv\Scripts\activate
+(dvs-venv) > pip install -r requirements.txt
+```
 
 Start the DVS GUI:
 
-`main.py`
+``` bash 
+(dvs-venv) > main.py 
+```
 
 #### Linux
-##### To run in a Python virtual environment:
+**Requierements:**
+
+Have Eceld-Wireshark installed: there are many ways you could install this. 
+* Install Eceld-Netsys: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-netsys.git
+* Install Eceld-Wireshark: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-wireshark
+* Install with the DVS Installer 
+
+DVS installation steps:
 
 Clone the repo to your desired destination and go into the DVS folder: 
 
-`git clone https://github.com/smedina7/DVS`
+```bash
+$ git clone https://github.com/smedina7/DVS
+$ cd DVS
+```
+
+Install ECELD-Wireshark & Python3 dependencies into environment:
+
+```bash
+$ sudo ./installDeb.sh
+```
+
+When prompted:
+
+```bash
+kali@kali:~/DVS$ sudo ./installDeb.sh 
+Running apt-get update
+Hit:1 https://packages.microsoft.com/repos/vscode stable InRelease
+Hit:2 http://kali.download/kali kali-rolling InRelease
+Reading package lists... Done
+DVS depends on : eceld-wireshark would you like to install it [Y/n] 
+```
+Input "Y" to install Eceld-Wireshark.
+
+**If you already have Eceld-Wireshark installed, skip installation by inputing "n"**
+
+Activate Environment:
+
+```bash
+$ source venv/bin/activate
+```
+
+Run DVS:
+
+```
+$ python3 main.py
+```
 
 
-`cd dvs`
 
-Install Python’s Virtual Environment Builder:
 
-`sudo pip install virtualenv`
 
-Create and activate virtual environment:
-
-`python3 -m venv dvs-venv`
-
-`source dvs-venv/bin/activate`
-
-Install required dependencies:
-
-`pip install -r requirements.txt`
-
-Start the DVS GUI:
-
-`python3 main.py`
-
-##### To run on your machine:
-
-Clone the repo to your desired destination and go into the DVS folder: 
-
-`git clone https://github.com/smedina7/DVS`
-
-`cd dvs`
-
-Install dependencies:
-
-`sudo ./installDeb.sh`
-
-Start the DVS GUI:
-
-`python3 main.py`
 
 ## Team Collaborators
   * Bianca Alvarez
