@@ -83,3 +83,6 @@ if __name__ == "__main__":
     ui = DVSstartUpPage()
 
     app.exec_()
+
+    
+    
