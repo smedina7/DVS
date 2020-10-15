@@ -54,21 +54,28 @@ Start the DVS GUI:
 
 Clone the repo to your desired destination and go into the DVS folder: 
 
-`git clone https://github.com/smedina7/DVS`
-
-`cd dvs`
+```bash
+$ git clone https://github.com/smedina7/DVS
+$ cd dvs
+```
 
 Install ECELD-Wireshark & Python3 dependencies into environment:
 
-`sudo ./installDeb.sh`
+```bash
+$ sudo ./installDeb.sh
+```
 
 Activate Environment:
 
-`source venv/bin/activate`
+```bash
+$ source venv/bin/activate
+```
 
 Run DVS:
 
-`bash run-dvs.sh`
+```
+$ bash run-dvs.sh
+```
 
 
 ## Team Collaborators
