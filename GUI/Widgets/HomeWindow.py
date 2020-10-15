@@ -44,12 +44,6 @@ class MainGUI(QMainWindow):
             if "TimedScreenshots.JSON" in file:
                 self.timed_json = file
 
-        """ #for throughput
-        throughput_files = os.path.join(throughput_files, "parsed/tshark")
-        self.throughput_json = os.path.join(throughput_files, "networkDataXY.JSON")
-        #send it over
-        self.w = WebEngine(self.throughput_json) """
-
         #Create toolbar and sync button widgets
         self.tb = self.addToolBar("")
         self.sync_button = QPushButton(self.tb)
@@ -95,7 +89,7 @@ class MainGUI(QMainWindow):
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
-            self.manager_instance.closeWebEngine()
+            #self.manager_instance.closeWebEngine()
             path = os.getcwd()
             os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
             print("Server Shutdown")

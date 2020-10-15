@@ -1,5 +1,8 @@
-PyQt5
+PyQt5==5.15.1
 pandas
 plotly
 Flask
 cachetools
+dash==1.16.3
+PyQtWebEngine
+flask_caching

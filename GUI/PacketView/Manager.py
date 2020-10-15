@@ -84,9 +84,6 @@ class PacketManager():
         self.web_engine_thread = RunWebEngine(throughputfile=self.throughput_path)
         self.web_engine_thread.start()
 
-    def closeWebEngine(self):
-        self.web_engine_thread.isFinished()
-
     def getJSON(self):
         return self.filelist2
         
