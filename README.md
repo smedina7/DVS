@@ -38,7 +38,7 @@ You will get a prompt to install wireshark. Install using default settings provi
 - Install required dependencies:
 ``` bash
 > pip install virtualenv
-> python -m venv dvs-venv
+> virtualenv dvs-venv 
 > dvs-venv\Scripts\activate
 (dvs-venv) > pip install -r requirements.txt
 ```
@@ -46,7 +46,7 @@ You will get a prompt to install wireshark. Install using default settings provi
 Start the DVS GUI:
 
 ``` bash 
-(dvs-venv) > run-dvs.py 
+(dvs-venv) > main.py 
 ```
 
 #### Linux
