@@ -50,7 +50,28 @@ Start the DVS GUI:
 ```
 
 #### Linux
+**Requierements:**
+
+Have Eceld-Wireshark installed: there are many ways you could install this. 
+* Install Eceld-Netsys: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-netsys.git
+* Install Eceld-Wireshark: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-wireshark
+* Install with the DVS Installer :
+> Follow the steps bellow: *To run in a Python virtual environment*
+
+> When prompted,
+
+```bash
+kali@kali:~/DVS$ sudo ./installDeb.sh 
+Running apt-get update
+Hit:1 https://packages.microsoft.com/repos/vscode stable InRelease
+Hit:2 http://kali.download/kali kali-rolling InRelease
+Reading package lists... Done
+DVS depends on : eceld-wireshark would you like to install it [Y/n] 
+```
+> Input 'Y' and hit enter, this will install Eceld-Wireshark in the DVS directory. 
+
 ##### To run in a Python virtual environment:
+
 
 Clone the repo to your desired destination and go into the DVS folder: 
 
