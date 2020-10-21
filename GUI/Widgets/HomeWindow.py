@@ -2,6 +2,7 @@ import logging
 import os
 import time
 import subprocess
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -10,7 +11,6 @@ from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.AbstractTable2 import pandasModel2
 from GUI.Widgets.AbstractTable2 import pandasModel3
-
 import pandas as pd
 
 class MainGUI(QMainWindow):
