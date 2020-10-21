@@ -12,7 +12,7 @@ from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 
 class NewProjectDialog(QtWidgets.QWidget):
     #Signal for when the user is done creating the new project
-    created = QtCore.pyqtSignal(str, str)
+    created = QtCore.pyqtSignal(str)
     
     def __init__(self):
         QtWidgets.QWidget.__init__(self, parent=None)
@@ -118,22 +118,22 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.batch_thread = BatchThread()
             self.batch_thread.progress_signal.connect(self.update_progress_bar)
             self.batch_thread.completion_signal.connect(self.copy_dir_complete)
-            self.batch_thread.add_function(self.copy_dir, self.folder_chosen)
+            self.batch_thread.add_function(self.copy_dir, self.project_data_path)
 
             self.progress_dialog_overall = ProgressBarDialog(self, self.batch_thread.get_load_count())
             self.batch_thread.start()
             self.progress_dialog_overall.show()
 
-            #send signal to manager to start getting the files
-            self.created.emit(self.project_data_path, self.folder_chosen)
-            self.close()
-
     def copy_dir(self, dir):
+        print("copying folder...")
         copy_tree(self.folder_chosen, dir)
 
     def copy_dir_complete(self):
         self.progress_dialog_overall.update_progress()
         self.progress_dialog_overall.hide()
+        #send signal to manager to start getting the files
+        self.created.emit(self.project_data_path)
+        self.close()
 
     def update_progress_bar(self):
         self.progress_dialog_overall.update_progress()

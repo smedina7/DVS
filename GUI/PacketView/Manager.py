@@ -17,11 +17,14 @@ class PacketManager():
         self.filelist = list()
         self.filelist2 = list()
         self.throughput_path = ''
+        self.clicks_path = ''
+        self.timed_path = ''
         self.wireshark_thread = QThread()
         self.web_engine_thread = QThread()
 
         #get dissector files path
         json_path = os.path.join(self.project_path, "ParsedLogs")
+        print(json_path)
         if not os.path.exists(json_path):
             print("NO JSON")
             return
