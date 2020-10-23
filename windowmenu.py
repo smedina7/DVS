@@ -23,7 +23,7 @@ class Menu(QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     #currentNumpyImage = cv2.imread("capture.png")
-    currentNumpyImage = cv2.imread("test3/Clicks/1602036122.2287035_main.py_root.png")
+    currentNumpyImage = cv2.imread("logo.png")
     app = QtWidgets.QApplication(sys.argv)
     ex = Menu(currentNumpyImage)
     sys.exit(app.exec_())

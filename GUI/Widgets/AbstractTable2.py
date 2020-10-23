@@ -1,5 +1,5 @@
 import sys
-
+import os
 from PyQt5.QtWidgets import QTableView
 from PyQt5.QtCore import QAbstractTableModel, Qt
 ##from PyQt5.QtGui     import *
@@ -11,10 +11,10 @@ from PyQt5.QtCore import Qt
 
 class pandasModel2(QAbstractTableModel):
 
-    def __init__(self, data):
+    def __init__(self, data, clicks_path):
         QAbstractTableModel.__init__(self)
         self._data = data
-
+        self.clicks = clicks_path
 
     def rowCount(self, parent=None):
         #the return is an int num of rows found in json file
@@ -32,7 +32,8 @@ class pandasModel2(QAbstractTableModel):
                     path = self._data.iloc[index.row(), index.column()]
                     # return QtGui.QColor('red')
                     last = path.split('/')[-1]
-                    pathclicks = "GUI/src/Data/test3/Clicks/" + last 
+                    #pathclicks = "GUI/src/Data/test3/Clicks/" + last 
+                    pathclicks = os.path.join(self.clicks, last)
 
                     # return str (pathclicks)
                 else: 
@@ -48,7 +49,8 @@ class pandasModel2(QAbstractTableModel):
                 path = self._data.iloc[index.row(), index.column()]
                     # return QtGui.QColor('red')
                 last = path.split('/')[-1]
-                pathclicks = "GUI/src/Data/test3/Clicks/" + last 
+                #pathclicks = "GUI/src/Data/test3/Clicks/" + last 
+                pathclicks = os.path.join(self.clicks, last)
                 return QtGui.QIcon(pathclicks)
             
             return None
@@ -61,10 +63,10 @@ class pandasModel2(QAbstractTableModel):
 
 class pandasModel3(QAbstractTableModel):
 
-    def __init__(self, data):
+    def __init__(self, data, timed_path):
         QAbstractTableModel.__init__(self)
         self._data = data
-
+        self.timed = timed_path
 
     def rowCount(self, parent=None):
         #the return is an int num of rows found in json file
@@ -80,9 +82,10 @@ class pandasModel3(QAbstractTableModel):
                 if index.column() == 3:
                     path = self._data.iloc[index.row(), index.column()]
                     last = path.split('/')[-1]
-                    pathclicks = "GUI/src/Data/test3/Timed/" + last 
+                    #pathclicks = "GUI/src/Data/test3/Timed/" + last 
+                    pathclicks = os.path.join(self.timed, last)
 
-                    # return str (pathclicks)
+                    #return str (pathclicks)
                 else: 
                     return str(self._data.iloc[index.row(), index.column()])
 
@@ -90,7 +93,8 @@ class pandasModel3(QAbstractTableModel):
             if role == Qt.DecorationRole and index.column() == 3:
                 path = self._data.iloc[index.row(), index.column()]
                 last = path.split('/')[-1]
-                pathclicks = "GUI/src/Data/test3/Timed/" + last 
+                #pathclicks = "GUI/src/Data/test3/Timed/" + last 
+                pathclicks = os.path.join(self.timed, last)
                 return QtGui.QIcon(pathclicks)
             
             return None
@@ -99,8 +103,3 @@ class pandasModel3(QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self._data.columns[col]
         return None
-
-
-   
-
-        

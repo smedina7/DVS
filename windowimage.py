@@ -2,7 +2,7 @@ import cv2
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QPixmap, QImage
- 
+
 
 class NewImage(QWidget):
 
@@ -23,6 +23,6 @@ class NewImage(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    currentNumpyImage = cv2.imread("test3/Clicks/1602036122.2287035_main.py_root.png")
+    currentNumpyImage = cv2.imread("capture.png")
     window = NewImage(currentNumpyImage)
     sys.exit(app.exec_())
