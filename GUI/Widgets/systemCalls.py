@@ -13,36 +13,11 @@ from dash.dependencies import Output, Input
 from navbar import Navbar
 from throughput import Throughput
 
-#nav = Navbar()
-df = pd.read_json("test3/ParsedLogs/Keypresses.JSON")
-# header = html.H3(
-#     'Key Presses Shown here'
-# )
+
+df = pd.read_json("test3/ParsedLogs/SystemCalls.JSON")
 
 
-
-
-# def Keypresses():
-#     layout = html.Div([
-#         #nav,
-#         header
-        
-#     ])
-#     return layout
-
-
-##THIS WORKS!!!!! ####################
-# def Keypresses():
-#     layout = dash_table.DataTable(
-#         id='table',
-#         columns=[{"name": i, "id": i} for i in df.columns],
-#         data=df.to_dict('records'),
-#     )
-#     return layout
-
-######################################
-
-def Keypresses():
+def SystemCalls():
     layout = html.Div([
 
         dash_table.DataTable(
@@ -72,8 +47,3 @@ def Keypresses():
 
     return layout
 
-
-
-
-
- 

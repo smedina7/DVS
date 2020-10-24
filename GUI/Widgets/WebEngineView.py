@@ -8,6 +8,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from keypresses import Keypresses
+from systemCalls import SystemCalls
 from throughput import Throughput
 from navbar import Navbar
 
@@ -35,16 +36,30 @@ def display_page(pathname):
     if pathname == '/keypresses':
         return Keypresses()
     
-    # else if:
-    #     pathname == '/mouseclicks':
-    #     return 
+    if pathname == '/systemCalls':
+        return SystemCalls()
 
     else:
         throughput_df = throughput_dataframe()
         return Throughput(throughput_df)
 
-
-
+# CALLBACK for keypresses input/ouput
+@app.callback(
+    Output('datatable-interactivity', 'style_data_conditional'),
+    [Input('datatable-interactivity', 'selected_columns')]
+)
+# CALLBACK for keypresses style table
+def update_styles(selected_columns):
+    return [{
+        'if': { 'column_id': i },
+        'background_color': '#D2F3FF'
+    } for i in selected_columns]
+# CALLBACK for keypresses input/ouput
+@app.callback(
+    Output('datatable-interactivity-container', "children"),
+    [Input('datatable-interactivity', "derived_virtual_data"),
+     Input('datatable-interactivity', "derived_virtual_selected_rows")])
+# CALLBACK for throughput graph
 @app.callback(Output('live-dropdown', 'value'),[Input('live-graph', 'clickData')])
 def update_dropdown(value):
     df = throughput_dataframe()

@@ -177,7 +177,6 @@ class MainGUI(QMainWindow):
             sub.setWidget(loading_label)
             web = QWebEngineView()
             self.manager_instance.runWebEngine()
-            # web.load(QUrl("http://127.0.0.1:8050/throughput")) #dash app rendered on browser 
             web.load(QUrl("http://127.0.0.1:8050/keypresses")) #dash app rendered on browser 
             self.mdi.addSubWindow(sub)
             sub.show()
@@ -218,28 +217,69 @@ class MainGUI(QMainWindow):
         #     view.show()
         #     sub.show()
         
-
         if q.text() == "System Calls":
             sub = QMdiSubWindow()
-            sub.resize(700,150)
-            sub.setWindowTitle("System Calls")
-            #sub.setWidget(QTextEdit())
+            sub.resize(700,310)
+
+            progressBarWidget = QWidget()
+            layout = QVBoxLayout()
+
+            pbar = QProgressBar(self)
+            pbar.setGeometry(30, 40, 200, 25)
+            pbar.setValue(50)
+            pbar.setWindowTitle("Loading")
+
+            label = QLabel('Processing, please wait...')
+            label.setAlignment(Qt.AlignCenter)
+
+            layout.addWidget(label)
+            layout.addWidget(pbar)
+
+            progressBarWidget.setLayout(layout)
             
-            df = pd.read_json(self.sys_json)
-
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
-
-            sub.setWidget(view)
-
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+            sub.setWindowTitle("System Calls")
+            loading_label = QLabel("Loading...")
+            sub.setWidget(loading_label)
+            web = QWebEngineView()
+            self.manager_instance.runWebEngine()
+            web.load(QUrl("http://127.0.0.1:8050/systemCalls")) #dash app rendered on browser 
             self.mdi.addSubWindow(sub)
-
-            view.show()
             sub.show()
+
+            sub.setWidget(progressBarWidget)
+
+            pbar.show()
+            for i in range(101): 
+                # slowing down the loop 
+                time.sleep(0.02) 
+                # setting value to progress bar 
+                pbar.setValue(i) 
+            
+            pbar.hide()
+            sub.setWidget(web)
+            web.show()
+
+        # if q.text() == "System Calls":
+        #     sub = QMdiSubWindow()
+        #     sub.resize(700,150)
+        #     sub.setWindowTitle("System Calls")
+        #     #sub.setWidget(QTextEdit())
+            
+        #     df = pd.read_json(self.sys_json)
+
+        #     model = pandasModel(df)
+        #     view = QTableView()
+        #     view.setModel(model)
+
+        #     sub.setWidget(view)
+
+        #     header = view.horizontalHeader()
+        #     view.setColumnWidth(1, 210)
+        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        #     self.mdi.addSubWindow(sub)
+
+        #     view.show()
+        #     sub.show()
 
         if q.text() == "Mouse Clicks":
             sub = QMdiSubWindow()
