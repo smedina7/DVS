@@ -9,6 +9,7 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from keypresses import Keypresses
 from systemCalls import SystemCalls
+from mouseClicks import MouseClicks
 from throughput import Throughput
 from navbar import Navbar
 
@@ -38,6 +39,9 @@ def display_page(pathname):
     
     if pathname == '/systemCalls':
         return SystemCalls()
+    
+    if pathname == '/mouseClicks':
+        return MouseClicks()
 
     else:
         throughput_df = throughput_dataframe()
@@ -59,6 +63,18 @@ def update_styles(selected_columns):
     Output('datatable-interactivity-container', "children"),
     [Input('datatable-interactivity', "derived_virtual_data"),
      Input('datatable-interactivity', "derived_virtual_selected_rows")])
+
+########## NOT WORKING TEST dropdown############
+# @app.callback(Output('datatable-interactivity', 'selected_rows'), [Input('my-dropdown', 'value')])
+# def update_rows(selected_value):
+#     dff = df[df[‘Number of Solar Plants’] == selected_value]
+#     return dff.to_dict(‘records’)
+
+
+
+############################
+
+
 # CALLBACK for throughput graph
 @app.callback(Output('live-dropdown', 'value'),[Input('live-graph', 'clickData')])
 def update_dropdown(value):

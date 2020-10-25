@@ -13,38 +13,11 @@ from dash.dependencies import Output, Input
 from navbar import Navbar
 # from throughput import Throughput
 
-#nav = Navbar()
-df = pd.read_json("test3/ParsedLogs/Keypresses.JSON")
-# header = html.H3(
-#     'Key Presses Shown here'
-# )
-
-
-
-
-# def Keypresses():
-#     layout = html.Div([
-#         #nav,
-#         header
-        
-#     ])
-#     return layout
-
-
-##THIS WORKS!!!!! ####################
-# def Keypresses():
-#     layout = dash_table.DataTable(
-#         id='table',
-#         columns=[{"name": i, "id": i} for i in df.columns],
-#         data=df.to_dict('records'),
-#     )
-#     return layout
-
-######################################
-
-
 #Value for color
-color = 'rgba(255, 255, 255, 1)'
+color = 'rgba(255, 159, 216, 0.4)'
+
+#need to fix path
+df = pd.read_json("test3/ParsedLogs/MouseClicks.JSON")
 
 ##########dropdown##########
 available_indicators = df['start'].unique()
@@ -58,10 +31,11 @@ dropdownsystem = html.Div([
 
 #######################
 
-def Keypresses():
+
+def MouseClicks():
     layout = html.Div([
 
-        #adding dropdown
+        ##adding dropdown
         dropdownsystem,
 
         dash_table.DataTable(
@@ -71,7 +45,7 @@ def Keypresses():
                 "id": i,
                 'renamable': True
                 # "selectable": True
-            }
+            } 
             for i in df.columns
             ],
             style_cell={
@@ -105,8 +79,3 @@ def Keypresses():
 
     return layout
 
-
-
-
-
- 
