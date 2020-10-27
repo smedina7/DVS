@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from re import search
 import subprocess
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -52,11 +53,19 @@ class MainGUI(QMainWindow):
 
         #Create toolbar and sync button widgets
         self.tb = self.addToolBar("")
-        self.sync_button = QPushButton(self.tb)
-        self.sync_button.setCheckable(True)
-        self.sync_button.setText("Unsyncronized")
-        self.tb.addWidget(self.sync_button)
-        self.sync_button.clicked.connect(self.buttonaction)
+        # Wireshark sync button
+        self.sync_button_wireshark = QPushButton(self.tb)
+        self.sync_button_wireshark.setCheckable(True)
+        self.sync_button_wireshark.setText("Wireshark Sync : off")
+        self.tb.addWidget(self.sync_button_wireshark)
+        self.sync_button_wireshark.clicked.connect(self.buttonaction_wireshark)
+
+        # Timestamp sync button
+        self.sync_button_timestamp = QPushButton(self.tb)
+        self.sync_button_timestamp.setCheckable(True)
+        self.sync_button_timestamp.setText("Timestamp Sync: off")
+        self.tb.addWidget(self.sync_button_timestamp)
+        self.sync_button_timestamp.clicked.connect(self.buttonaction_timestamp)
 
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
@@ -102,11 +111,35 @@ class MainGUI(QMainWindow):
         else:
             event.ignore()
 
-    def buttonaction(self, b):
+    def buttonaction_wireshark(self, b):
         if b == True:
-            self.sync_button.setText("Synchronized")
+            self.sync_button_wireshark.setText("Wireshark Sync : on")
+            self.wiresharkTrigger = True
         else:
-            self.sync_button.setText("Unsynchronized")
+            self.sync_button_wireshark.setText("Wireshark Sync : off")
+            self.wiresharkTrigger = False
+
+    def buttonaction_timestamp(self, b):
+        if b == True:
+            self.sync_button_timestamp.setText("Timestamp Sync : on")
+            self.timestampTrigger = True
+            # redraw
+            children = self.findChildren(QTableView)
+            for child in children:
+                columncount = child.model().columnCount()
+                for row in range(child.model().rowCount()):
+                    index = child.model().index(row, columncount - 1)
+                    indexTimeStamp = str(child.model().itemData(index))
+                    if search(self.timestamp, indexTimeStamp):
+                        child.selectRow(row)
+                    child.show()
+        else:
+            self.sync_button_timestamp.setText("Timestamp Sync : off")
+            self.timestampTrigger = False
+            children = self.findChildren(QTableView)
+            for child in children:
+                child.clearSelection()
+                child.show()
 
     def resizeEvent(self, event):
         self.sizeHint()
@@ -164,6 +197,8 @@ class MainGUI(QMainWindow):
 
             model = pandasModel(df)
             view = QTableView()
+            view.setObjectName("Keypresses")
+            view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
             view.setModel(model)
 
             sub.setWidget(view)
@@ -172,6 +207,7 @@ class MainGUI(QMainWindow):
             view.setColumnWidth(1, 210)
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
+            view.setSelectionMode(QAbstractItemView.MultiSelection)
 
             view.show()
             sub.show()
@@ -186,6 +222,8 @@ class MainGUI(QMainWindow):
 
             model = pandasModel(df)
             view = QTableView()
+            view.setObjectName("Systemcalls")
+            view.setSelectionBehavior(QtWidgets.QTableView.selectRows)
             view.setModel(model)
 
             sub.setWidget(view)
@@ -194,7 +232,7 @@ class MainGUI(QMainWindow):
             view.setColumnWidth(1, 210)
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
-
+            view.setSelectionMode(QAbstractItemView.MultiSelection)
             view.show()
             sub.show()
 
@@ -208,6 +246,8 @@ class MainGUI(QMainWindow):
 
             model = pandasModel2(df, self.clicks_path)
             view = QTableView()
+            view.setObjectName("Mouse Clicks")
+            view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
             view.setModel(model)
 
             sub.setWidget(view)
@@ -218,7 +258,7 @@ class MainGUI(QMainWindow):
             view.setIconSize(QSize(256, 256))
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
-
+            view.setSelectionMode(QAbstractItemView.MultiSelection)
             view.show()
             sub.show()
 
@@ -232,6 +272,8 @@ class MainGUI(QMainWindow):
 
             model = pandasModel3(df, self.timed_path)
             view = QTableView()
+            view.setObjectName("Timed Screenshots")
+            view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
             view.setModel(model)
 
             sub.setWidget(view)
@@ -242,7 +284,7 @@ class MainGUI(QMainWindow):
             view.setIconSize(QSize(256, 256))
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
-
+            view.setSelectionMode(QAbstractItemView.MultiSelection)
             view.show()
             sub.show()
 
