@@ -6,3 +6,4 @@ cachetools
 dash==1.16.3
 PyQtWebEngine
 flask_caching
+dash-bootstrap-components 0.10.7 

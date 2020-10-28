@@ -282,71 +282,71 @@ class MainGUI(QMainWindow):
         #     sub.show()
 
 
-        if q.text() == "Mouse Clicks":
-            sub = QMdiSubWindow()
-            sub.resize(700,310)
-
-            progressBarWidget = QWidget()
-            layout = QVBoxLayout()
-
-            pbar = QProgressBar(self)
-            pbar.setGeometry(30, 40, 200, 25)
-            pbar.setValue(50)
-            pbar.setWindowTitle("Loading")
-
-            label = QLabel('Processing, please wait...')
-            label.setAlignment(Qt.AlignCenter)
-
-            layout.addWidget(label)
-            layout.addWidget(pbar)
-
-            progressBarWidget.setLayout(layout)
-            
-            sub.setWindowTitle("Mouse Clicks")
-            loading_label = QLabel("Loading...")
-            sub.setWidget(loading_label)
-            web = QWebEngineView()
-            self.manager_instance.runWebEngine()
-            web.load(QUrl("http://127.0.0.1:8050/mouseClicks")) #dash app rendered on browser 
-            self.mdi.addSubWindow(sub)
-            sub.show()
-
-            sub.setWidget(progressBarWidget)
-
-            pbar.show()
-            for i in range(101): 
-                # slowing down the loop 
-                time.sleep(0.02) 
-                # setting value to progress bar 
-                pbar.setValue(i) 
-            
-            pbar.hide()
-            sub.setWidget(web)
-            web.show()
-
         # if q.text() == "Mouse Clicks":
         #     sub = QMdiSubWindow()
-        #     sub.resize(700,150)
-        #     sub.setWindowTitle("Mouse Clicks")
-        #     sub.setWidget(QTextEdit())
+        #     sub.resize(700,310)
+
+        #     progressBarWidget = QWidget()
+        #     layout = QVBoxLayout()
+
+        #     pbar = QProgressBar(self)
+        #     pbar.setGeometry(30, 40, 200, 25)
+        #     pbar.setValue(50)
+        #     pbar.setWindowTitle("Loading")
+
+        #     label = QLabel('Processing, please wait...')
+        #     label.setAlignment(Qt.AlignCenter)
+
+        #     layout.addWidget(label)
+        #     layout.addWidget(pbar)
+
+        #     progressBarWidget.setLayout(layout)
             
-        #     df = pd.read_json(self.mouse_json)
-
-        #     model = pandasModel2(df, self.clicks_path)
-        #     view = QTableView()
-        #     view.setModel(model)
-
-        #     sub.setWidget(view)
-
-        #     header = view.horizontalHeader()
-        #     view.setColumnWidth(1, 210)
-        #     view.setColumnWidth(2, 50)
-        #     view.setIconSize(QSize(256, 256))
-        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        #     sub.setWindowTitle("Mouse Clicks")
+        #     loading_label = QLabel("Loading...")
+        #     sub.setWidget(loading_label)
+        #     web = QWebEngineView()
+        #     self.manager_instance.runWebEngine()
+        #     web.load(QUrl("http://127.0.0.1:8050/mouseClicks")) #dash app rendered on browser 
         #     self.mdi.addSubWindow(sub)
-
-        #     view.show()
         #     sub.show()
+
+        #     sub.setWidget(progressBarWidget)
+
+        #     pbar.show()
+        #     for i in range(101): 
+        #         # slowing down the loop 
+        #         time.sleep(0.02) 
+        #         # setting value to progress bar 
+        #         pbar.setValue(i) 
+            
+        #     pbar.hide()
+        #     sub.setWidget(web)
+        #     web.show()
+
+        if q.text() == "Mouse Clicks":
+            sub = QMdiSubWindow()
+            sub.resize(700,150)
+            sub.setWindowTitle("Mouse Clicks")
+            sub.setWidget(QTextEdit())
+            
+            df = pd.read_json(self.mouse_json)
+
+            model = pandasModel2(df, self.clicks_path)
+            view = QTableView()
+            view.setModel(model)
+
+            sub.setWidget(view)
+
+            header = view.horizontalHeader()
+            view.setColumnWidth(1, 210)
+            view.setColumnWidth(2, 50)
+            view.setIconSize(QSize(256, 256))
+            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+            self.mdi.addSubWindow(sub)
+
+            view.show()
+            sub.show()
 
         if q.text() == "Timed Screenshots":
             sub = QMdiSubWindow()

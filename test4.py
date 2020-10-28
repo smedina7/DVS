@@ -20,8 +20,16 @@ button = html.Div(
 )
 
 # url1 = '![myImage-1](assets/test.png)'
-url1 = '![myImage-1; style = max-height:50px](assets/1602036122.2287035_main.py_root.png)'
+style = "max-height:50px"
+# url1 = '![myImage-1; style = max-height:50px](assets/1602036122.2287035_main.py_root.png)'
+# url1 = '![myImage-1;' style = 'max-height:50px'](assets/1602036122.2287035_main.py_root.png)'
 
+st1 = '![myImage-1;'
+st2 = 'style = "max-height:50px"]'
+st3 = '(assets/1602036122.2287035_main.py_root.png)'
+
+
+url1 = '[style = max-height:50px](assets/1602036122.2287035_main.py_root.png)'
 data = [['Item 1', url1], ['Item 2', url1]]
 # Create the pandas DataFrame 
 df = pd.DataFrame(data, columns = ['Name', 'Image']) 

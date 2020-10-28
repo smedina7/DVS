@@ -6,7 +6,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import dash_bootstrap_components as dbc
+# import dash_bootstrap_components as dbc
 from keypresses import Keypresses
 from systemCalls import SystemCalls
 from mouseClicks import MouseClicks
@@ -37,11 +37,11 @@ def display_page(pathname):
     if pathname == '/keypresses':
         return Keypresses()
     
-    if pathname == '/systemCalls':
-        return SystemCalls()
+    # if pathname == '/systemCalls':
+    #     return SystemCalls()
     
-    if pathname == '/mouseClicks':
-        return MouseClicks()
+    # if pathname == '/mouseClicks':
+    #     return MouseClicks()
 
     else:
         throughput_df = throughput_dataframe()
