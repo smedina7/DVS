@@ -24,7 +24,6 @@ class PacketManager():
 
         #get dissector files path
         json_path = os.path.join(self.project_path, "ParsedLogs")
-        print(json_path)
         if not os.path.exists(json_path):
             print("NO JSON")
             return

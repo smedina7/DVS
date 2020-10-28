@@ -1,2 +1,3 @@
-root       28659  0.0  0.0   2392   760 pts/2    S+   22:27   0:00 sh -c ps aux | grep WebEngineView >/home/kali/DVS/GUI/Dash/dash_pid.txt
-root       28661  0.0  0.0   6216   892 pts/2    S+   22:27   0:00 grep WebEngineView
+root       39926  0.9  3.4 289336 138296 pts/3   S+   16:53   0:01 python3 /home/kali/DVS/GUI/Widgets/WebEngineView.py /home/kali/DVS/ProjectData/t1/ecel-export_1602705146/parsed/tshark/networkDataXY.JSON
+root       39973  0.0  0.0   2392   828 pts/3    S+   16:55   0:00 sh -c ps aux | grep WebEngineView >/home/kali/DVS/GUI/Dash/dash_pid.txt
+root       39975  0.0  0.0   6216   892 pts/3    S+   16:55   0:00 grep WebEngineView

@@ -125,7 +125,6 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.progress_dialog_overall.show()
 
     def copy_dir(self, dir):
-        print("copying folder...")
         copy_tree(self.folder_chosen, dir)
 
     def copy_dir_complete(self):

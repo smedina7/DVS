@@ -6,12 +6,15 @@ import subprocess
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.AbstractTable2 import pandasModel2
 from GUI.Widgets.AbstractTable2 import pandasModel3
 import pandas as pd
+
+from GUI.Threading.BatchThread import BatchThread
+from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 
 class MainGUI(QMainWindow):
     def __init__(self, json_files, clicks, timed, manager_inst, parent = None):
@@ -22,6 +25,10 @@ class MainGUI(QMainWindow):
         self.clicks_path = clicks
         self.timed_path = timed
         self.manager_instance = manager_inst
+
+        self.progress = ProgressBarDialog(self, 100)
+        #self.progress.setGeometry(0, 0, 300, 25)
+        #self.progress.setWindowTitle("Loading...")
 
         self.key_json = ''
         self.sys_json = ''
@@ -58,6 +65,7 @@ class MainGUI(QMainWindow):
 
         #add scrollbar
         self.mdi.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.mdi.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         #Add menu bar
         bar = self.menuBar()
@@ -84,18 +92,6 @@ class MainGUI(QMainWindow):
         self.setMinimumHeight(565)
         self.setMinimumWidth(710)
 
-    def closeEvent(self, event):
-        reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            event.accept()
-            #self.manager_instance.closeWebEngine()
-            path = os.getcwd()
-            os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
-            print("Server Shutdown")
-        else:
-            event.ignore()
-
     def buttonaction(self, b):
         if b == True:
             self.sync_button.setText("Synchronized")
@@ -107,47 +103,13 @@ class MainGUI(QMainWindow):
 
     def windowaction(self, q):
         if q.text() == "Throughput":
-            sub = QMdiSubWindow()
-            sub.resize(700,310)
+            self.web = QWebEngineView()
+            self.manager_instance.runWebEngine() #start dash
+            self.web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser
+            self.web.loadStarted.connect(self.loadstarted)
+            self.web.loadProgress.connect(self.loadprogress)
+            self.web.loadFinished.connect(self.loadfinished)
             
-            progressBarWidget = QWidget()
-            layout = QVBoxLayout()
-
-            pbar = QProgressBar(self)
-            pbar.setGeometry(30, 40, 200, 25)
-            pbar.setValue(50)
-            pbar.setWindowTitle("Loading")
-
-            label = QLabel('Processing, please wait...')
-            label.setAlignment(Qt.AlignCenter)
-
-            layout.addWidget(label)
-            layout.addWidget(pbar)
-
-            progressBarWidget.setLayout(layout)
-            
-            sub.setWindowTitle("Throughput")
-            loading_label = QLabel("Loading...")
-            sub.setWidget(loading_label)
-            web = QWebEngineView()
-            self.manager_instance.runWebEngine()
-            web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser 
-            self.mdi.addSubWindow(sub)
-            sub.show()
-
-            sub.setWidget(progressBarWidget)
-
-            pbar.show()
-            for i in range(101): 
-                # slowing down the loop 
-                time.sleep(0.02) 
-                # setting value to progress bar 
-                pbar.setValue(i) 
-            
-            pbar.hide()
-            sub.setWidget(web)
-            web.show()
-
         if q.text() == "Keypresses":
             sub = QMdiSubWindow()
             sub.resize(700,150)
@@ -241,5 +203,51 @@ class MainGUI(QMainWindow):
             sub.show()
 
         if q.text() =="Tile Layout":
-            self.mdi.tileSubWindows()
-        
+            self.mdi.tileSubWindows()        
+
+    def load_throughput_complete(self):
+        sub = QMdiSubWindow()
+        sub.resize(700,310)
+        sub.setWindowTitle("Throughput")
+        loading_label = QLabel("Loading...")
+        sub.setWidget(loading_label)
+        self.mdi.addSubWindow(sub)
+        sub.show()
+        print("setting web window")  
+        self.web.show()
+        sub.setWidget(self.web)     
+    
+    @QtCore.pyqtSlot(int)
+    def loadprogress(self, progress):
+        self.progress.show()
+        count = 0
+        while(count < 100):
+            count += 1
+            time.sleep(0.02)
+            self.progress.setValue(count)
+    
+    @QtCore.pyqtSlot()
+    def loadstarted(self):
+        print(time.time(), ": load started")
+    
+    @QtCore.pyqtSlot()
+    def loadfinished(self):
+        self.progress.hide()
+        print(time.time(), ": load finished")
+        #load the dataline
+        self.load_throughput_complete()
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
+                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.web.close()
+            event.accept()
+            #self.manager_instance.closeWebEngine()
+            path = os.getcwd()
+            os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
+            print("Server Shutdown")
+        else:
+            event.ignore()
+
+            

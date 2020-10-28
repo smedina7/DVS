@@ -46,18 +46,16 @@ class DVSstartUpPage(QMainWindow):
         self.hide()
         
     def openDir(self):
-        self.folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
+        folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
 
-        if self.folder_chosen == "":
+        if folder_chosen == "":
             logging.debug("File choose cancelled")
             return
 
-        if len(self.folder_chosen) > 0:
-            QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
-            return
-
-        self.window.show()
-        self.window.hide()
+        if len(folder_chosen) > 0:
+            self.project_folder = folder_chosen
+            self.openHomeWindow()
+            self.hide()
 
     def openSettings(self):
         QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
