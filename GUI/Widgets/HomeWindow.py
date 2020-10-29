@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from re import search
 import subprocess
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -10,6 +11,8 @@ from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.AbstractTable2 import pandasModel2
 from GUI.Widgets.AbstractTable2 import pandasModel3
+from GUI.Widgets.Mouseclicks import First
+from GUI.Widgets.textdataline import Keypresses, SystemCalls
 
 import pandas as pd
 
@@ -44,13 +47,27 @@ class MainGUI(QMainWindow):
             if "TimedScreenshots.JSON" in file:
                 self.timed_json = file
 
+        """ #for throughput
+        throughput_files = os.path.join(throughput_files, "parsed/tshark")
+        self.throughput_json = os.path.join(throughput_files, "networkDataXY.JSON")
+        #send it over
+        self.w = WebEngine(self.throughput_json) """
+
         #Create toolbar and sync button widgets
         self.tb = self.addToolBar("")
-        self.sync_button = QPushButton(self.tb)
-        self.sync_button.setCheckable(True)
-        self.sync_button.setText("Unsyncronized")
-        self.tb.addWidget(self.sync_button)
-        self.sync_button.clicked.connect(self.buttonaction)
+        # Wireshark sync button
+        self.sync_button_wireshark = QPushButton(self.tb)
+        self.sync_button_wireshark.setCheckable(True)
+        self.sync_button_wireshark.setText("Wireshark Sync : off")
+        self.tb.addWidget(self.sync_button_wireshark)
+        self.sync_button_wireshark.clicked.connect(self.buttonaction_wireshark)
+
+        # Timestamp sync button
+        self.sync_button_timestamp = QPushButton(self.tb)
+        self.sync_button_timestamp.setCheckable(True)
+        self.sync_button_timestamp.setText("Timestamp Sync: off")
+        self.tb.addWidget(self.sync_button_timestamp)
+        self.sync_button_timestamp.clicked.connect(self.buttonaction_timestamp)
 
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
@@ -89,21 +106,42 @@ class MainGUI(QMainWindow):
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
-            #self.manager_instance.closeWebEngine()
+            self.manager_instance.closeWebEngine()
             path = os.getcwd()
             os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
             print("Server Shutdown")
         else:
             event.ignore()
 
-    def buttonaction(self, b):
+    def buttonaction_wireshark(self, b):
         if b == True:
-            self.sync_button.setText("Synchronized")
-            for i in self.mdi.subWindowList():
-                print(i)
+            self.sync_button_wireshark.setText("Wireshark Sync : on")
+            self.wiresharkTrigger = True
         else:
-            self.sync_button.setText("Unsynchronized")
+            self.sync_button_wireshark.setText("Wireshark Sync : off")
+            self.wiresharkTrigger = False
 
+    def buttonaction_timestamp(self, b):
+        if b == True:
+            self.sync_button_timestamp.setText("Timestamp Sync : on")
+            self.timestampTrigger = True
+            # redraw 
+            children = self.findChildren(QTableView)
+            for child in children:
+                columncount = child.model().columnCount()
+                for row in range(child.model().rowCount()):
+                    index = child.model().index(row, columncount - 1)
+                    indexTimeStamp = str(child.model().itemData(index))
+                    if search(self.timestamp, indexTimeStamp):
+                        child.selectRow(row)
+                    child.show()
+        else:
+            self.sync_button_timestamp.setText("Timestamp Sync : off")
+            self.timestampTrigger = False
+            children = self.findChildren(QTableView)
+            for child in children:
+                child.clearSelection()
+                child.show()
 
     def resizeEvent(self, event):
         self.sizeHint()
@@ -112,7 +150,7 @@ class MainGUI(QMainWindow):
         if q.text() == "Throughput":
             sub = QMdiSubWindow()
             sub.resize(700,310)
-
+            
             progressBarWidget = QWidget()
             layout = QVBoxLayout()
 
@@ -134,8 +172,7 @@ class MainGUI(QMainWindow):
             sub.setWidget(loading_label)
             web = QWebEngineView()
             self.manager_instance.runWebEngine()
-            web.load(QUrl("http://127.0.0.1:8050/throughput")) #dash app rendered on browser 
-            # web.load(QUrl("http://127.0.0.1:8050/keypresses")) #dash app rendered on browser 
+            web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser 
             self.mdi.addSubWindow(sub)
             sub.show()
 
@@ -151,53 +188,72 @@ class MainGUI(QMainWindow):
             pbar.hide()
             sub.setWidget(web)
             web.show()
-        
+
+  
+      
         if q.text() == "Keypresses":
             sub = QMdiSubWindow()
-            sub.resize(700,310)
-
-            progressBarWidget = QWidget()
-            layout = QVBoxLayout()
-
-            pbar = QProgressBar(self)
-            pbar.setGeometry(30, 40, 200, 25)
-            pbar.setValue(50)
-            pbar.setWindowTitle("Loading")
-
-            label = QLabel('Processing, please wait...')
-            label.setAlignment(Qt.AlignCenter)
-
-            layout.addWidget(label)
-            layout.addWidget(pbar)
-
-            progressBarWidget.setLayout(layout)
-            
+            sub.resize(700,150)
             sub.setWindowTitle("Keypresses")
-            loading_label = QLabel("Loading...")
-            sub.setWidget(loading_label)
-            web = QWebEngineView()
-            self.manager_instance.runWebEngine()
-            web.load(QUrl("http://127.0.0.1:8050/keypresses")) #dash app rendered on browser 
+            sub.setWidget(QTextEdit())
+            df = self.key_json
+            view = Keypresses(df)
+            sub.setWidget(view)
             self.mdi.addSubWindow(sub)
+            # view.setSelectionMode(QAbstractItemView.MultiSelection)
+
+            view.show()
             sub.show()
 
-            sub.setWidget(progressBarWidget)
+        if q.text() == "System Calls":
+            sub = QMdiSubWindow()
+            sub.resize(700,150)
+            sub.setWindowTitle("System Calls")
+            sub.setWidget(QTextEdit())
+            df = self.sys_json
+            view = SystemCalls(df)
+            sub.setWidget(view)
+            self.mdi.addSubWindow(sub)
+            # view.setSelectionMode(QAbstractItemView.MultiSelection)
 
-            pbar.show()
-            for i in range(101): 
-                # slowing down the loop 
-                time.sleep(0.02) 
-                # setting value to progress bar 
-                pbar.setValue(i) 
-            
-            pbar.hide()
-            sub.setWidget(web)
-            web.show()
+            view.show()
+            sub.show()
 
+        if q.text() == "Mouse Clicks":
+            sub = QMdiSubWindow()
+            sub.resize(700,150)
+            sub.setWindowTitle("Mouse Clicks")
+            sub.setWidget(QTextEdit())
+            df = self.mouse_json
+            view = QTableView()
+            # view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+            view = First(df, self.clicks_path)
+            sub.setWidget(view)
+            self.mdi.addSubWindow(sub)
+            # view.setSelectionMode(QAbstractItemView.MultiSelection)
+            view.show()
+            sub.show()
+        
+        if q.text() == "Timed Screenshots":
+            sub = QMdiSubWindow()
+            sub.resize(700,150)
+            sub.setWindowTitle("Timed Screenshots")
+            sub.setWidget(QTextEdit())
+
+            df = self.timed_json
+
+            view = First(df, self.timed_path)
+            # view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+            sub.setWidget(view)
+
+            self.mdi.addSubWindow(sub)
+            # view.setSelectionMode(QAbstractItemView.MultiSelection)
+            view.show()
+            sub.show()
+        
         # if q.text() == "Keypresses":
         #     sub = QMdiSubWindow()
         #     sub.resize(700,150)
-
         #     sub.setWindowTitle("Keypresses")
         #     sub.setWidget(QTextEdit())
 
@@ -205,6 +261,8 @@ class MainGUI(QMainWindow):
 
         #     model = pandasModel(df)
         #     view = QTableView()
+        #     view.setObjectName("Keypresses")
+        #     view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         #     view.setModel(model)
 
         #     sub.setWidget(view)
@@ -213,51 +271,10 @@ class MainGUI(QMainWindow):
         #     view.setColumnWidth(1, 210)
         #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         #     self.mdi.addSubWindow(sub)
+        #     view.setSelectionMode(QAbstractItemView.MultiSelection)
 
         #     view.show()
         #     sub.show()
-        
-        if q.text() == "System Calls":
-            sub = QMdiSubWindow()
-            sub.resize(700,310)
-
-            progressBarWidget = QWidget()
-            layout = QVBoxLayout()
-
-            pbar = QProgressBar(self)
-            pbar.setGeometry(30, 40, 200, 25)
-            pbar.setValue(50)
-            pbar.setWindowTitle("Loading")
-
-            label = QLabel('Processing, please wait...')
-            label.setAlignment(Qt.AlignCenter)
-
-            layout.addWidget(label)
-            layout.addWidget(pbar)
-
-            progressBarWidget.setLayout(layout)
-            
-            sub.setWindowTitle("System Calls")
-            loading_label = QLabel("Loading...")
-            sub.setWidget(loading_label)
-            web = QWebEngineView()
-            self.manager_instance.runWebEngine()
-            web.load(QUrl("http://127.0.0.1:8050/systemCalls")) #dash app rendered on browser 
-            self.mdi.addSubWindow(sub)
-            sub.show()
-
-            sub.setWidget(progressBarWidget)
-
-            pbar.show()
-            for i in range(101): 
-                # slowing down the loop 
-                time.sleep(0.02) 
-                # setting value to progress bar 
-                pbar.setValue(i) 
-            
-            pbar.hide()
-            sub.setWidget(web)
-            web.show()
 
         # if q.text() == "System Calls":
         #     sub = QMdiSubWindow()
@@ -269,6 +286,8 @@ class MainGUI(QMainWindow):
 
         #     model = pandasModel(df)
         #     view = QTableView()
+        #     view.setObjectName("Systemcalls")
+        #     view.setSelectionBehavior(QtWidgets.QTableView.selectRows)
         #     view.setModel(model)
 
         #     sub.setWidget(view)
@@ -277,100 +296,61 @@ class MainGUI(QMainWindow):
         #     view.setColumnWidth(1, 210)
         #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         #     self.mdi.addSubWindow(sub)
-
+        #     view.setSelectionMode(QAbstractItemView.MultiSelection)
         #     view.show()
         #     sub.show()
 
-
         # if q.text() == "Mouse Clicks":
         #     sub = QMdiSubWindow()
-        #     sub.resize(700,310)
-
-        #     progressBarWidget = QWidget()
-        #     layout = QVBoxLayout()
-
-        #     pbar = QProgressBar(self)
-        #     pbar.setGeometry(30, 40, 200, 25)
-        #     pbar.setValue(50)
-        #     pbar.setWindowTitle("Loading")
-
-        #     label = QLabel('Processing, please wait...')
-        #     label.setAlignment(Qt.AlignCenter)
-
-        #     layout.addWidget(label)
-        #     layout.addWidget(pbar)
-
-        #     progressBarWidget.setLayout(layout)
-            
+        #     sub.resize(700,150)
         #     sub.setWindowTitle("Mouse Clicks")
-        #     loading_label = QLabel("Loading...")
-        #     sub.setWidget(loading_label)
-        #     web = QWebEngineView()
-        #     self.manager_instance.runWebEngine()
-        #     web.load(QUrl("http://127.0.0.1:8050/mouseClicks")) #dash app rendered on browser 
+        #     sub.setWidget(QTextEdit())
+            
+        #     df = pd.read_json(self.mouse_json)
+
+        #     model = pandasModel2(df, self.clicks_path)
+        #     view = QTableView()
+        #     view.setObjectName("Mouse Clicks")
+        #     view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        #     view.setModel(model)
+
+        #     sub.setWidget(view)
+
+        #     header = view.horizontalHeader()
+        #     view.setColumnWidth(1, 210)
+        #     view.setColumnWidth(2, 50)
+        #     view.setIconSize(QSize(256, 256))
+        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         #     self.mdi.addSubWindow(sub)
+        #     view.setSelectionMode(QAbstractItemView.MultiSelection)
+        #     view.show()
         #     sub.show()
 
-        #     sub.setWidget(progressBarWidget)
+        # if q.text() == "Timed Screenshots":
+        #     sub = QMdiSubWindow()
+        #     sub.resize(700,150)
+        #     sub.setWindowTitle("Timed Screenshots")
+        #     sub.setWidget(QTextEdit())
 
-        #     pbar.show()
-        #     for i in range(101): 
-        #         # slowing down the loop 
-        #         time.sleep(0.02) 
-        #         # setting value to progress bar 
-        #         pbar.setValue(i) 
-            
-        #     pbar.hide()
-        #     sub.setWidget(web)
-        #     web.show()
+        #     df = pd.read_json(self.timed_json)
 
-        if q.text() == "Mouse Clicks":
-            sub = QMdiSubWindow()
-            sub.resize(700,150)
-            sub.setWindowTitle("Mouse Clicks")
-            sub.setWidget(QTextEdit())
-            
-            df = pd.read_json(self.mouse_json)
+        #     model = pandasModel3(df, self.timed_path)
+        #     view = QTableView()
+        #     view.setObjectName("Timed Screenshots")
+        #     view.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        #     view.setModel(model)
 
-            model = pandasModel2(df, self.clicks_path)
-            view = QTableView()
-            view.setModel(model)
+        #     sub.setWidget(view)
 
-            sub.setWidget(view)
-
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            view.setColumnWidth(2, 50)
-            view.setIconSize(QSize(256, 256))
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
-
-            view.show()
-            sub.show()
-
-        if q.text() == "Timed Screenshots":
-            sub = QMdiSubWindow()
-            sub.resize(700,150)
-            sub.setWindowTitle("Timed Screenshots")
-            sub.setWidget(QTextEdit())
-
-            df = pd.read_json(self.timed_json)
-
-            model = pandasModel3(df, self.timed_path)
-            view = QTableView()
-            view.setModel(model)
-
-            sub.setWidget(view)
-
-            header = view.horizontalHeader()
-            view.setColumnWidth(4, 210)
-            view.setColumnWidth(2, 50) 
-            view.setIconSize(QSize(256, 256))
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
-
-            view.show()
-            sub.show()
+        #     header = view.horizontalHeader()
+        #     view.setColumnWidth(4, 210)
+        #     view.setColumnWidth(2, 50) 
+        #     view.setIconSize(QSize(256, 256))
+        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        #     self.mdi.addSubWindow(sub)
+        #     view.setSelectionMode(QAbstractItemView.MultiSelection)
+        #     view.show()
+        #     sub.show()
 
         if q.text() =="Tile Layout":
             self.mdi.tileSubWindows()

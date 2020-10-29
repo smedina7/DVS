@@ -34,8 +34,6 @@ class pandasModel2(QAbstractTableModel):
                     last = path.split('/')[-1]
                     #pathclicks = "GUI/src/Data/test3/Clicks/" + last 
                     pathclicks = os.path.join(self.clicks, last)
-                    self.button = QPushButton()
-                    self.button.setText('Add Item') 
 
                     # return str (pathclicks)
                 else: 
@@ -56,20 +54,11 @@ class pandasModel2(QAbstractTableModel):
                 return QtGui.QIcon(pathclicks)
             
             return None
-    
 
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self._data.columns[col]
         return None
-
-    #Edit from the cell
-    # def flags(self, index):
-    #     if (index.column() == 0):
-    #         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled
-    #     else:
-    #         return QtCore.Qt.ItemIsEnabled
-
 
 
 class pandasModel3(QAbstractTableModel):

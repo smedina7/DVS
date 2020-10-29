@@ -1,154 +1,71 @@
+import logging
+import os
 import sys
-import dash_bootstrap_components as dbc
-import pandas as pd
-from flask_caching import Cache
+import subprocess
+from PyQt5.QtCore import QThread, pyqtSignal
+import time
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import pandas as pd
 from dash.dependencies import Input, Output
-# import dash_bootstrap_components as dbc
-from keypresses import Keypresses
-from systemCalls import SystemCalls
-from mouseClicks import MouseClicks
-from throughput import Throughput
-from navbar import Navbar
+from flask_caching import Cache
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-app.config.suppress_callback_exceptions = True
-
-nav = Navbar()
+cache = Cache(app.server, config={'CACHE_TYPE': 'filesystem','CACHE_DIR': 'cache-directory'})
 
 throughput_file = sys.argv[1]  #filename passed through manager
 
 def throughput_dataframe():
-    #return pd.read_json(query_throughput_data()) #for future use when caching?
     return pd.read_json(throughput_file) 
 
+#probably need to have the following functions as well
+def keypresses_dataframe():
+    return
+def mouseclicks_dataframe():
+    return
+def systemcalls_dataframe():
+    return
+
 app.layout = html.Div([
-    dcc.Location(id = 'url', refresh = False),
-    html.Div(id = 'page-content')
+    dcc.Dropdown( #dropdown menu for updating throughput graph
+        id='live-dropdown',
+        options=[{'label': throughput_dataframe().loc[i, 'start'], 'value': i} for i in throughput_dataframe().index] #displays timestamps
+    ),
+    dcc.Graph(id='live-graph') #throughput graph
+
+    #can add more dcc objects here for displaying other dataline info
+    
 ])
-
-@app.callback(Output('page-content', 'children'),
-            [Input('url', 'pathname')])
-def display_page(pathname):
-    if pathname == '/keypresses':
-        return Keypresses()
-    
-    # if pathname == '/systemCalls':
-    #     return SystemCalls()
-    
-    # if pathname == '/mouseClicks':
-    #     return MouseClicks()
-
-    else:
-        throughput_df = throughput_dataframe()
-        return Throughput(throughput_df)
-
-# CALLBACK for keypresses input/ouput
-@app.callback(
-    Output('datatable-interactivity', 'style_data_conditional'),
-    [Input('datatable-interactivity', 'selected_columns')]
-)
-# CALLBACK for keypresses style table
-def update_styles(selected_columns):
-    return [{
-        'if': { 'column_id': i },
-        'background_color': '#D2F3FF'
-    } for i in selected_columns]
-# CALLBACK for keypresses input/ouput
-@app.callback(
-    Output('datatable-interactivity-container', "children"),
-    [Input('datatable-interactivity', "derived_virtual_data"),
-     Input('datatable-interactivity', "derived_virtual_selected_rows")])
-
-########## NOT WORKING TEST dropdown############
-# @app.callback(Output('datatable-interactivity', 'selected_rows'), [Input('my-dropdown', 'value')])
-# def update_rows(selected_value):
-#     dff = df[df[‘Number of Solar Plants’] == selected_value]
-#     return dff.to_dict(‘records’)
-
-
-
-############################
-
-
-# CALLBACK for throughput graph
-@app.callback(Output('live-dropdown', 'value'),[Input('live-graph', 'clickData')])
-def update_dropdown(value):
-    df = throughput_dataframe()
-    key = 0
-
-    if value is None:
-        return key
-    else:
-        x = value["points"]
-        for d in x:
-            timestamp = d['x'].replace(' ','T')
-        for i in range(len(df)):
-            if timestamp == df.loc[i,'start']:
-                key = int(df.loc[i,'traffic_xy_id'])
-                return key
 
 #this call back method allows to update graph based on the selected value in the dropdown menu
 #we can have multiple callbacks (probably one for each dataline) --this is most likely how we can acheive the sync behavior 
-@app.callback(Output('live-graph', 'figure'),[Input('live-dropdown', 'value'), Input('timeframe', 'value'), Input('color-picker','value')])
-def update_live_graph(timestamp, t_frame, color):
+@app.callback(Output('live-graph', 'figure'),[Input('live-dropdown', 'value')])
+def update_live_graph(value):
     df = throughput_dataframe()
-
-    if color is None:
-        margin_color = 'rgba(211,211,211,.7)' #default light gray background
-        highlight_color = 'rgba(211,211,235,.2)'
-    else:
-        rgb = color.split(".")
-        margin_color = color
-        highlight_color = rgb[0]+".2)"
-
-    if t_frame is None: 
-        timeframe = 0 # seconds
-    else:
-        timeframe = t_frame # in seconds
-
-    if timestamp is not None: 
-        start_time = df.loc[timestamp, 'start']
-
-        if timestamp <= ((len(df)-1)-timeframe):
-            end_time = df.loc[timestamp+timeframe, 'start']
-        else:
-            start_time = df.loc[(len(df)-1)-timeframe, 'start']
-            end_time = df.loc[len(df)-1, 'start']
-    else:
-        start_time = df.loc[0, 'start']
-        end_time = df.loc[0, 'start']
+    start_time = df.loc[0, 'start']
 
     return {
         'data': [{
             'x': df['start'], # x axis is timestamp
-            'y': df['y'], # y axis is number of packets since previous timestamp
+            'y': df['y'], # y axis is number of packets
             'line': {
                 'width': 1,
-                'color': 'Black',
+                'color': '#0074D9',
                 'shape': 'spline'
-            },
-            'text': {'color': 'Black'}
+            }
         }],
         'layout': {
             'height': 225,
-            'width': 675,
-            'paper_bgcolor' : margin_color,
-            #'plot_bgcolor' : plot_color, 
+            'width': 670,
             # when updating graph, here we can manipulate the following to show a certain range or specific info (based on input 'value')
             'shapes': [{
-                'type': 'rect',
-                'xref': 'x', 'x0': start_time, 'x1': end_time, #highlights a time range (timeframe) from selected dropdown timestamp value
-                'yref': 'paper', 'y0': 0, 'y1': 1,
-                'line': {'color': 'Black', 'width': 1},
-                'fillcolor': highlight_color,
-                'text': {'color': 'Black'}
-            }]
-            ,
+                'type': 'line',
+                'xref': 'x', 'x0': start_time, 'x1': start_time, #x axis range is the 1st timestamp to last timestamp on json
+                'yref': 'paper', 'y0': 0, 'y1': 0,
+                'line': {'color': 'darkgrey', 'width': 1}
+            }],
             'annotations': [{
                 'showarrow': False,
                 'xref': 'x', 'x': start_time, 'xanchor': 'right',
@@ -157,14 +74,14 @@ def update_live_graph(timestamp, t_frame, color):
                 'bgcolor': 'rgba(255, 255, 255, 0.8)'
             }],
             # aesthetic options
-            'margin': {'l': 40, 'b': 30, 'r': 20, 't': 20},
-            'xaxis': {'showgrid': True, 'zeroline': False},
-            'yaxis': {'showgrid': True, 'zeroline': False},
-            'text': {'color': 'Black'}
-            
+            'margin': {'l': 20, 'b': 20, 'r': 10, 't': 5},
+            'xaxis': {'showgrid': False, 'zeroline': False},
+            'yaxis': {'showgrid': False, 'zeroline': False}
         }
     }
 
+#This callback can be used for caching later
+#@cache.memoize(timeout=60)
+#def query_throughput_data():
 if __name__ == '__main__':
     app.run_server(debug=False)
-

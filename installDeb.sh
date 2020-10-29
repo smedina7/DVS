@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# do we need to chmod manually of install.sh before running it?
-#chmod +x install.sh
 
 set -e
 
-ECEL_NETSYS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DVS_DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #Update
 echo "Running apt-get update"
@@ -20,39 +18,32 @@ prompt_accepted_Yn() {
     esac
 }
 
+DVS_DEPS="eceld-wireshark"
 #Installing Wireshark
-ECELD_DEPS="eceld-wireshark"
-for eceld_dep in $ECELD_DEPS; do
-    eceld_prompt="$eceld_dep found, remove it and reinstall?"
-    if [ -d $ECEL_NETSYS_DIR/$eceld_dep ]; then
-        if prompt_accepted_Yn "$eceld_prompt"; then
-            rm $ECEL_NETSYS_DIR/$eceld_dep -rf
-        git clone https://github.com/ARL-UTEP-OC/$eceld_dep "$ECEL_NETSYS_DIR"/$eceld_dep
-        pushd "$ECEL_NETSYS_DIR"/$eceld_dep
+for dvs_dep in $DVS_DEPS; do
+    dvs_prompt="DVS depends on : $dvs_dep would you like to install it"
+    if prompt_accepted_Yn "$dvs_prompt"; then
+        rm $DVS_DIRECTORY/$dvs_dep -rf
+        git clone https://github.com/ARL-UTEP-OC/$dvs_dep "$DVS_DIRECTORY"/$dvs_dep
+        pushd "$DVS_DIRECTORY"/$dvs_dep
         chmod +x install.sh
         ./install.sh
         popd
-        fi
+        for dvs_dep in $DVS_DEPS; do
+            if [ ! -d $DVS_DIRECTORY/$dvs_dep ]; then
+                echo "Download and installation of $dvs_dep not successful (can't execute program) quitting..."
+                exit 1
+            fi
+        done
     else
-        eceld_prompt="$eceld_dep not found, download and install?"
-        if prompt_accepted_Yn "$eceld_prompt"; then
-            rm $ECEL_NETSYS_DIR/$eceld_dep -rf
-        git clone https://github.com/ARL-UTEP-OC/$eceld_dep "$ECEL_NETSYS_DIR"/$eceld_dep
-        pushd "$ECEL_NETSYS_DIR"/$eceld_dep
-        chmod +x install.sh
-        ./install.sh
-        popd
-        fi
+        echo "Did not install: $dvs_dep . DVS depends on $dvs_dep to work properly. Please make sure it is installed. "
+        echo "Please go to README to see installation requierements."
     fi
 done
 
-for eceld_dep in $ECELD_DEPS; do
-    if [ ! -d $ECEL_NETSYS_DIR/$eceld_dep ]; then
-        echo "Download and installation of $eceld_dep not successful (can't execute program) quitting..."
-        exit 1
-    fi
-done
-##needs to be implemented
+
+
+
 
 ### Install dependencies
 REQUIRED_PROGRAMS="python3-pip python3-venv git"
