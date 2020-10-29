@@ -311,7 +311,10 @@ class MainGUI(QMainWindow):
 
     def color_picker(self):
         color = QColorDialog.getColor()
-        return color      
+        if color == '':
+            return 
+        else:
+            return color      
 
     def load_throughput_complete(self):
         sub = QMdiSubWindow()

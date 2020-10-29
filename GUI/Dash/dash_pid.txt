@@ -1,3 +1,3 @@
-root       67321  1.0  3.3 255184 134136 pts/2   S+   01:24   0:01 python3 /home/kali/DVS/GUI/Widgets/WebEngineView.py /home/kali/DVS/GUI/Dash/throughput_info.txt
-root       67360  0.0  0.0   2392   764 pts/2    S+   01:26   0:00 sh -c ps aux | grep WebEngineView >/home/kali/DVS/GUI/Dash/dash_pid.txt
-root       67362  0.0  0.0   6216   892 pts/2    S+   01:26   0:00 grep WebEngineView
+root       68782  3.7  3.3 328868 134196 pts/2   S+   03:30   0:00 python3 /home/kali/DVS/GUI/Widgets/WebEngineView.py /home/kali/DVS/GUI/Dash/throughput_info.txt
+root       68817  0.0  0.0   2392   768 pts/2    S+   03:31   0:00 sh -c ps aux | grep WebEngineView >/home/kali/DVS/GUI/Dash/dash_pid.txt
+root       68819  0.0  0.0   6216   900 pts/2    S+   03:31   0:00 grep WebEngineView

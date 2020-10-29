@@ -95,6 +95,7 @@ class NewProjectDialog(QtWidgets.QWidget):
         project_data_folder = os.path.join(working_dir, "ProjectData")
         if(not os.path.exists(project_data_folder)):
             os.mkdir(project_data_folder)
+            
         self.project_data_path = os.path.join(project_data_folder, self.project_name.text())
 
         #set project path
