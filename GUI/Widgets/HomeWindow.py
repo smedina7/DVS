@@ -241,7 +241,7 @@ class MainGUI(QMainWindow):
 
         if q.text() == "Mouse Clicks":
             sub = QMdiSubWindow()
-            sub.resize(790,200)
+            sub.resize(790,220)
             sub.setWindowTitle("Mouse Clicks")
             
             #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
@@ -260,6 +260,9 @@ class MainGUI(QMainWindow):
             view.setColumnWidth(1, 210)
             view.setColumnWidth(2, 50)
             view.setIconSize(QSize(256, 256))
+            count_row = df.shape[0]
+            for x in range(count_row):
+                view.setRowHeight(x,100)
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
 
@@ -271,7 +274,7 @@ class MainGUI(QMainWindow):
 
         if q.text() == "Timed Screenshots":
             sub = QMdiSubWindow()
-            sub.resize(790,200)
+            sub.resize(790,220)
             sub.setWindowTitle("Timed Screenshots")
             
             #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
@@ -290,6 +293,10 @@ class MainGUI(QMainWindow):
             view.setColumnWidth(4, 210)
             view.setColumnWidth(2, 50) 
             view.setIconSize(QSize(256, 256))
+            count_row = df.shape[0]
+            for x in range(count_row):
+                view.setRowHeight(x,100)
+
             header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
 
@@ -341,10 +348,11 @@ class MainGUI(QMainWindow):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            event.accept()
             if(self.web != ''):
                 self.web.close()
-            event.accept()
-            self.manager_instance.stopWebEngine()
+                self.manager_instance.stopWebEngine()
+            
             self.manager_instance.stopWireshark()
             
         else:
