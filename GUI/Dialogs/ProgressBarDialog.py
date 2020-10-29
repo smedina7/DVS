@@ -26,5 +26,5 @@ class ProgressBarDialog(QDialog):
         self.completed += 1
         self.progress.setValue(self.completed)
     
-    def setValue(self, val):
+    def setBarValue(self, val):
         self.progress.setValue(val)

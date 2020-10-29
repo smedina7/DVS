@@ -1,0 +1,2 @@
+/home/kali/DVS/ProjectData/t1/ecel-export_1602705146/parsed/tshark/networkDataXY.JSON
+(0, 0, 255, 255)

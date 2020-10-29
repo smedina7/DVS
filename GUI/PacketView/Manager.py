@@ -82,11 +82,17 @@ class PacketManager():
             self.wireshark_thread = WiresharkRunner(pcap_filename=pcap_path)
 
         self.wireshark_thread.start()
+    
+    def stopWireshark(self):
+        self.wireshark_thread.quit()
 
     def runWebEngine(self):
-        self.web_engine_thread = RunWebEngine(throughputfile=self.throughput_path)
+        self.web_engine_thread = RunWebEngine()
         self.web_engine_thread.start()
-
+    
+    def stopWebEngine(self):
+        self.web_engine_thread.stopTrigHandle()
+        
     def getJSON(self):
         return self.filelist2
         
