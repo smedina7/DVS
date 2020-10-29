@@ -4,55 +4,82 @@ import os
 import sys
 from GUI.Widgets.HomeWindow import MainGUI
 from GUI.PacketView.Manager import PacketManager
+from GUI.Dialogs.NewProjectDialog import NewProjectDialog
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
+from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtCore import Qt
 from PyQt5.uic import loadUi
+from PyQt5 import QtCore
+
+print(sys.executable)
 
 class DVSstartUpPage(QMainWindow):
     def __init__(self):
         super(DVSstartUpPage, self).__init__()
         loadUi('GUI/src/DVSstartUpPage.ui', self)
+        QApplication.setStyle("Fusion")
+
+        # Now use a palette to switch to dark colors:
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        palette.setColor(QPalette.WindowText, Qt.white)
+        palette.setColor(QPalette.Base, QColor(53, 53, 53))
+        palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+        palette.setColor(QPalette.ToolTipBase, Qt.white)
+        palette.setColor(QPalette.ToolTipText, Qt.white)
+        palette.setColor(QPalette.Text, Qt.white)
+        palette.setColor(QPalette.Button, QColor(53, 53, 53))
+        palette.setColor(QPalette.ButtonText, Qt.white)
+        palette.setColor(QPalette.BrightText, Qt.red)
+        palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        palette.setColor(QPalette.Highlight, QColor(70,70,70))
+        palette.setColor(QPalette.HighlightedText, Qt.black)
+        QApplication.setPalette(palette)
+
+        self.project_folder = ''
         self.setFixedSize(620,565)
         self.setGeometry(500, 300, 500, 100)
         self.CreateNew_pushButton = self.findChild(QPushButton, 'CreateNew_pushButton')
-        self.CreateNew_pushButton.clicked.connect(self.openMain)
+        self.CreateNew_pushButton.clicked.connect(self.createNewProject)
         self.CurrentProject_PushButton = self.findChild(QPushButton, 'CurrentProject_PushButton')
         self.CurrentProject_PushButton.clicked.connect(self.openDir)
         self.Settings_pushButton = self.findChild(QPushButton, 'Settings_pushButton')
         self.Settings_pushButton.clicked.connect(self.openSettings)
         self.show()
 
-    def openMain(self):
-        self.folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Project Directory you want to analyze"))
+    def createNewProject(self):
+        self.new_project_popup = NewProjectDialog()
+        self.new_project_popup.created.connect(self.project_created)
+        self.new_project_popup.show()
 
-        if self.folder_chosen == "":
-            logging.debug("File choose cancelled")
-            return
-
-        if len(self.folder_chosen) > 0:
-            project_path_chosen = os.path.abspath(self.folder_chosen)
-
-        self.manager = PacketManager(project_path_chosen)
+    def openHomeWindow(self):
+        self.manager = PacketManager(self.project_folder)
         json_files = self.manager.getJSON()
         clicks = self.manager.getClicks()
         timed = self.manager.getTimed()
-        self.window = MainGUI(json_files, clicks, timed, self.manager)
+        throughput = self.manager.getThroughput()
+        self.window = MainGUI(json_files, clicks, timed, throughput, self.manager)
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
+
+    #Slot for when the user created the new project, path and configname
+    @QtCore.pyqtSlot(str)
+    def project_created(self, project_dir):
+        self.project_folder = project_dir
+        self.openHomeWindow()
         self.hide()
-
+        
     def openDir(self):
-        self.folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
+        folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
 
-        if self.folder_chosen == "":
+        if folder_chosen == "":
             logging.debug("File choose cancelled")
             return
 
-        if len(self.folder_chosen) > 0:
-            QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
-            return
-
-        self.window.show()
-        self.window.hide()
+        if len(folder_chosen) > 0:
+            self.project_folder = folder_chosen
+            self.openHomeWindow()
+            self.hide()
 
     def openSettings(self):
         QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
