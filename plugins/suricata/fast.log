@@ -1,0 +1,12 @@
+10/20/2020-17:33:57.955297  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {TCP} 10.0.2.15:49292 -> 172.217.12.78:80
+10/20/2020-17:33:58.043008  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {TCP} 10.0.2.15:48336 -> 142.250.113.106:80
+10/20/2020-17:33:57.994073  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {TCP} 172.217.12.78:80 -> 10.0.2.15:49292
+10/20/2020-17:33:57.902549  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {UDP} 10.0.2.15:37139 -> 192.168.1.1:53
+10/20/2020-17:33:57.902549  [**] [1:2:0] Test dns_query option [**] [Classification: (null)] [Priority: 3] {UDP} 10.0.2.15:37139 -> 192.168.1.1:53
+10/20/2020-17:33:58.036749  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {UDP} 10.0.2.15:45865 -> 192.168.1.1:53
+10/20/2020-17:33:58.036749  [**] [1:2:0] Test dns_query option [**] [Classification: (null)] [Priority: 3] {UDP} 10.0.2.15:45865 -> 192.168.1.1:53
+10/20/2020-17:33:57.902572  [**] [1:2:0] Test dns_query option [**] [Classification: (null)] [Priority: 3] {UDP} 10.0.2.15:37139 -> 192.168.1.1:53
+10/20/2020-17:33:58.075413  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {TCP} 142.250.113.106:80 -> 10.0.2.15:48336
+10/20/2020-17:33:58.036783  [**] [1:2:0] Test dns_query option [**] [Classification: (null)] [Priority: 3] {UDP} 10.0.2.15:45865 -> 192.168.1.1:53
+10/20/2020-17:33:57.949593  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {UDP} 192.168.1.1:53 -> 10.0.2.15:37139
+10/20/2020-17:33:58.042454  [**] [1:1:0]  CMD-wget [**] [Classification: (null)] [Priority: 3] {UDP} 192.168.1.1:53 -> 10.0.2.15:45865
