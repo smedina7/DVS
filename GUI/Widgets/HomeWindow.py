@@ -10,8 +10,9 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-from GUI.Widgets.AbstractTable2 import pandasModel2
-from GUI.Widgets.AbstractTable2 import pandasModel3
+from GUI.Widgets.textdataline import Keypresses, SystemCalls
+from GUI.Widgets.Mouseclicks import First
+from GUI.Widgets.TimedScreenshots import First
 import pandas as pd
 
 from GUI.Threading.BatchThread import BatchThread
@@ -183,128 +184,197 @@ class MainGUI(QMainWindow):
             self.web.loadProgress.connect(self.loadprogress)
             self.web.loadFinished.connect(self.loadfinished)
             
+        # if q.text() == "Keypresses":
+        #     sub = QMdiSubWindow()
+        #     sub.resize(790,200)
+        #     sub.setWindowTitle("Keypresses")
+
+        #     #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
+        #     color = self.color_picker()
+        #     sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+
+        #     df = pd.read_json (self.key_json)
+
+        #     model = pandasModel(df)
+        #     view = QTableView()
+        #     view.setModel(model)
+
+        #     sub.setWidget(view)
+
+        #     header = view.horizontalHeader()
+        #     view.setColumnWidth(1, 210)
+        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        #     self.mdi.addSubWindow(sub)
+
+        #     view.setSelectionMode(QAbstractItemView.SingleSelection)
+        #     view.clicked.connect(self.getCoords)
+
+        #     view.show()
+        #     sub.show()
+
         if q.text() == "Keypresses":
             sub = QMdiSubWindow()
-            sub.resize(790,200)
+            sub.resize(700,150)
             sub.setWindowTitle("Keypresses")
-
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
             color = self.color_picker()
             sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-            df = pd.read_json (self.key_json)
-
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
-
+            sub.setWidget(QTextEdit())
+            df = self.key_json
+            view = Keypresses(df)
             sub.setWidget(view)
-
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
-
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
 
             view.show()
             sub.show()
 
         if q.text() == "System Calls":
             sub = QMdiSubWindow()
-            sub.resize(790,200)
+            sub.resize(700,200)
             sub.setWindowTitle("System Calls")
-            
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
+
             color = self.color_picker()
             sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
-            
-            df = pd.read_json(self.sys_json)
 
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
 
+            sub.setWidget(QTextEdit())
+            df = self.sys_json
+            view = SystemCalls(df)
             sub.setWidget(view)
-
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
-
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
 
             view.show()
             sub.show()
-
+        
         if q.text() == "Mouse Clicks":
             sub = QMdiSubWindow()
-            sub.resize(790,220)
+            sub.resize(700,150)
             sub.setWindowTitle("Mouse Clicks")
-            
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
             color = self.color_picker()
             sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
-            
-            df = pd.read_json(self.mouse_json)
 
-            model = pandasModel2(df, self.clicks_path)
+            sub.setWidget(QTextEdit())
+            df = self.mouse_json
             view = QTableView()
-            view.setModel(model)
-
+            view = First(df, self.clicks_path)
             sub.setWidget(view)
-
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            view.setColumnWidth(2, 50)
-            view.setIconSize(QSize(256, 256))
-            count_row = df.shape[0]
-            for x in range(count_row):
-                view.setRowHeight(x,100)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
-
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
-
             view.show()
             sub.show()
-
+        
         if q.text() == "Timed Screenshots":
             sub = QMdiSubWindow()
-            sub.resize(790,220)
+            sub.resize(700,150)
             sub.setWindowTitle("Timed Screenshots")
-            
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
             color = self.color_picker()
             sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-            df = pd.read_json(self.timed_json)
+            sub.setWidget(QTextEdit())
 
-            model = pandasModel3(df, self.timed_path)
-            view = QTableView()
-            view.setModel(model)
+            df = self.timed_json
 
+            view = First(df, self.timed_path)
             sub.setWidget(view)
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(4, 210)
-            view.setColumnWidth(2, 50) 
-            view.setIconSize(QSize(256, 256))
-            count_row = df.shape[0]
-            for x in range(count_row):
-                view.setRowHeight(x,100)
-
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
             self.mdi.addSubWindow(sub)
-
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
-
             view.show()
             sub.show()
+
+
+        # if q.text() == "System Calls":
+        #     sub = QMdiSubWindow()
+        #     sub.resize(790,200)
+        #     sub.setWindowTitle("System Calls")
+            
+        #     #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
+        #     color = self.color_picker()
+        #     sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+            
+        #     df = pd.read_json(self.sys_json)
+
+        #     model = pandasModel(df)
+        #     view = QTableView()
+        #     view.setModel(model)
+
+        #     sub.setWidget(view)
+
+        #     header = view.horizontalHeader()
+        #     view.setColumnWidth(1, 210)
+        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        #     self.mdi.addSubWindow(sub)
+
+        #     view.setSelectionMode(QAbstractItemView.SingleSelection)
+        #     view.clicked.connect(self.getCoords)
+
+        #     view.show()
+        #     sub.show()
+
+        # if q.text() == "Mouse Clicks":
+        #     sub = QMdiSubWindow()
+        #     sub.resize(790,220)
+        #     sub.setWindowTitle("Mouse Clicks")
+            
+        #     #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
+        #     color = self.color_picker()
+        #     sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+            
+        #     df = pd.read_json(self.mouse_json)
+
+        #     model = pandasModel2(df, self.clicks_path)
+        #     view = QTableView()
+        #     view.setModel(model)
+
+        #     sub.setWidget(view)
+
+        #     header = view.horizontalHeader()
+        #     view.setColumnWidth(1, 210)
+        #     view.setColumnWidth(2, 50)
+        #     view.setIconSize(QSize(256, 256))
+        #     count_row = df.shape[0]
+        #     for x in range(count_row):
+        #         view.setRowHeight(x,100)
+        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        #     self.mdi.addSubWindow(sub)
+
+        #     view.setSelectionMode(QAbstractItemView.SingleSelection)
+        #     view.clicked.connect(self.getCoords)
+
+        #     view.show()
+        #     sub.show()
+
+        # if q.text() == "Timed Screenshots":
+        #     sub = QMdiSubWindow()
+        #     sub.resize(790,220)
+        #     sub.setWindowTitle("Timed Screenshots")
+            
+        #     #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
+        #     color = self.color_picker()
+        #     sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+
+        #     df = pd.read_json(self.timed_json)
+
+        #     model = pandasModel3(df, self.timed_path)
+        #     view = QTableView()
+        #     view.setModel(model)
+
+        #     sub.setWidget(view)
+
+        #     header = view.horizontalHeader()
+        #     view.setColumnWidth(4, 210)
+        #     view.setColumnWidth(2, 50) 
+        #     view.setIconSize(QSize(256, 256))
+        #     count_row = df.shape[0]
+        #     for x in range(count_row):
+        #         view.setRowHeight(x,100)
+
+        #     header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        #     self.mdi.addSubWindow(sub)
+
+        #     view.setSelectionMode(QAbstractItemView.SingleSelection)
+        #     view.clicked.connect(self.getCoords)
+
+        #     view.show()
+        #     sub.show()
 
         if q.text() =="Tile Layout":
             self.mdi.tileSubWindows()    
