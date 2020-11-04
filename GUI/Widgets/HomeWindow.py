@@ -66,12 +66,6 @@ class MainGUI(QMainWindow):
         self.tb.addWidget(self.sync_button_timestamp)
         self.sync_button_timestamp.clicked.connect(self.buttonaction_timestamp)
 
-        #create color button
-        """ self.color_button = QPushButton(self.tb)
-        self.color_button.setText("Color")
-        self.tb.addWidget(self.color_button)
-        self.color_button.clicked.connect(self.color_picker) """
-
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
