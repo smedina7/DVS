@@ -3,6 +3,7 @@ import subprocess
 import shlex
 import sys, traceback
 import os
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QMessageBox
@@ -16,6 +17,8 @@ class PacketManager():
         self.filelist = list()
         self.filelist2 = list()
         self.throughput_path = ''
+        self.clicks_path = ''
+        self.timed_path = ''
         self.wireshark_thread = QThread()
         self.web_engine_thread = QThread()
 
@@ -79,14 +82,17 @@ class PacketManager():
             self.wireshark_thread = WiresharkRunner(pcap_filename=pcap_path)
 
         self.wireshark_thread.start()
+    
+    def stopWireshark(self):
+        self.wireshark_thread.quit()
 
     def runWebEngine(self):
-        self.web_engine_thread = RunWebEngine(throughputfile=self.throughput_path)
+        self.web_engine_thread = RunWebEngine()
         self.web_engine_thread.start()
-
-    def closeWebEngine(self):
-        self.web_engine_thread.isFinished()
-
+    
+    def stopWebEngine(self):
+        self.web_engine_thread.stopTrigHandle()
+        
     def getJSON(self):
         return self.filelist2
         

@@ -47,7 +47,7 @@ done
 
 ### Install dependencies
 REQUIRED_PROGRAMS="python3-pip python3-venv git"
-REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 plotly dash Flask pandas flask_caching PyQtWebEngine virtualenv"
+REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 dash dash-bootstrap-components==0.10.7rc1 plotly Flask pandas flask_caching PyQtWebEngine virtualenv dash_daq"
 
 echo "+++++++++++++++++++++++++++++++++"
 echo "installing REQUIRED_PROGRAMS"
@@ -72,4 +72,7 @@ fi
 
 source venv/bin/activate
 pip install pip --upgrade
-pip install $REQUIRED_PYTHON_PACKAGES --use-feature=2020-resolver
+# sudo pip install dash --use-feature=2020-resolver
+# sudo pip install dash-bootstrap-components==0.10.7rc1 --use-feature=2020-resolver
+sudo apt-get install -y python3-pyqt5.qtwebengine
+sudo pip install $REQUIRED_PYTHON_PACKAGES --use-feature=2020-resolver
