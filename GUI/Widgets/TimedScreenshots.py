@@ -22,7 +22,7 @@ class Second(QtWidgets.QMainWindow):
         self.move(300, 200)   
  
  
-class First(QtWidgets.QMainWindow):
+class Timed(QtWidgets.QMainWindow):
     def __init__(self, data, clicks_path):
         # super(First, self).__init__(parent)
         QtWidgets.QMainWindow.__init__(self)

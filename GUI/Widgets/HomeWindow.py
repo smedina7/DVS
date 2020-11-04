@@ -12,7 +12,7 @@ from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.textdataline import Keypresses, SystemCalls
 from GUI.Widgets.Mouseclicks import First
-from GUI.Widgets.TimedScreenshots import First
+from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
 
 from GUI.Threading.BatchThread import BatchThread
@@ -273,7 +273,7 @@ class MainGUI(QMainWindow):
 
             df = self.timed_json
 
-            view = First(df, self.timed_path)
+            view = Timed(df, self.timed_path)
             sub.setWidget(view)
 
             self.mdi.addSubWindow(sub)
