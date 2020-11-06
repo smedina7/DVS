@@ -231,8 +231,6 @@ class MainGUI(QMainWindow):
 
             table = Keypresses(data, count_row, 4)
             # table.cellClicked.connect(self.updateUiCellClick)
-
-
             # print(table.item(1,0).text())
 
             sub.setWidget(table)
@@ -251,12 +249,15 @@ class MainGUI(QMainWindow):
 
 
             sub.setWidget(QTextEdit())
-            df = self.sys_json
-            view = SystemCalls(df)
-            sub.setWidget(view)
+            data =  self.sys_json
+            df = pd.read_json(self.sys_json)
+            count_row = df.shape[0]
+
+            table = SystemCalls(data, count_row, 4)
+            sub.setWidget(table)
             self.mdi.addSubWindow(sub)
 
-            view.show()
+            table.show()
             sub.show()
         
         if q.text() == "Mouse Clicks":
