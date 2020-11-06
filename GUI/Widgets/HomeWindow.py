@@ -7,6 +7,7 @@ import subprocess
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+# from PyQt5.QtWidgets import QTableWidget, QAction, QPushButton, QApplication, QTableView, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QTableWidgetItem
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
@@ -165,6 +166,8 @@ class MainGUI(QMainWindow):
             self.timestamp = stamp
             self.syncWindows()
 
+
+
     def windowaction(self, q):
         if q.text() == "Throughput":
             #file that holds throughput file path and selected dataline color; this will be read by dash app
@@ -212,6 +215,7 @@ class MainGUI(QMainWindow):
         #     view.show()
         #     sub.show()
 
+        
         if q.text() == "Keypresses":
             sub = QMdiSubWindow()
             sub.resize(700,150)
@@ -220,12 +224,21 @@ class MainGUI(QMainWindow):
             sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
             sub.setWidget(QTextEdit())
-            df = self.key_json
-            view = Keypresses(df)
-            sub.setWidget(view)
+            data = self.key_json
+            df = pd.read_json(self.key_json)
+
+            count_row = df.shape[0]
+
+            table = Keypresses(data, count_row, 4)
+            # table.cellClicked.connect(self.updateUiCellClick)
+
+
+            # print(table.item(1,0).text())
+
+            sub.setWidget(table)
             self.mdi.addSubWindow(sub)
 
-            view.show()
+            table.show()
             sub.show()
 
         if q.text() == "System Calls":
