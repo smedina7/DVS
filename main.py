@@ -73,7 +73,6 @@ class DVSstartUpPage(QMainWindow):
     def sync_enabled(self, enabled):
         self.enabled_sync = enabled
         print("IN MAIN: Is Sync Enabled? - " + str(self.enabled_sync))
-        #self.settings_popup.hide()
         
     def openDir(self):
         folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
@@ -90,9 +89,7 @@ class DVSstartUpPage(QMainWindow):
     def openSettings(self):
         self.settings_popup = SettingsDialog(self.enabled_sync)
         self.settings_popup.sync_enabled.connect(self.sync_enabled)
-        self.settings_popup.show()
-        #QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
-    
+        self.settings_popup.show()    
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Window', 'Are you sure you want to quit?', 
