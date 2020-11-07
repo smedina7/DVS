@@ -166,6 +166,9 @@ class MainGUI(QMainWindow):
             self.timestamp = stamp
             self.syncWindows()
 
+    def selectRows(self, selection: list):
+        for i in selection: 
+            self.tableWidget.selectRow(i)
 
 
     def windowaction(self, q):
@@ -225,18 +228,23 @@ class MainGUI(QMainWindow):
 
             sub.setWidget(QTextEdit())
             data = self.key_json
-            df = pd.read_json(self.key_json)
 
-            count_row = df.shape[0]
-
-            table = Keypresses(data, count_row, 4)
+            count_row = 0
+            print(count_row)
+            self.tableWidget = QTableWidget (self)
+            self.tableWidget = Keypresses(data, count_row, 4)
+            # table = Keypresses(data, count_row, 4)
             # table.cellClicked.connect(self.updateUiCellClick)
             # print(table.item(1,0).text())
+            # view.setSelectionMode(QAbstractItemView.SingleSelection)
+            lstSelection = [0, 1]
+            self.selectRows(lstSelection)
+            
 
-            sub.setWidget(table)
+            sub.setWidget(self.tableWidget)
             self.mdi.addSubWindow(sub)
 
-            table.show()
+            self.tableWidget.show()
             sub.show()
 
         if q.text() == "System Calls":
@@ -250,14 +258,19 @@ class MainGUI(QMainWindow):
 
             sub.setWidget(QTextEdit())
             data =  self.sys_json
-            df = pd.read_json(self.sys_json)
-            count_row = df.shape[0]
+            count_row = 0
 
-            table = SystemCalls(data, count_row, 4)
-            sub.setWidget(table)
+            self.tableWidget = QTableWidget (self)
+            self.tableWidget = SystemCalls(data, count_row, 4)
+
+            # table = SystemCalls(data, count_row, 4)
+            sub.setWidget(self.tableWidget)
             self.mdi.addSubWindow(sub)
 
-            table.show()
+            lstSelection = [0, 3,4]
+            self.selectRows(lstSelection)
+
+            self.tableWidget.show()
             sub.show()
         
         if q.text() == "Mouse Clicks":

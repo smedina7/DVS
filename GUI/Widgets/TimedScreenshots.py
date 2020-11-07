@@ -47,7 +47,7 @@ class Timed(QtWidgets.QMainWindow):
             for j in keys:
                 btn= QtWidgets.QPushButton()
                 it = QtWidgets.QTableWidgetItem()
-                if j == "clicks_id":
+                if j == "time_id":
                     it.setData(QtCore.Qt.DisplayRole, (clicks_id))
                 
                 elif j == "content":
@@ -85,4 +85,7 @@ class Timed(QtWidgets.QMainWindow):
         dialog = Second(self.clicks,self)
         self.dialogs.append(dialog)
         dialog.show()
+
+
+    
  
