@@ -36,6 +36,7 @@ class Timed(QtWidgets.QMainWindow):
         labels = keys
         w = QtWidgets.QTableWidget(0, len(labels))
         w.setHorizontalHeaderLabels(labels)
+        w.setObjectName("timedscreenshots")
         df = pd.read_json (dfdata)
         pathclicks = ""
         

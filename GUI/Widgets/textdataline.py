@@ -35,16 +35,7 @@ class Keypresses(QTableWidget):
 
                 self.setItem(ind, c, it)
                 c= c+1
-        self.cellClicked.connect(self.cell_was_clicked)        
 
-
-    def cell_was_clicked(self):
-        row = self.currentItem().row()
-        # print (row)
-        col = self.currentItem().column()
-        # print (col)
-        item = self.item(row,col).text()
-        print (item)
 
 
 class SystemCalls(QTableWidget):
@@ -74,46 +65,6 @@ class SystemCalls(QTableWidget):
 
                 self.setItem(ind, c, it)
                 c= c+1
-        self.cellClicked.connect(self.cell_was_clicked)        
 
 
-    def cell_was_clicked(self):
-        row = self.currentItem().row()
-        # print (row)
-        col = self.currentItem().column()
-        # print (col)
-        item = self.item(row,col).text()
-        print (item)
-
-# class SystemCalls(QtWidgets.QMainWindow):
-#     def __init__(self, data):
-#         # super(First, self).__init__(parent)
-#         QtWidgets.QMainWindow.__init__(self)
-#         self._data = data
-#         dfdata = data
-
-
-#         keys = ["auditd_id", "content", "className", "start"]
-#         labels = keys
-#         w = QtWidgets.QTableWidget(0, len(labels))
-#         w.setHorizontalHeaderLabels(labels)
-#         df = pd.read_json (dfdata)
-        
-#         for ind in df.index:
-#             c = 0
-#             tableid = str(ind)
-#             w.insertRow(w.rowCount())
-            
-#             for j in keys:
-#                 btn= QtWidgets.QPushButton()
-#                 it = QtWidgets.QTableWidgetItem()
-#                 if j == "auditd_id":
-#                     it.setData(QtCore.Qt.DisplayRole, (tableid))
-#                 else:
-#                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
-
-#                 w.setItem(ind, c, it)
-#                 c= c+1
-
-#         self.setCentralWidget(w)
 

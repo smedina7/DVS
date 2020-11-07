@@ -38,6 +38,7 @@ class First(QtWidgets.QMainWindow):
         keys = ["clicks_id", "content", "type", "classname", "start"]
         labels = keys
         w = QtWidgets.QTableWidget(0, len(labels))
+        w.setObjectName("mouseclicks")
         w.setHorizontalHeaderLabels(labels)
         # df = pd.read_json (r'test3/ParsedLogs/MouseClicks.JSON')
         df = pd.read_json (dfdata)
