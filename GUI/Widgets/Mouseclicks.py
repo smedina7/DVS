@@ -44,19 +44,19 @@ class First(QtWidgets.QMainWindow):
                 it = QtWidgets.QTableWidgetItem()
                 if j == "clicks_id":
                     it.setData(QtCore.Qt.DisplayRole, (clicks_id))
-                
+                        
                 elif j == "content":
                     path = (df[j][ind])
                     last = path.split('/')[-1]
                     pathclicks = os.path.join(self.clicks, last)
-                    it.setData(QtCore.Qt.DisplayRole, (pathclicks))
                     icon  = QtGui.QIcon(pathclicks)
                     btn= QtWidgets.QPushButton()
                     btn.setIcon(icon)
-                    btn.setIconSize(QtCore.QSize(300, 300))
-                    w.setCellWidget(ind,c, btn)
+                    btn.setIconSize(QtCore.QSize(200, 200))
+                    w.setColumnWidth(ind, 200)
+                    w.setRowHeight(ind, 100)
+                    w.setCellWidget(ind,c,btn)
                     btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
-
 
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))

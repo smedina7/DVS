@@ -194,7 +194,7 @@ class MainGUI(QMainWindow):
     
     def keypresses_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(790,150)
         sub.setWindowTitle("Keypresses")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -210,7 +210,7 @@ class MainGUI(QMainWindow):
 
     def syscalls_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,200)
+        sub.resize(790,200)
         sub.setWindowTitle("System Calls")
 
         color = self.color_picker()
@@ -227,7 +227,7 @@ class MainGUI(QMainWindow):
     
     def mouse_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(790,150)
         sub.setWindowTitle("Mouse Clicks")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -243,7 +243,7 @@ class MainGUI(QMainWindow):
 
     def timed_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(790,150)
         sub.setWindowTitle("Timed Screenshots")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
