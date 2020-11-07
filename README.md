@@ -29,7 +29,7 @@ DVS installation steps:
 Install eceld-wireshark using the installer provided. Type the following in the command prompt.
 
 ```bash
-> eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
+> nsis\Wireshark-win64-3.2.5.exe
 ```
 You will get a prompt to install wireshark. Install using default settings provided.
 
@@ -38,7 +38,7 @@ You will get a prompt to install wireshark. Install using default settings provi
 - Install required dependencies:
 ``` bash
 > pip install virtualenv
-> python -m venv dvs-venv
+> virtualenv dvs-venv 
 > dvs-venv\Scripts\activate
 (dvs-venv) > pip install -r requirements.txt
 ```
@@ -46,17 +46,20 @@ You will get a prompt to install wireshark. Install using default settings provi
 Start the DVS GUI:
 
 ``` bash 
-(dvs-venv) > run-dvs.py 
-```
+* Install Eceld-Netsys: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-netsys.git
+* Install Eceld-Wireshark: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-wireshark
+* Install with the DVS Installer 
 
-#### Linux
-##### To run in a Python virtual environment:
+DVS installation steps:
 
 Clone the repo to your desired destination and go into the DVS folder: 
 
 ```bash
 $ git clone https://github.com/smedina7/DVS
+<<<<<<< HEAD
 $ cd dvs
+$ cd DVS
+>>>>>>> bsalvarez
 ```
 
 Install ECELD-Wireshark & Python3 dependencies into environment:
@@ -64,6 +67,20 @@ Install ECELD-Wireshark & Python3 dependencies into environment:
 ```bash
 $ sudo ./installDeb.sh
 ```
+
+When prompted:
+
+```bash
+kali@kali:~/DVS$ sudo ./installDeb.sh 
+Running apt-get update
+Hit:1 https://packages.microsoft.com/repos/vscode stable InRelease
+Hit:2 http://kali.download/kali kali-rolling InRelease
+Reading package lists... Done
+DVS depends on : eceld-wireshark would you like to install it [Y/n] 
+```
+Input "Y" to install Eceld-Wireshark.
+
+**If you already have Eceld-Wireshark installed, skip installation by inputing "n"**
 
 Activate Environment:
 
@@ -74,8 +91,12 @@ $ source venv/bin/activate
 Run DVS:
 
 ```
-$ bash run-dvs.sh
+$ python3 main.py
 ```
+
+
+
+
 
 
 ## Team Collaborators
