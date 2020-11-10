@@ -3,7 +3,6 @@ import os
 import time
 from re import search
 import subprocess
-import json
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -128,24 +127,22 @@ class MainGUI(QMainWindow):
 
     def syncWindows(self):
         if self.timestampTrigger:
-            children = self.findChildren(QTableView)
+            children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.MultiSelection)
-                columncount = child.model().columnCount()
+                columncount = child.columnCount()
                 child.clearSelection()
-                for row in range(child.model().rowCount()):
-                    index = child.model().index(row, columncount - 1)
-                    indexTimeStamp = str(child.model().itemData(index))
-                    temp = indexTimeStamp[5:len(indexTimeStamp) - 2]
-                    if self.timestamp == temp:
+                for row in range(child.rowCount()):
+                    indexTimeStamp = child.item(row,columncount-1).text()
+                    if self.timestamp == indexTimeStamp:
                         child.selectRow(row)
-                    child.show()
+                    #child.show()
         if self.timestampTrigger == False:
-            children = self.findChildren(QTableView)
+            children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.SingleSelection)
                 child.clearSelection()
-                child.show()
+                #child.show()
 
     def buttonaction_timestamp(self, b):
         if b == True:
@@ -163,16 +160,20 @@ class MainGUI(QMainWindow):
     def resizeEvent(self, event):
         self.sizeHint()
 
-    def getCoords(self, item):
-        columncount = item.model().columnCount()
-        row = item.row()
-        index = item.model().index(row, columncount - 1)
-        indexTimeStamp = str(item.model().itemData(index))
+    def getCoords(self, r , c):
+        sender = self.sender()
+        name = sender.objectName()
+        table = self.findChild(QTableWidget, name)
+        columncount = table.columnCount()
+        indexTimeStamp = table.item(r,columncount-1).text()
         if (self.timestampTrigger):
             # stamp = DateFormat("yyyy-MM-dd'T'HH:MM:ss")
-            stamp = indexTimeStamp[5:len(indexTimeStamp) - 2]
-            self.timestamp = stamp
+            self.timestamp = indexTimeStamp
             self.syncWindows()
+
+    def selectRows(self, selection: list):
+        for i in selection: 
+            self.tableWidget.selectRow(i)
 
     def throughput_selected(self):
         #file that holds throughput file path and selected dataline color; this will be read by dash app
@@ -194,69 +195,98 @@ class MainGUI(QMainWindow):
     
     def keypresses_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(790,200)
+        sub.resize(700,150)
         sub.setWindowTitle("Keypresses")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
         sub.setWidget(QTextEdit())
-        df = self.key_json
-        view = Keypresses(df)
-        sub.setWidget(view)
+        data = self.key_json
+
+        count_row = 0
+        self.tableWidget = QTableWidget (self)
+        self.tableWidget = Keypresses(data, count_row, 4)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Keypresses")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+        
+        sub.setWidget(self.tableWidget)
         self.mdi.addSubWindow(sub)
 
-        view.show()
+        self.tableWidget.show()
         sub.show()
 
     def syscalls_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(790,200)
+        sub.resize(700,200)
         sub.setWindowTitle("System Calls")
 
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
         sub.setWidget(QTextEdit())
-        df = self.sys_json
-        view = SystemCalls(df)
-        sub.setWidget(view)
+        data =  self.sys_json
+        count_row = 0
+
+        self.tableWidget = QTableWidget (self)
+        self.tableWidget = SystemCalls(data, count_row, 4)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Systemcalls")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+
+        sub.setWidget(self.tableWidget)
         self.mdi.addSubWindow(sub)
 
-        view.show()
+        self.tableWidget.show()
         sub.show()
-    
+
     def mouse_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(790,250)
+        sub.resize(700,150)
         sub.setWindowTitle("Mouse Clicks")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
         sub.setWidget(QTextEdit())
         df = self.mouse_json
-        view = QTableView()
-        view = First(df, self.clicks_path)
-        sub.setWidget(view)
+        count_row = 0
+
+        self.tableWidget = QTableWidget (self)
+        self.tableWidget = First(df, self.clicks_path, count_row, 5)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Mouseclicks")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+
+        sub.setWidget(self.tableWidget)
         self.mdi.addSubWindow(sub)
-        view.show()
+        self.tableWidget.show()
         sub.show()
 
     def timed_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(790,250)
+        sub.resize(700,150)
         sub.setWindowTitle("Timed Screenshots")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
         sub.setWidget(QTextEdit())
-
         df = self.timed_json
 
-        view = Timed(df, self.timed_path)
-        sub.setWidget(view)
+        count_row = 0
 
+        self.tableWidget = QTableWidget (self)
+        self.tableWidget = Timed(df, self.timed_path, count_row, 5)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("TimedScreenshots")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+
+        sub.setWidget(self.tableWidget)
         self.mdi.addSubWindow(sub)
-        view.show()
+        self.tableWidget.show()
         sub.show()
 
     def tile_selected(self):
