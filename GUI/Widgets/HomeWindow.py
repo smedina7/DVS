@@ -176,25 +176,25 @@ class MainGUI(QMainWindow):
 
     def throughput_selected(self):
         #file that holds throughput file path and selected dataline color; this will be read by dash app
-            path = os.path.abspath("GUI/Dash/throughput_info.txt")
-            throughput_info_file = open(path, 'w')
-            throughput_info_file.write(self.throughput_json+"\n")
+        path = os.path.abspath("GUI/Dash/throughput_info.txt")
+        throughput_info_file = open(path, 'w')
+        throughput_info_file.write(self.throughput_json+"\n")
 
-            #get rgb values for graph background color
-            color = self.color_picker()
-            throughput_info_file.write(str(color.getRgb())+"\n")
-            throughput_info_file.close()
+        #get rgb values for graph background color
+        color = self.color_picker()
+        throughput_info_file.write(str(color.getRgb())+"\n")
+        throughput_info_file.close()
 
-            self.web = QWebEngineView()
-            self.manager_instance.runWebEngine() #start dash
-            self.web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser
-            self.web.loadStarted.connect(self.loadstarted)
-            self.web.loadProgress.connect(self.loadprogress)
-            self.web.loadFinished.connect(self.loadfinished)
+        self.web = QWebEngineView()
+        self.manager_instance.runWebEngine() #start dash
+        self.web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser
+        self.web.loadStarted.connect(self.loadstarted)
+        self.web.loadProgress.connect(self.loadprogress)
+        self.web.loadFinished.connect(self.loadfinished)
     
     def keypresses_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(790,150)
+        sub.resize(790,200)
         sub.setWindowTitle("Keypresses")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -227,7 +227,7 @@ class MainGUI(QMainWindow):
     
     def mouse_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(790,150)
+        sub.resize(790,250)
         sub.setWindowTitle("Mouse Clicks")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -243,7 +243,7 @@ class MainGUI(QMainWindow):
 
     def timed_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(790,150)
+        sub.resize(790,250)
         sub.setWindowTitle("Timed Screenshots")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -277,7 +277,6 @@ class MainGUI(QMainWindow):
                 open_f = open(json_chosen_path, "r")
                 open_json = json.load(open_f)
                 for j in open_json:
-                    #open_json = json.load(j)
                     mouse_key = "clicks_id"
                     timed_key = "timed_id"
                     keypress_key = "keypresses_id"

@@ -20,7 +20,6 @@ class Second(QtWidgets.QMainWindow):
         self.resize(200, 200)
         self.move(300, 200)   
  
- 
 class Timed(QtWidgets.QMainWindow):
     def __init__(self, data, clicks_path):
         QtWidgets.QMainWindow.__init__(self)
@@ -54,8 +53,7 @@ class Timed(QtWidgets.QMainWindow):
                     btn= QtWidgets.QPushButton()
                     btn.setIcon(icon)
                     btn.setIconSize(QtCore.QSize(200, 200))
-                    w.setColumnWidth(ind, 200)
-                    w.setRowHeight(ind, 100)
+                    btn.setStyleSheet('QPushButton{border: 0px solid;}')
                     w.setCellWidget(ind,c, btn)
                     btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
 
@@ -67,6 +65,8 @@ class Timed(QtWidgets.QMainWindow):
 
         btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
         self.dialogs = list()
+        w.resizeColumnsToContents()
+        w.resizeRowsToContents()
         self.setCentralWidget(w)
 
     def on_pushButton_clicked(self, clicks_path):
