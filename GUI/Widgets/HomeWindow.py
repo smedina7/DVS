@@ -14,7 +14,8 @@ from GUI.Widgets.textdataline import Keypresses, SystemCalls
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
-
+from GUI.Widgets.Timestamp import Timestamp
+from GUI.PacketView.WiresharkColorFilters import WiresharkColors
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 
@@ -29,6 +30,7 @@ class MainGUI(QMainWindow):
         throughput_path = throughput
         self.web = ''
         self.progress = ProgressBarDialog(self, 100)
+        t = Timestamp()
 
         self.key_json = ''
         self.sys_json = ''
@@ -117,6 +119,9 @@ class MainGUI(QMainWindow):
         self.timestamp = ""
         self.timestampTrigger = False
 
+    def file_changed(self):
+        self.syncWindows(1)
+
     def buttonaction_wireshark(self, b):
         if b == True:
             self.sync_button_wireshark.setText("Wireshark Sync : on")
@@ -125,7 +130,7 @@ class MainGUI(QMainWindow):
             self.sync_button_wireshark.setText("Wireshark Sync : off")
             self.wiresharkTrigger = False
 
-    def syncWindows(self):
+    def syncWindows(self, b):
         if self.timestampTrigger:
             children = self.findChildren(QTableWidget)
             for child in children:
@@ -134,9 +139,16 @@ class MainGUI(QMainWindow):
                 child.clearSelection()
                 for row in range(child.rowCount()):
                     indexTimeStamp = child.item(row,columncount-1).text()
-                    if self.timestamp == indexTimeStamp:
-                        child.selectRow(row)
-                    #child.show()
+                    if b == -1:
+                        if self.timestamp == indexTimeStamp:
+                            child.selectRow(row)
+                            Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
+                    else:
+                        currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
+                        if indexTimeStamp == currTimeStamp:
+                            child.clearSelection()
+                            child.selectRow(row)
+                        #child.show()
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
@@ -148,14 +160,17 @@ class MainGUI(QMainWindow):
         if b == True:
             self.sync_button_timestamp.setText("Timestamp Sync : on")
             self.timestampTrigger = True
+            self.file_watcher = QFileSystemWatcher()
+            self.file_watcher.addPath('/home/kali/DVS/GUI/Dash/timestamp.txt') #listens for file changes
+            self.file_watcher.fileChanged.connect(self.file_changed)
             # redraw
-            self.syncWindows()
+            self.syncWindows(-1)
         else:
             self.sync_button_timestamp.setText("Timestamp Sync : off")
             self.timestampTrigger = False
             # undraw
             self.timestamp = ""
-            self.syncWindows()
+            self.syncWindows(-1)
 
     def resizeEvent(self, event):
         self.sizeHint()
@@ -167,9 +182,9 @@ class MainGUI(QMainWindow):
         columncount = table.columnCount()
         indexTimeStamp = table.item(r,columncount-1).text()
         if (self.timestampTrigger):
-            # stamp = DateFormat("yyyy-MM-dd'T'HH:MM:ss")
             self.timestamp = indexTimeStamp
-            self.syncWindows()
+            Timestamp.update_timestamp(self.timestamp) #writes to timestamp.txt (updates timestamp)
+            self.syncWindows(-1)
 
     def selectRows(self, selection: list):
         for i in selection: 
@@ -200,6 +215,8 @@ class MainGUI(QMainWindow):
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
+        WiresharkColors(sub.windowTitle(), color.getRgb())
+
         sub.setWidget(QTextEdit())
         data = self.key_json
 
@@ -225,6 +242,9 @@ class MainGUI(QMainWindow):
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
+        WiresharkColors(sub.windowTitle(), color.getRgb())
+
+
         sub.setWidget(QTextEdit())
         data =  self.sys_json
         count_row = 0
@@ -248,6 +268,7 @@ class MainGUI(QMainWindow):
         sub.setWindowTitle("Mouse Clicks")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        WiresharkColors(sub.windowTitle(), color.getRgb())
 
         sub.setWidget(QTextEdit())
         df = self.mouse_json
@@ -271,6 +292,9 @@ class MainGUI(QMainWindow):
         sub.setWindowTitle("Timed Screenshots")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+
+        WiresharkColors(sub.windowTitle(), color.getRgb())
+
 
         sub.setWidget(QTextEdit())
         df = self.timed_json
