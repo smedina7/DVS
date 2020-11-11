@@ -26,7 +26,6 @@ class WiresharkColors():
     def setFilterRule(self, keyword, tty_standard_color):
         custom_filter = keyword.lower()
         blacktext = "[0,0,0]"
-        #newRule = "@"+keyword+"@"+custom_filter+"@"+tty_standard_color+blacktext
         if keyword == "Keypresses":
             newRule = "@"+"Keypress Log"+"@"+"keypresses"+"@"+tty_standard_color+blacktext
         if keyword == "Timed Screenshots":
@@ -37,7 +36,6 @@ class WiresharkColors():
             newRule = "@"+"MouseClicks Log"+"@"+"mouseclicks"+"@"+tty_standard_color+blacktext
 
         self.appendToColorFilterFile(newRule+"\n")
-        
         
     def appendToColorFilterFile(self, newRule):
         path = os.path.abspath("GUI/PacketView/colorFilters.txt")

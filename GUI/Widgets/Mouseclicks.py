@@ -39,7 +39,6 @@ class First(QTableWidget):
             self.insertRow(self.rowCount())
             
             for j in keys:
-                btn= QtWidgets.QPushButton()
                 it = QtWidgets.QTableWidgetItem()
                 if j == "clicks_id":
                     it.setData(QtCore.Qt.DisplayRole, (clicks_id))
@@ -49,12 +48,13 @@ class First(QTableWidget):
                     last = path.split('/')[-1]
                     pathclicks = os.path.join(self.clicks, last)
                     icon  = QtGui.QIcon(pathclicks)
-                    btn= QtWidgets.QPushButton()
-                    btn.setIcon(icon)
-                    btn.setIconSize(QtCore.QSize(200, 200))
-                    btn.setStyleSheet('QPushButton{border: 0px solid;}')
-                    self.setCellWidget(ind,c,btn)
-                    btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
+                    self.btn= QtWidgets.QToolButton()
+                    self.btn.setText(pathclicks)
+                    self.btn.setIcon(icon)
+                    self.btn.setIconSize(QtCore.QSize(200, 200))
+                    self.btn.setStyleSheet('QToolButton{border: 0px solid; font-size: 1px;padding-bottom: 1px; height: 100px; width: 200px;}')
+                    self.setCellWidget(ind,c,self.btn)
+                    self.btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
 
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
@@ -62,13 +62,13 @@ class First(QTableWidget):
                 self.setItem(ind, c, it)
                 c= c+1     
 
-        btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
         self.dialogs = list()
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
 
     def on_pushButton_clicked(self, clicks_path):
         self.clicks = clicks_path
-        dialog = Second(self.clicks,self)
+        path = self.sender().text()
+        dialog = Second(path,self)
         self.dialogs.append(dialog)
         dialog.show()

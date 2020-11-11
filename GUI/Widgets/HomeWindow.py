@@ -113,8 +113,8 @@ class MainGUI(QMainWindow):
 
         #Home Window Widget Configuration
         self.setWindowTitle("Timeline View")
-        self.setMinimumHeight(700)
-        self.setMinimumWidth(800)
+        self.setMinimumHeight(750)
+        self.setMinimumWidth(850)
         # sync stuff
         self.timestamp = ""
         self.timestampTrigger = False
@@ -210,7 +210,7 @@ class MainGUI(QMainWindow):
     
     def keypresses_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(840,210)
         sub.setWindowTitle("Keypresses")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -236,14 +236,13 @@ class MainGUI(QMainWindow):
 
     def syscalls_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,200)
+        sub.resize(840,210)
         sub.setWindowTitle("System Calls")
 
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
         WiresharkColors(sub.windowTitle(), color.getRgb())
-
 
         sub.setWidget(QTextEdit())
         data =  self.sys_json
@@ -264,7 +263,7 @@ class MainGUI(QMainWindow):
 
     def mouse_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(840,260)
         sub.setWindowTitle("Mouse Clicks")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -288,7 +287,7 @@ class MainGUI(QMainWindow):
 
     def timed_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(840,260)
         sub.setWindowTitle("Timed Screenshots")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -373,7 +372,7 @@ class MainGUI(QMainWindow):
 
     def load_throughput_complete(self):
         sub = QMdiSubWindow()
-        sub.resize(790,320)
+        sub.resize(840,320)
         sub.setWindowTitle("Throughput")
         loading_label = QLabel("Loading...")
         sub.setWidget(loading_label)
