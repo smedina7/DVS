@@ -148,20 +148,20 @@ class MainGUI(QMainWindow):
                         if indexTimeStamp == currTimeStamp:
                             child.clearSelection()
                             child.selectRow(row)
-                        #child.show()
+                
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.SingleSelection)
                 child.clearSelection()
-                #child.show()
 
     def buttonaction_timestamp(self, b):
         if b == True:
             self.sync_button_timestamp.setText("Timestamp Sync : on")
             self.timestampTrigger = True
             self.file_watcher = QFileSystemWatcher()
-            self.file_watcher.addPath('/home/kali/DVS/GUI/Dash/timestamp.txt') #listens for file changes
+            path = os.path.abspath('GUI/Dash/timestamp.txt')
+            self.file_watcher.addPath(path) #listens for file changes
             self.file_watcher.fileChanged.connect(self.file_changed)
             # redraw
             self.syncWindows(-1)
@@ -180,6 +180,7 @@ class MainGUI(QMainWindow):
         name = sender.objectName()
         table = self.findChild(QTableWidget, name)
         columncount = table.columnCount()
+    
         indexTimeStamp = table.item(r,columncount-1).text()
         if (self.timestampTrigger):
             self.timestamp = indexTimeStamp
@@ -379,7 +380,28 @@ class MainGUI(QMainWindow):
         self.mdi.addSubWindow(sub)
         sub.show()
         self.web.show()
-        sub.setWidget(self.web)     
+        sub.setWidget(self.web)  
+
+    """ def contextMenuEvent(self, event):
+        menu = QMenu(self)
+        addRow = menu.addAction("Add Row")
+        addColumn = menu.addAction("Add Column")
+    
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+        if action == addRow:
+            self.addRow()
+        elif action ==addColumn:
+            self.addColumn()
+
+    def addRow(self):
+        print("New Row Added")
+        row = self.tableWidget.rowCount()
+        self.tableWidget.setRowCount(row+1)
+
+    def addColumn(self):
+        print("New Column Added")
+        col = self.tableWidget.columnCount()
+        self.tableWidget.setColumnCount(col+1) """
     
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
