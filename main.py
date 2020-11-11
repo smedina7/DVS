@@ -5,13 +5,12 @@ import sys
 from GUI.Widgets.HomeWindow import MainGUI
 from GUI.PacketView.Manager import PacketManager
 from GUI.Dialogs.NewProjectDialog import NewProjectDialog
+from GUI.Dialogs.Settings import SettingsDialog
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
 from PyQt5.uic import loadUi
 from PyQt5 import QtCore
-
-print(sys.executable)
 
 class DVSstartUpPage(QMainWindow):
     def __init__(self):
@@ -36,6 +35,7 @@ class DVSstartUpPage(QMainWindow):
         palette.setColor(QPalette.HighlightedText, Qt.black)
         QApplication.setPalette(palette)
 
+        self.enabled_sync = False
         self.project_folder = ''
         self.setFixedSize(620,565)
         self.setGeometry(500, 300, 500, 100)
@@ -68,6 +68,11 @@ class DVSstartUpPage(QMainWindow):
         self.project_folder = project_dir
         self.openHomeWindow()
         self.hide()
+
+    @QtCore.pyqtSlot(bool)
+    def sync_enabled(self, enabled):
+        self.enabled_sync = enabled
+        print("IN MAIN: Is Sync Enabled? - " + str(self.enabled_sync))
         
     def openDir(self):
         folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
@@ -82,17 +87,16 @@ class DVSstartUpPage(QMainWindow):
             self.hide()
 
     def openSettings(self):
-        QMessageBox.critical(self, 'Nonfunctional Button', f'This button does not work yet\n')
-    
+        self.settings_popup = SettingsDialog(self.enabled_sync)
+        self.settings_popup.sync_enabled.connect(self.sync_enabled)
+        self.settings_popup.show()    
+
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Window', 'Are you sure you want to quit?', 
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
-            cmd = "python " + os.getcwd() + "/GUI/Dash/shutdown_dash_server.py"
-            print(cmd)
-            os.system(cmd)
-            print("closed")
+            self.close()
         else:
             event.ignore()
 
