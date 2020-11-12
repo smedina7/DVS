@@ -46,7 +46,7 @@ You will get a prompt to install wireshark. Install using default settings provi
 Start the DVS GUI:
 
 ``` bash 
-(dvs-venv) > main.py 
+(dvs-venv) > python3 main.py 
 ```
 
 #### Linux
