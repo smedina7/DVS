@@ -1,13 +1,12 @@
 import sys
-import dash_bootstrap_components as dbc
 import pandas as pd
 from flask_caching import Cache
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import dash_bootstrap_components as dbc
 from throughput import Throughput
+from Timestamp import Timestamp
 
 
 #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -32,7 +31,7 @@ throughput_df = throughput_dataframe()
 
 
 app.layout = html.Div([
-    dcc.Location(id = 'url', refresh = False),
+    dcc.Location(id = 'url', refresh = True),
     html.Div(id = 'page-content')
 ])
 
@@ -40,65 +39,81 @@ app.layout = html.Div([
             [Input('url', 'pathname')])
 def display_page(pathname):
     return Throughput(throughput_df)
-   
 
-# CALLBACK for throughput graph
-@app.callback(Output('live-dropdown', 'value'),[Input('live-graph', 'clickData')])
-def update_dropdown(value):
-    df = throughput_df
-    key = 0
-
-    output_file = open('GUI/Dash/throughput_output_file.txt', 'w')
-
-    if value is None:
-        return key
-    else:
-        x = value["points"]
+@app.callback(Output('switch', 'on'), Input('live-graph', 'clickData'))
+def disable_interval(click):
+    if click is not None:
+        x = click["points"]
         for d in x:
             timestamp = d['x'].replace(' ','T')
-        for i in range(len(df)):
-            if timestamp == df.loc[i,'start']:
-                key = int(df.loc[i,'traffic_xy_id'])
-                output_file.write(timestamp)
-                output_file.close()
-                return key
-
+            Timestamp.update_timestamp(timestamp)
+    return False
+    
 #this call back method allows to update graph based on the selected value in the dropdown menu
 #we can have multiple callbacks (probably one for each dataline) --this is most likely how we can acheive the sync behavior 
-@app.callback(Output('live-graph', 'figure'),[Input('live-dropdown', 'value'), Input('timeframe', 'value')])
-def update_live_graph(timestamp, t_frame):
+@app.callback([Output('live-graph', 'figure'), Output('interval', 'disabled')],
+               [Input('interval','n_intervals'),Input('live-graph', 'clickData'), Input('switch','on')])
+def update_live_graph(intervals, click, on):
     df = throughput_df
+    disabled = not on
+    #switch = on
+    start_time = df.loc[0,'start']
+    key = 0
 
     info = open(inputfile, 'r')
-
+    
     throughput_info = info.readlines()
     throughput_color = 'rgba'+throughput_info[1].strip('\n')
     h = throughput_color.split(",")
-    highlight_color = h[0]+","+h[1]+","+h[2]+","+",.5)"
+
     plot_color = h[0]+","+h[1]+","+h[2]+","+",.2)"
     info.close()
 
-    output_file = open('GUI/Dash/throughput_output_file.txt', 'w')
+    if(on):
+        currTimestamp = Timestamp.get_current_timestamp()
+        timestamp = currTimestamp
+        #for clickable graph actions during sync
+        """ if click is not None:
+            #disabled=False
+            x = click["points"]
+            for d in x:
+                timestamp = d['x'].replace(' ','T') """
 
-    if t_frame is None: 
-        timeframe = 0 # seconds
-    else:
-        timeframe = t_frame # in seconds
-
-    if timestamp is not None: 
-        start_time = df.loc[timestamp, 'start']
-
-        if timestamp <= ((len(df)-1)-timeframe):
-            end_time = df.loc[timestamp+timeframe, 'start']
+        for i in range(len(df)):
+            if timestamp == df.loc[i,'start']:
+                #key = int(df.loc[i,'traffic_xy_id'])
+                start_time = timestamp
+                #if start_time is not currTimestamp:
+                    #Timestamp.update_timestamp(start_time)
+                    #switch = False
+                    #disabled = True                    
+        """
         else:
-            start_time = df.loc[(len(df)-1)-timeframe, 'start']
-            end_time = df.loc[len(df)-1, 'start']
-    else:
-        start_time = df.loc[0, 'start']
-        end_time = df.loc[0, 'start']
+            currTimestamp = Timestamp.get_current_timestamp()
+            for i in range(len(df)):
+                if currTimestamp == df.loc[i,'start']:
+                    start_time = currTimestamp 
+                    key = int(df.loc[i,'traffic_xy_id'])
+        """
 
-    output_file.write(start_time)
-    output_file.close()
+    else:
+        currTimestamp = Timestamp.get_current_timestamp()
+        for i in range(len(df)):
+            if currTimestamp == df.loc[i,'start']:
+                start_time = currTimestamp 
+                key = int(df.loc[i,'traffic_xy_id'])
+        
+        if click is not None:
+            #disabled=False
+            x = click["points"]
+            for d in x:
+                timestamp = d['x'].replace(' ','T')
+            for i in range(len(df)):
+                if timestamp == df.loc[i,'start']:
+                    key = int(df.loc[i,'traffic_xy_id'])
+                    start_time = df.loc[i,'start']
+
+            
     return {
         'data': [{
             'x': df['start'], # x axis is timestamp
@@ -114,11 +129,11 @@ def update_live_graph(timestamp, t_frame):
             'height': 225,
             'width': 675,
             'paper_bgcolor' : throughput_color,
-            'plot_bgcolor' : highlight_color, 
+            'plot_bgcolor' : throughput_color, 
             # when updating graph, here we can manipulate the following to show a certain range or specific info (based on input 'value')
             'shapes': [{
                 'type': 'rect',
-                'xref': 'x', 'x0': start_time, 'x1': end_time, #highlights a time range (timeframe) from selected dropdown timestamp value
+                'xref': 'x', 'x0': start_time, 'x1': start_time, #highlights a time range (timeframe) from selected dropdown timestamp value
                 'yref': 'paper', 'y0': 0, 'y1': 1,
                 'line': {'color': 'Black', 'width': 1},
                 'fillcolor': plot_color,
@@ -139,7 +154,8 @@ def update_live_graph(timestamp, t_frame):
             'text': {'color': 'Black'}
             
         }
-    }
+    }, disabled
+
 
 if __name__ == '__main__':
     app.run_server(debug=False)

@@ -3,6 +3,7 @@ import os
 import time
 from re import search
 import subprocess
+import json
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -10,10 +11,12 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-from GUI.Widgets.AbstractTable2 import pandasModel2
-from GUI.Widgets.AbstractTable2 import pandasModel3
+from GUI.Widgets.textdataline import TextDataline
+from GUI.Widgets.Mouseclicks import First
+from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
-
+from GUI.Widgets.Timestamp import Timestamp
+from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 
@@ -28,11 +31,13 @@ class MainGUI(QMainWindow):
         throughput_path = throughput
         self.web = ''
         self.progress = ProgressBarDialog(self, 100)
+        t = Timestamp()
 
         self.key_json = ''
         self.sys_json = ''
         self.mouse_json = ''
         self.timed_json = ''
+        self.suricata_json = ''
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
 
         #Get JSON Files        
@@ -66,12 +71,6 @@ class MainGUI(QMainWindow):
         self.tb.addWidget(self.sync_button_timestamp)
         self.sync_button_timestamp.clicked.connect(self.buttonaction_timestamp)
 
-        #create color button
-        """ self.color_button = QPushButton(self.tb)
-        self.color_button.setText("Color")
-        self.tb.addWidget(self.color_button)
-        self.color_button.clicked.connect(self.color_picker) """
-
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
@@ -83,30 +82,47 @@ class MainGUI(QMainWindow):
         #Add menu bar
         bar = self.menuBar()
         file = bar.addMenu("File")
-        file.triggered[QAction].connect(self.windowaction)
 
         #add default datalines
         add_dataline = bar.addMenu("Add Dataline")
-        add_dataline.addAction("Throughput")
-        add_dataline.addAction("Keypresses")
-        add_dataline.addAction("System Calls")
-        add_dataline.addAction("Mouse Clicks")
-        add_dataline.addAction("Timed Screenshots")
+        preset_dataline = add_dataline.addMenu("Preset Dataline")
+        custom_dataline = add_dataline.addAction("Choose JSON")
+
+        throughput = preset_dataline.addAction("Throughput")
+        keypress = preset_dataline.addAction("Keypresses")
+        syscalls = preset_dataline.addAction("System Calls")
+        mouse = preset_dataline.addAction("Mouse Clicks")
+        timed = preset_dataline.addAction("Timed Screenshots")
         
         #dataline windows actions
-        add_dataline.triggered[QAction].connect(self.windowaction)
-        self.resizeEvent(add_dataline.triggered[QAction])
+        throughput.triggered.connect(self.throughput_selected)
+        self.resizeEvent(throughput.triggered)
+        keypress.triggered.connect(self.keypresses_selected)
+        self.resizeEvent(keypress.triggered)
+        syscalls.triggered.connect(self.syscalls_selected)
+        self.resizeEvent(syscalls.triggered)
+        mouse.triggered.connect(self.mouse_selected)
+        self.resizeEvent(mouse.triggered)
+        timed.triggered.connect(self.timed_selected)
+        self.resizeEvent(timed.triggered)
+
+        custom_dataline.triggered.connect(self.choose_json)
+        self.resizeEvent(custom_dataline.triggered)
+
         adjust = bar.addMenu("Adjust Subwindows")
         adjust.addAction("Tile Layout")
-        adjust.triggered[QAction].connect(self.windowaction)
+        adjust.triggered[QAction].connect(self.tile_selected)
 
         #Home Window Widget Configuration
         self.setWindowTitle("Timeline View")
-        self.setMinimumHeight(700)
-        self.setMinimumWidth(800)
+        self.setMinimumHeight(750)
+        self.setMinimumWidth(850)
         # sync stuff
         self.timestamp = ""
         self.timestampTrigger = False
+
+    def file_changed(self):
+        self.syncWindows(1)
 
     def buttonaction_wireshark(self, b):
         if b == True:
@@ -116,198 +132,271 @@ class MainGUI(QMainWindow):
             self.sync_button_wireshark.setText("Wireshark Sync : off")
             self.wiresharkTrigger = False
 
-    def syncWindows(self):
+    def syncWindows(self, b):
         if self.timestampTrigger:
-            children = self.findChildren(QTableView)
+            children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.MultiSelection)
-                columncount = child.model().columnCount()
+                columncount = child.columnCount()
                 child.clearSelection()
-                for row in range(child.model().rowCount()):
-                    index = child.model().index(row, columncount - 1)
-                    indexTimeStamp = str(child.model().itemData(index))
-                    temp = indexTimeStamp[5:len(indexTimeStamp) - 2]
-                    if self.timestamp == temp:
-                        child.selectRow(row)
-                    child.show()
+                for row in range(child.rowCount()):
+                    indexTimeStamp = child.item(row,columncount-1).text()
+                    if b == -1:
+                        if self.timestamp == indexTimeStamp:
+                            child.selectRow(row)
+                            Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
+                    else:
+                        currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
+                        if indexTimeStamp == currTimeStamp:
+                            #child.clearSelection()
+                            child.selectRow(row)
+                        #child.show()
         if self.timestampTrigger == False:
-            children = self.findChildren(QTableView)
+            children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.SingleSelection)
                 child.clearSelection()
-                child.show()
+                #child.show()
 
     def buttonaction_timestamp(self, b):
         if b == True:
             self.sync_button_timestamp.setText("Timestamp Sync : on")
             self.timestampTrigger = True
+            self.file_watcher = QFileSystemWatcher()
+            self.file_watcher.addPath('/home/kali/DVS/GUI/Dash/timestamp.txt') #listens for file changes
+            self.file_watcher.fileChanged.connect(self.file_changed)
             # redraw
-            self.syncWindows()
+            self.syncWindows(-1)
         else:
             self.sync_button_timestamp.setText("Timestamp Sync : off")
             self.timestampTrigger = False
             # undraw
             self.timestamp = ""
-            self.syncWindows()
+            self.syncWindows(-1)
 
     def resizeEvent(self, event):
         self.sizeHint()
 
-    def getCoords(self, item):
-        columncount = item.model().columnCount()
-        row = item.row()
-        index = item.model().index(row, columncount - 1)
-        indexTimeStamp = str(item.model().itemData(index))
+    def getCoords(self, r , c):
+        sender = self.sender()
+        name = sender.objectName()
+        table = self.findChild(QTableWidget, name)
+        columncount = table.columnCount()
+        indexTimeStamp = table.item(r,columncount-1).text()
         if (self.timestampTrigger):
-            # stamp = DateFormat("yyyy-MM-dd'T'HH:MM:ss")
-            stamp = indexTimeStamp[5:len(indexTimeStamp) - 2]
-            self.timestamp = stamp
-            self.syncWindows()
+            self.timestamp = indexTimeStamp
+            Timestamp.update_timestamp(self.timestamp) #writes to timestamp.txt (updates timestamp)
+            self.syncWindows(-1)
 
-    def windowaction(self, q):
-        if q.text() == "Throughput":
-            #file that holds throughput file path and selected dataline color; this will be read by dash app
-            path = os.path.abspath("GUI/Dash/throughput_info.txt")
-            throughput_info_file = open(path, 'w')
-            throughput_info_file.write(self.throughput_json+"\n")
+    def selectRows(self, selection: list):
+        for i in selection: 
+            self.tableWidget.selectRow(i)
 
-            #get rgb values for graph background color
-            color = self.color_picker()
-            throughput_info_file.write(str(color.getRgb())+"\n")
-            throughput_info_file.close()
+    def throughput_selected(self):
+        #file that holds throughput file path and selected dataline color; this will be read by dash app
+        path = os.path.abspath("GUI/Dash/throughput_info.txt")
+        throughput_info_file = open(path, 'w')
+        throughput_info_file.write(self.throughput_json+"\n")
 
-            self.web = QWebEngineView()
-            self.manager_instance.runWebEngine() #start dash
-            self.web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser
-            self.web.loadStarted.connect(self.loadstarted)
-            self.web.loadProgress.connect(self.loadprogress)
-            self.web.loadFinished.connect(self.loadfinished)
-            
-        if q.text() == "Keypresses":
-            sub = QMdiSubWindow()
-            sub.resize(790,200)
-            sub.setWindowTitle("Keypresses")
+        #get rgb values for graph background color
+        color = self.color_picker()
+        throughput_info_file.write(str(color.getRgb())+"\n")
+        throughput_info_file.close()
 
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
-            color = self.color_picker()
-            sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        self.web = QWebEngineView()
+        self.manager_instance.runWebEngine() #start dash
+        self.web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser
+        self.web.loadStarted.connect(self.loadstarted)
+        self.web.loadProgress.connect(self.loadprogress)
+        self.web.loadFinished.connect(self.loadfinished)
+    
+    def keypresses_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,210)
+        sub.setWindowTitle("Keypresses")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-            df = pd.read_json (self.key_json)
+        WiresharkColors(sub.windowTitle(), color.getRgb())
 
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
+        sub.setWidget(QTextEdit())
+        data = self.key_json
 
-            sub.setWidget(view)
+        count_row = 0
+        self.tableWidget = QTableWidget (self)
+        label = "keypresses"
+        self.tableWidget = TextDataline(data, label, count_row, 4)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Keypresses")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+        
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
+        self.tableWidget.show()
+        sub.show()
 
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
+    def syscalls_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,210)
+        sub.setWindowTitle("System Calls")
 
-            view.show()
-            sub.show()
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-        if q.text() == "System Calls":
-            sub = QMdiSubWindow()
-            sub.resize(790,200)
-            sub.setWindowTitle("System Calls")
-            
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
-            color = self.color_picker()
-            sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
-            
-            df = pd.read_json(self.sys_json)
+        WiresharkColors(sub.windowTitle(), color.getRgb())
 
-            model = pandasModel(df)
-            view = QTableView()
-            view.setModel(model)
+        sub.setWidget(QTextEdit())
+        data =  self.sys_json
+        count_row = 0
 
-            sub.setWidget(view)
+        self.tableWidget = QTableWidget (self)
+        label = "systemcalls"
+        self.tableWidget = TextDataline(data, label, count_row, 4)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Systemcalls")
+        self.tableWidget.cellClicked.connect(self.getCoords)
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
 
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
+        self.tableWidget.show()
+        sub.show()
+    
+    def suricata_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,210)
+        sub.setWindowTitle("Suricata")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-            view.show()
-            sub.show()
+        sub.setWidget(QTextEdit())
+        data = self.suricata_json
 
-        if q.text() == "Mouse Clicks":
-            sub = QMdiSubWindow()
-            sub.resize(790,220)
-            sub.setWindowTitle("Mouse Clicks")
-            
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
-            color = self.color_picker()
-            sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
-            
-            df = pd.read_json(self.mouse_json)
+        count_row = 0
+        self.tableWidget = QTableWidget (self)
 
-            model = pandasModel2(df, self.clicks_path)
-            view = QTableView()
-            view.setModel(model)
+        label = "suricata"
+        self.tableWidget = TextDataline(data, label, count_row, 5)
 
-            sub.setWidget(view)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Suricata Alerts")
+        self.tableWidget.cellClicked.connect(self.getCoords)
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(1, 210)
-            view.setColumnWidth(2, 50)
-            view.setIconSize(QSize(256, 256))
-            count_row = df.shape[0]
-            for x in range(count_row):
-                view.setRowHeight(x,100)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
 
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
+        self.tableWidget.show()
+        sub.show()
 
-            view.show()
-            sub.show()
+    def mouse_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,260)
+        sub.setWindowTitle("Mouse Clicks")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        WiresharkColors(sub.windowTitle(), color.getRgb())
 
-        if q.text() == "Timed Screenshots":
-            sub = QMdiSubWindow()
-            sub.resize(790,220)
-            sub.setWindowTitle("Timed Screenshots")
-            
-            #this gives the hex value of the color; can be changed to rgb with 'color.getRgb()' instead of color.name()
-            color = self.color_picker()
-            sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        sub.setWidget(QTextEdit())
+        df = self.mouse_json
+        count_row = 0
 
-            df = pd.read_json(self.timed_json)
+        self.tableWidget = QTableWidget (self)
+        self.tableWidget = First(df, self.clicks_path, count_row, 5)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Mouseclicks")
+        self.tableWidget.cellClicked.connect(self.getCoords)
 
-            model = pandasModel3(df, self.timed_path)
-            view = QTableView()
-            view.setModel(model)
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
+        self.tableWidget.show()
+        sub.show()
 
-            sub.setWidget(view)
+    def timed_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,260)
+        sub.setWindowTitle("Timed Screenshots")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-            header = view.horizontalHeader()
-            view.setColumnWidth(4, 210)
-            view.setColumnWidth(2, 50) 
-            view.setIconSize(QSize(256, 256))
-            count_row = df.shape[0]
-            for x in range(count_row):
-                view.setRowHeight(x,100)
+        WiresharkColors(sub.windowTitle(), color.getRgb())
 
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            self.mdi.addSubWindow(sub)
+        sub.setWidget(QTextEdit())
+        df = self.timed_json
 
-            view.setSelectionMode(QAbstractItemView.SingleSelection)
-            view.clicked.connect(self.getCoords)
+        count_row = 0
 
-            view.show()
-            sub.show()
+        self.tableWidget = QTableWidget (self)
+        self.tableWidget = Timed(df, self.timed_path, count_row, 5)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("TimedScreenshots")
+        self.tableWidget.cellClicked.connect(self.getCoords)
 
-        if q.text() =="Tile Layout":
-            self.mdi.tileSubWindows()    
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
+        self.tableWidget.show()
+        sub.show()
+
+    def tile_selected(self):
+        self.mdi.tileSubWindows() 
+
+    def choose_json(self):
+        f = QFileDialog()
+        filenames, _ = QFileDialog.getOpenFileName(f, "Select JSON file")
+
+        if len(filenames) < 0:
+            logging.debug("File choose cancelled")
+            return
+
+        if len(filenames) > 0:
+            json_chosen_path = str(filenames)
+
+            try:
+                open_f = open(json_chosen_path, "r")
+                open_json = json.load(open_f)
+                for j in open_json:
+                    mouse_key = "clicks_id"
+                    timed_key = "timed_id"
+                    keypress_key = "keypresses_id"
+                    syscalls_key = "auditd_id"
+                    throughput_key = "traffic_xy_id"
+                    suricata_key = "suricata_id"
+
+                    if mouse_key in j:
+                        self.mouse_json = json_chosen_path
+                        self.mouse_selected()
+                        return
+                    elif timed_key in j:
+                        self.timed_json = json_chosen_path
+                        self.timed_selected()
+                        return
+                    elif keypress_key in j:
+                        self.key_json = json_chosen_path
+                        self.keypresses_selected()
+                        return
+                    elif syscalls_key in j:
+                        self.sys_json = json_chosen_path
+                        self.syscalls_selected()
+                        return
+                    elif throughput_key in j:
+                        self.throughput_json = json_chosen_path
+                        self.throughput_selected()
+                        return
+                    elif suricata_key in j:
+                        self.suricata_json = json_chosen_path
+                        self.suricata_selected()
+                        return
+
+                open_f.close()
+                
+            except IOError:
+                print("Cant Open File")
+
 
     def color_picker(self):
         color = QColorDialog.getColor()
@@ -318,15 +407,15 @@ class MainGUI(QMainWindow):
 
     def load_throughput_complete(self):
         sub = QMdiSubWindow()
-        sub.resize(790,320)
+        sub.resize(840,320)
         sub.setWindowTitle("Throughput")
         loading_label = QLabel("Loading...")
         sub.setWidget(loading_label)
         self.mdi.addSubWindow(sub)
         sub.show()
         self.web.show()
-        sub.setWidget(self.web)     
-    
+        sub.setWidget(self.web)  
+
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
         self.progress.show()
@@ -357,8 +446,7 @@ class MainGUI(QMainWindow):
                 self.manager_instance.stopWebEngine()
             
             self.manager_instance.stopWireshark()
+            clearFilters()
             
         else:
             event.ignore()
-
-            

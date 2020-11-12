@@ -48,11 +48,19 @@ class RunWebEngine(QThread):
             
     def stop(self):
         try:
-            path = os.getcwd()
-            os.system("python3 "+ path+"/GUI/Dash/shutdown_dash_server.py")
-            print("Server Shutdown")
-            self.quit()
-        
+            if sys.platform == "linux" or sys.platform == "linux2":
+                python = "python3 "
+                path = os.getcwd()
+                os.system(python + path +"/GUI/Dash/shutdown_dash_server.py")
+                print("Server Shutdown")
+                self.quit()
+            else:
+                python = "python "
+                path = os.getcwd()
+                os.system(python + path +"\GUI\Dash\shutdown_dash_server.py")
+                print("Server Shutdown")
+                self.quit()
+
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             logging.error('RunWebEngine(): Error during Web Engine termination')
