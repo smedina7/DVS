@@ -77,7 +77,7 @@ public class SuricataToJSON{
 			System.out.println("\tFinished processing suricata alerts data (" + Long.toString(id) + " items)");
 			br.close();
 			answer += "\n]\n";
-			FileOutput.WriteToFile(outputPath + "/suricataAlertsData.JSON", answer);
+			FileOutput.WriteToFile(outputPath + "/suricata.JSON", answer);
 		}
 
 		catch (FileNotFoundException e) {
@@ -92,7 +92,6 @@ public class SuricataToJSON{
 	public static String formatOutLine(long id, String rule, String alertText, String timestamp){
 
 		String answer = "";
-		String timestampEpoch = "";
 		if (id > 0) {
 			answer += ",";
 			answer += "\n";
@@ -102,7 +101,7 @@ public class SuricataToJSON{
 		answer += "\"suricata_rule_id\" : \"";
 		answer += quote(rule);
 		answer += "\", ";
-		answer += "\"alert_text\" : \"";
+		answer += "\"content\" : \"";
 		answer += quote(alertText);
 		answer += "\", ";
 
@@ -110,13 +109,50 @@ public class SuricataToJSON{
 		answer += "\", ";
 
 		answer += "\"start\" : \"";
-		answer += timestamp.replaceAll("-", "T").split("\\.")[0];
+		answer += formatTimestamp(timestamp);
 		answer += "\"";
 		answer += "}";
 
 		return answer;
 
 	}
+
+	public static String formatTimestamp(String timestamp)
+     {
+        String answer;
+//         System.out.println(timestamp);
+        String time = timestamp.replace("-", " ").split("\\.")[0];
+//         System.out.println(time);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        try
+        {
+            Date date = sdf.parse(time);
+            System.out.println(date);
+            sdf.applyPattern("yyyy-MM-dd'T'HH:mm:ss");
+            return sdf.format(date);
+        }catch(ParseException e)
+        {
+            System.out.println("Error while parsing time in raw suricata file: " + e);
+            return "";
+        }
+     }
+
+//     public static String removeOffsetTime(String timestamp)
+//      {
+//         String answer;
+//         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+//         try
+//         {
+//             Date myFormattedDate = sdf.parse(timestamp);
+//             SimpleDateFormat toFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+//             toFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//             return toFormat.format(myFormattedDate);
+//         }catch(ParseException e)
+//         {
+//             System.out.println("Error while parsing time in raw auditd file: " + e);
+//             return "";
+//         }
+//      }
 
 	/**
  * Code adapted from Jettison JSONObject open source software:

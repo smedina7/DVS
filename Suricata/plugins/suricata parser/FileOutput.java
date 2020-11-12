@@ -19,7 +19,7 @@ public class FileOutput {
 			bw.append(content);
 			bw.close();
 
-			//System.out.println("Done writing to " + filename);
+			System.out.println("Done writing to " + filename);
 
 		} catch (IOException e) {
 			e.printStackTrace();
