@@ -3,6 +3,7 @@ import os
 import time
 from re import search
 import subprocess
+import json
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -10,12 +11,12 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-from GUI.Widgets.textdataline import Keypresses, SystemCalls
+from GUI.Widgets.textdataline import TextDataline
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
 from GUI.Widgets.Timestamp import Timestamp
-from GUI.PacketView.WiresharkColorFilters import WiresharkColors
+from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 
@@ -36,6 +37,7 @@ class MainGUI(QMainWindow):
         self.sys_json = ''
         self.mouse_json = ''
         self.timed_json = ''
+        self.suricata_json = ''
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
 
         #Get JSON Files        
@@ -146,22 +148,22 @@ class MainGUI(QMainWindow):
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
-                            child.clearSelection()
+                            #child.clearSelection()
                             child.selectRow(row)
-                
+                        #child.show()
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.SingleSelection)
                 child.clearSelection()
+                #child.show()
 
     def buttonaction_timestamp(self, b):
         if b == True:
             self.sync_button_timestamp.setText("Timestamp Sync : on")
             self.timestampTrigger = True
             self.file_watcher = QFileSystemWatcher()
-            path = os.path.abspath('GUI/Dash/timestamp.txt')
-            self.file_watcher.addPath(path) #listens for file changes
+            self.file_watcher.addPath('/home/kali/DVS/GUI/Dash/timestamp.txt') #listens for file changes
             self.file_watcher.fileChanged.connect(self.file_changed)
             # redraw
             self.syncWindows(-1)
@@ -180,7 +182,6 @@ class MainGUI(QMainWindow):
         name = sender.objectName()
         table = self.findChild(QTableWidget, name)
         columncount = table.columnCount()
-    
         indexTimeStamp = table.item(r,columncount-1).text()
         if (self.timestampTrigger):
             self.timestamp = indexTimeStamp
@@ -223,7 +224,8 @@ class MainGUI(QMainWindow):
 
         count_row = 0
         self.tableWidget = QTableWidget (self)
-        self.tableWidget = Keypresses(data, count_row, 4)
+        label = "keypresses"
+        self.tableWidget = TextDataline(data, label, count_row, 4)
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidget.setObjectName("Keypresses")
@@ -250,10 +252,38 @@ class MainGUI(QMainWindow):
         count_row = 0
 
         self.tableWidget = QTableWidget (self)
-        self.tableWidget = SystemCalls(data, count_row, 4)
+        label = "systemcalls"
+        self.tableWidget = TextDataline(data, label, count_row, 4)
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidget.setObjectName("Systemcalls")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
+
+        self.tableWidget.show()
+        sub.show()
+    
+    def suricata_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,210)
+        sub.setWindowTitle("Suricata")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+
+        sub.setWidget(QTextEdit())
+        data = self.suricata_json
+
+        count_row = 0
+        self.tableWidget = QTableWidget (self)
+
+        label = "suricata"
+        self.tableWidget = TextDataline(data, label, count_row, 5)
+
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Suricata Alerts")
         self.tableWidget.cellClicked.connect(self.getCoords)
 
         sub.setWidget(self.tableWidget)
@@ -295,7 +325,6 @@ class MainGUI(QMainWindow):
 
         WiresharkColors(sub.windowTitle(), color.getRgb())
 
-
         sub.setWidget(QTextEdit())
         df = self.timed_json
 
@@ -336,6 +365,7 @@ class MainGUI(QMainWindow):
                     keypress_key = "keypresses_id"
                     syscalls_key = "auditd_id"
                     throughput_key = "traffic_xy_id"
+                    suricata_key = "suricata_id"
 
                     if mouse_key in j:
                         self.mouse_json = json_chosen_path
@@ -356,6 +386,10 @@ class MainGUI(QMainWindow):
                     elif throughput_key in j:
                         self.throughput_json = json_chosen_path
                         self.throughput_selected()
+                        return
+                    elif suricata_key in j:
+                        self.suricata_json = json_chosen_path
+                        self.suricata_selected()
                         return
 
                 open_f.close()
@@ -382,27 +416,6 @@ class MainGUI(QMainWindow):
         self.web.show()
         sub.setWidget(self.web)  
 
-    """ def contextMenuEvent(self, event):
-        menu = QMenu(self)
-        addRow = menu.addAction("Add Row")
-        addColumn = menu.addAction("Add Column")
-    
-        action = menu.exec_(self.mapToGlobal(event.pos()))
-        if action == addRow:
-            self.addRow()
-        elif action ==addColumn:
-            self.addColumn()
-
-    def addRow(self):
-        print("New Row Added")
-        row = self.tableWidget.rowCount()
-        self.tableWidget.setRowCount(row+1)
-
-    def addColumn(self):
-        print("New Column Added")
-        col = self.tableWidget.columnCount()
-        self.tableWidget.setColumnCount(col+1) """
-    
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
         self.progress.show()
@@ -433,6 +446,7 @@ class MainGUI(QMainWindow):
                 self.manager_instance.stopWebEngine()
             
             self.manager_instance.stopWireshark()
+            clearFilters()
             
         else:
             event.ignore()
