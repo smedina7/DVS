@@ -11,7 +11,8 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-from GUI.Widgets.textdataline import Keypresses, SystemCalls
+# from GUI.Widgets.textdataline import Keypresses, SystemCalls
+from GUI.Widgets.textdataline import TextDataline
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
@@ -38,6 +39,7 @@ class MainGUI(QMainWindow):
         self.mouse_json = ''
         self.timed_json = ''
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
+        self.suricata_json = ''
 
         #Get JSON Files        
         #get path for each file
@@ -53,6 +55,7 @@ class MainGUI(QMainWindow):
             
             if "TimedScreenshots.JSON" in file:
                 self.timed_json = file
+
 
         #Create toolbar and sync button widgets
         self.tb = self.addToolBar("")
@@ -223,7 +226,10 @@ class MainGUI(QMainWindow):
 
         count_row = 0
         self.tableWidget = QTableWidget (self)
-        self.tableWidget = Keypresses(data, count_row, 4)
+        ##NEW
+        label = "keypresses"
+        self.tableWidget = TextDataline(data, label, count_row, 4)
+
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidget.setObjectName("Keypresses")
@@ -251,12 +257,44 @@ class MainGUI(QMainWindow):
         count_row = 0
 
         self.tableWidget = QTableWidget (self)
-        self.tableWidget = SystemCalls(data, count_row, 4)
+        ##NEW
+        label = "systemcalls"
+        self.tableWidget = TextDataline(data, label, count_row, 4)
+
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidget.setObjectName("Systemcalls")
         self.tableWidget.cellClicked.connect(self.getCoords)
 
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
+
+        self.tableWidget.show()
+        sub.show()
+
+    def suricata_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(700,150)
+        sub.setWindowTitle("Suricata")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+
+        # WiresharkColors(sub.windowTitle(), color.getRgb())
+
+        sub.setWidget(QTextEdit())
+        data = self.suricata_json
+
+        count_row = 0
+        self.tableWidget = QTableWidget (self)
+        
+        label = "suricata"
+        self.tableWidget = TextDataline(data, label, count_row, 5)
+
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Suricata Alerts")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+        
         sub.setWidget(self.tableWidget)
         self.mdi.addSubWindow(sub)
 
@@ -337,6 +375,7 @@ class MainGUI(QMainWindow):
                     keypress_key = "keypresses_id"
                     syscalls_key = "auditd_id"
                     throughput_key = "traffic_xy_id"
+                    suricata_key = "suricata_id"
 
                     if mouse_key in j:
                         self.mouse_json = json_chosen_path
@@ -357,6 +396,10 @@ class MainGUI(QMainWindow):
                     elif throughput_key in j:
                         self.throughput_json = json_chosen_path
                         self.throughput_selected()
+                        return
+                    elif suricata_key in j:
+                        self.suricata_json = json_chosen_path
+                        self.suricata_selected()
                         return
 
                 open_f.close()

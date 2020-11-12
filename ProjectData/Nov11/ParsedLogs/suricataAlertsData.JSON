@@ -1,0 +1,12 @@
+[
+	{"suricata_id" : 0, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:51"},
+	{"suricata_id" : 1, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:51"},
+	{"suricata_id" : 2, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:51"},
+	{"suricata_id" : 3, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:51"},
+	{"suricata_id" : 4, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:53"},
+	{"suricata_id" : 5, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:54"},
+	{"suricata_id" : 6, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:54"},
+	{"suricata_id" : 7, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:55"},
+	{"suricata_id" : 8, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:55"},
+	{"suricata_id" : 9, "suricata_rule_id" : "[1:2:0]", "content" : "Test dns_query option ", "className" : "suricataAlert", "start" : "2020-10-07T02:02:55"}
+]
