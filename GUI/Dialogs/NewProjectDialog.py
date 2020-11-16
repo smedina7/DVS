@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.Qt import QKeyEvent, QTextCursor
 import logging
 import os
+import sys
 import shutil
 from distutils.dir_util import copy_tree
 
@@ -128,7 +129,18 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.progress_dialog_overall.show()
 
     def copy_dir(self, dir):
+<<<<<<< HEAD
         copy_tree(self.folder_chosen, dir)
+=======
+        try:
+            copy_tree(self.folder_chosen, dir)
+        
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            logging.error('copy_dir(): Error copying directory chosen')
+            traceback.print_exception(exc_type, exc_value, exc_traceback)
+
+>>>>>>> master
 
     def copy_dir_complete(self):
         self.progress_dialog_overall.update_progress()

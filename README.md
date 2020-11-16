@@ -46,6 +46,13 @@ You will get a prompt to install wireshark. Install using default settings provi
 Start the DVS GUI:
 
 ``` bash 
+(dvs-venv) > python3 main.py 
+```
+
+#### Linux
+**Requierements:**
+
+Have Eceld-Wireshark installed: there are many ways you could install this. 
 * Install Eceld-Netsys: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-netsys.git
 * Install Eceld-Wireshark: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-wireshark
 * Install with the DVS Installer 
@@ -57,9 +64,13 @@ Clone the repo to your desired destination and go into the DVS folder:
 ```bash
 $ git clone https://github.com/smedina7/DVS
 <<<<<<< HEAD
+<<<<<<< HEAD
 $ cd dvs
 $ cd DVS
 >>>>>>> bsalvarez
+=======
+$ cd DVS
+>>>>>>> master
 ```
 
 Install ECELD-Wireshark & Python3 dependencies into environment:

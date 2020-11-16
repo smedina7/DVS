@@ -3,6 +3,7 @@ import subprocess
 import shlex
 import sys, traceback
 import os
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QMessageBox
@@ -21,41 +22,48 @@ class PacketManager():
         self.wireshark_thread = QThread()
         self.web_engine_thread = QThread()
 
-        #get dissector files path
-        json_path = os.path.join(self.project_path, "ParsedLogs")
-        if not os.path.exists(json_path):
-            print("NO JSON")
-            return
-        else:
-            for r, d, f in os.walk(json_path):
-                    for file in f:
-                        if '.JSON' in file:
-                            self.filelist2.append(os.path.join(r, file))
+        try:
 
-        self.runWireshark()
+            #get dissector files path
+            json_path = os.path.join(self.project_path, "ParsedLogs")
+            if not os.path.exists(json_path):
+                print("NO JSON")
+                return
+            else:
+                for r, d, f in os.walk(json_path):
+                        for file in f:
+                            if '.JSON' in file:
+                                self.filelist2.append(os.path.join(r, file))
 
-        #get throughput data
-        for r, d, f in os.walk(self.project_path):
-            for dir in d:
-                #print(dir) 
-                if "ecel-export" in dir:
-                    #convert name to string
-                    dir = str(dir)
-                    self.throughput_path = os.path.join(r, dir)
-                    break
+            self.runWireshark()
 
-        #getting screenshots
-        #CLICKS
-        self.clicks_path = os.path.join(self.project_path, "Clicks")
-        if not os.path.exists(self.clicks_path):
-            print("NO SCREENSHOTS")
-            return
+            #get throughput data
+            for r, d, f in os.walk(self.project_path):
+                for dir in d:
+                    #print(dir) 
+                    if "ecel-export" in dir:
+                        #convert name to string
+                        dir = str(dir)
+                        self.throughput_path = os.path.join(r, dir)
+                        break
 
-        #Timed
-        self.timed_path = os.path.join(self.project_path, "Timed")
-        if not os.path.exists(self.timed_path):
-            print("NO Timed SCREENSHOTS")
-            return
+            #getting screenshots
+            #CLICKS
+            self.clicks_path = os.path.join(self.project_path, "Clicks")
+            if not os.path.exists(self.clicks_path):
+                print("NO SCREENSHOTS")
+                return
+
+            #Timed
+            self.timed_path = os.path.join(self.project_path, "Timed")
+            if not os.path.exists(self.timed_path):
+                print("NO Timed SCREENSHOTS")
+                return
+
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            logging.error('RunWebEngine(): Error during Web Engine termination')
+            traceback.print_exception(exc_type, exc_value, exc_traceback)
 
     def runWireshark(self):
         #get dissector files path
