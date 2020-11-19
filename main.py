@@ -36,6 +36,7 @@ class DVSstartUpPage(QMainWindow):
         QApplication.setPalette(palette)
 
         self.enabled_sync = False
+        self.sync_margin = 0
         self.project_folder = ''
         self.setFixedSize(620,565)
         self.setGeometry(500, 300, 500, 100)
@@ -73,7 +74,12 @@ class DVSstartUpPage(QMainWindow):
     def sync_enabled(self, enabled):
         self.enabled_sync = enabled
         print("IN MAIN: Is Sync Enabled? - " + str(self.enabled_sync))
-        
+
+    @QtCore.pyqtSlot(int)
+    def margin_selected(self, margin):
+        self.sync_margin = margin
+        print("IN MAIN: Sync Margin Selected - " + str(self.sync_margin))
+
     def openDir(self):
         folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
 
@@ -89,6 +95,7 @@ class DVSstartUpPage(QMainWindow):
     def openSettings(self):
         self.settings_popup = SettingsDialog(self.enabled_sync)
         self.settings_popup.sync_enabled.connect(self.sync_enabled)
+        self.settings_popup.sync_config.connect(self.margin_selected)
         self.settings_popup.show()    
 
     def closeEvent(self, event):
