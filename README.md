@@ -29,7 +29,7 @@ DVS installation steps:
 Install eceld-wireshark using the installer provided. Type the following in the command prompt.
 
 ```bash
-> nsis\Wireshark-win64-3.2.5.exe
+> eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
 ```
 You will get a prompt to install wireshark. Install using default settings provided.
 
@@ -63,14 +63,7 @@ Clone the repo to your desired destination and go into the DVS folder:
 
 ```bash
 $ git clone https://github.com/smedina7/DVS
-<<<<<<< HEAD
-<<<<<<< HEAD
-$ cd dvs
 $ cd DVS
->>>>>>> bsalvarez
-=======
-$ cd DVS
->>>>>>> master
 ```
 
 Install ECELD-Wireshark & Python3 dependencies into environment:

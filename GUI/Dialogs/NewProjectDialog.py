@@ -129,9 +129,6 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.progress_dialog_overall.show()
 
     def copy_dir(self, dir):
-<<<<<<< HEAD
-        copy_tree(self.folder_chosen, dir)
-=======
         try:
             copy_tree(self.folder_chosen, dir)
         
@@ -140,7 +137,6 @@ class NewProjectDialog(QtWidgets.QWidget):
             logging.error('copy_dir(): Error copying directory chosen')
             traceback.print_exception(exc_type, exc_value, exc_traceback)
 
->>>>>>> master
 
     def copy_dir_complete(self):
         self.progress_dialog_overall.update_progress()
