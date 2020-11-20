@@ -12,6 +12,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.textdataline import TextDataline
+from GUI.Widgets.commentsParser import commentsParser
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
@@ -40,6 +41,8 @@ class MainGUI(QMainWindow):
         self.suricata_json = ''
         self.packetsComments_json = ''
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
+
+        # commentsParser()
 
         #Get JSON Files        
         #get path for each file
@@ -307,7 +310,7 @@ class MainGUI(QMainWindow):
         self.tableWidget = QTableWidget (self)
 
         label = "packetcomments"
-        self.tableWidget = TextDataline(data, label, count_row, 5)
+        self.tableWidget = TextDataline(data, label, count_row, 8)
 
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -429,7 +432,10 @@ class MainGUI(QMainWindow):
                 
             except IOError:
                 print("Cant Open File")
-
+    
+    # #RUN Parser packets
+    # def packetscommentsparser(self):
+    #     os.system("/GUI/Widgets/test.py")
 
     def color_picker(self):
         color = QColorDialog.getColor()

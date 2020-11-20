@@ -5,8 +5,6 @@ class Timestamp:
         if not os.path.exists(throughput_file):
             create = open(throughput_file, "w+")
             create.close()
-
-        print(throughput_file)
         
     def update_timestamp(new_timestamp):
         ts = new_timestamp

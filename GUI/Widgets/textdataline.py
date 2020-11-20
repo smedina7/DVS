@@ -30,10 +30,11 @@ class TextDataline(QTableWidget):
             ser = pd.Series(df['suricata_id']) 
         
         if (label == "packetcomments"):
-            keys = ["packet_id", "scope", "important-packet-identifier", "program-used", "timestamp"]
+            keys = ["packet_id", "scope", "important-packet-identifier","program-used", "cmd", "description", "confidence","timestamp" ]
             ser = pd.Series(df['packet_id']) 
+            ser_confidence = pd.Series(df['confidence']) 
+            ser_timestamp = pd.Series(df['timestamp']) 
             
-
         labels = keys
         self.setHorizontalHeaderLabels(labels)
         
@@ -59,6 +60,16 @@ class TextDataline(QTableWidget):
                 elif j == "packet_id":
                     tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
+
+                elif j == "confidence":
+                    tableid = str(ser_confidence[ind])
+                    if tableid !='nan':
+                        it.setData(QtCore.Qt.DisplayRole, (tableid))
+
+                elif j == "timestamp":
+                    tableid = str(ser_timestamp[ind])
+                    it.setData(QtCore.Qt.DisplayRole, (tableid))
+
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
 

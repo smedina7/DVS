@@ -10,6 +10,7 @@ from distutils.dir_util import copy_tree
 
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
+from GUI.Widgets.commentsParser import commentsParser
 
 class NewProjectDialog(QtWidgets.QWidget):
     #Signal for when the user is done creating the new project
@@ -124,9 +125,15 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.batch_thread.completion_signal.connect(self.copy_dir_complete)
             self.batch_thread.add_function(self.copy_dir, self.project_data_path)
 
+            
+
             self.progress_dialog_overall = ProgressBarDialog(self, self.batch_thread.get_load_count())
             self.batch_thread.start()
             self.progress_dialog_overall.show()
+
+            #TRIGGER PACKET COMMENTS PARSER
+            packetscomments_jsonpath = self.project_data_path + "/ParsedLogs/"
+            commentsParser(packetscomments_jsonpath)
 
     def copy_dir(self, dir):
         try:

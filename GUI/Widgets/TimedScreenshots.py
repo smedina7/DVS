@@ -52,7 +52,7 @@ class Timed(QTableWidget):
                     self.btn.setText(pathclicks)
                     self.btn.setIcon(icon)
                     self.btn.setIconSize(QtCore.QSize(200, 200))
-                    self.btn.setStyleSheet('QToolButton{border: 0px solid; font-size: 1px;padding-bottom: 1px;}')
+                    self.btn.setStyleSheet('QToolButton{border: 0px solid; font-size: 1px;padding-bottom: 1px; height: 100px; width: 200px;}')
                     self.setCellWidget(ind,c,self.btn)
                     self.btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
 
@@ -73,4 +73,3 @@ class Timed(QTableWidget):
         dialog = Second(path,self)
         self.dialogs.append(dialog)
         dialog.show()
- 
