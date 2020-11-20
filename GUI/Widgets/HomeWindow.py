@@ -19,6 +19,7 @@ from GUI.Widgets.Timestamp import Timestamp
 from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
+from GUI.Dialogs.ExportDialog import ExportDialog
 
 class MainGUI(QMainWindow):
     def __init__(self, json_files, clicks, timed, throughput, manager_inst, parent = None):
@@ -32,6 +33,7 @@ class MainGUI(QMainWindow):
         self.web = ''
         self.progress = ProgressBarDialog(self, 100)
         t = Timestamp()
+        self.project_path = os.path.dirname(clicks)
 
         self.key_json = ''
         self.sys_json = ''
@@ -82,6 +84,13 @@ class MainGUI(QMainWindow):
         #Add menu bar
         bar = self.menuBar()
         file = bar.addMenu("File")
+        save = file.addAction("Save")
+        importProject = file.addAction("Import")
+        exportProject = file.addAction("Export")
+        quitDVS = file.addAction("Quit")
+
+        quitDVS.triggered.connect(self.closeEvent)
+        exportProject.triggered.connect(self.export_project)
 
         #add default datalines
         add_dataline = bar.addMenu("Add Dataline")
@@ -416,6 +425,9 @@ class MainGUI(QMainWindow):
         self.web.show()
         sub.setWidget(self.web)  
 
+    def export_project(self):
+        ExportDialog(self, self.project_path).exec()
+
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
         self.progress.show()
@@ -440,13 +452,18 @@ class MainGUI(QMainWindow):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            event.accept()
             if(self.web != ''):
                 self.web.close()
                 self.manager_instance.stopWebEngine()
             
             self.manager_instance.stopWireshark()
             clearFilters()
+            qApp.quit()
+            return
             
-        else:
+        elif reply == QMessageBox.No and not type(event) == bool:
             event.ignore()
+        
+        else:
+            pass
+        return
