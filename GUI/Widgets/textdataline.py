@@ -15,33 +15,49 @@ class TextDataline(QTableWidget):
         label = label
         keys = []
 
+        df = pd.read_json (dfdata)
+
         if(label == "keypresses"):
             keys = ["keypresses_id", "content", "className", "start"]
+            ser = pd.Series(df['keypresses_id']) 
 
-        
         if (label == "systemcalls"):
             keys = ["auditd_id", "content", "className", "start"]
+            ser = pd.Series(df['auditd_id']) 
 
         if (label == "suricata"):
             keys = ["suricata_id", "suricata_rule_id", "content", "className", "start"]
-
+            ser = pd.Series(df['suricata_id']) 
+        
+        if (label == "packetcomments"):
+            keys = ["packet_id", "scope", "important-packet-identifier", "program-used", "timestamp"]
+            ser = pd.Series(df['packet_id']) 
+            
 
         labels = keys
         self.setHorizontalHeaderLabels(labels)
-        df = pd.read_json (dfdata)
         
         for ind in df.index:
             c = 0
-            tableid = str(ind)
+            # tableid = str(ind)
             self.insertRow(self.rowCount())
             
             for j in keys:
                 it = QtWidgets.QTableWidgetItem()
                 if j == "keypresses_id":
+                    tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
-                if j == "auditd_id":
+
+                elif j == "auditd_id":
+                    tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
-                if j == "suricata_id":
+
+                elif j == "suricata_id":
+                    tableid = str(ser[ind])
+                    it.setData(QtCore.Qt.DisplayRole, (tableid))
+
+                elif j == "packet_id":
+                    tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
@@ -51,4 +67,3 @@ class TextDataline(QTableWidget):
 
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
-

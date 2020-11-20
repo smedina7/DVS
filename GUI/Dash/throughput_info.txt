@@ -1,2 +1,2 @@
-/home/kali/DVS_branches/DVS-bsalvarez/DVS/ProjectData/test3/ecel-export_1602036174/parsed/tshark/networkDataXY.JSON
-(252, 233, 79, 255)
+/home/kali/DVS_branches/DVS-bsalvarez/ProjectData/t0/ecel-export_1602036174/parsed/tshark/networkDataXY.JSON
+(0, 0, 0, 255)

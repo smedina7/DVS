@@ -40,3 +40,7 @@
 @SystemCalls Log@systemcalls@[64070, 21356, 31909][0,0,0]
 @MouseClicks Log@mouseclicks@[21356, 0, 31909][0,0,0]
 @TimedScreenshots Log@timedscreenshots@[0, 0, 31909][0,0,0]
+@MouseClicks Log@mouseclicks@[21356, 64070, 0][0,0,0]
+@Keypress Log@keypresses@[64070, 64070, 31909][0,0,0]
+@SystemCalls Log@systemcalls@[42713, 64070, 64070][0,0,0]
+@TimedScreenshots Log@timedscreenshots@[0, 64070, 64070][0,0,0]

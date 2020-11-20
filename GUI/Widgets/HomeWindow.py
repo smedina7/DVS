@@ -11,13 +11,12 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-# from GUI.Widgets.textdataline import Keypresses, SystemCalls
 from GUI.Widgets.textdataline import TextDataline
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
 from GUI.Widgets.Timestamp import Timestamp
-from GUI.PacketView.WiresharkColorFilters import WiresharkColors
+from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 
@@ -38,8 +37,9 @@ class MainGUI(QMainWindow):
         self.sys_json = ''
         self.mouse_json = ''
         self.timed_json = ''
-        self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
         self.suricata_json = ''
+        self.packetsComments_json = ''
+        self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
 
         #Get JSON Files        
         #get path for each file
@@ -55,7 +55,6 @@ class MainGUI(QMainWindow):
             
             if "TimedScreenshots.JSON" in file:
                 self.timed_json = file
-
 
         #Create toolbar and sync button widgets
         self.tb = self.addToolBar("")
@@ -117,8 +116,8 @@ class MainGUI(QMainWindow):
 
         #Home Window Widget Configuration
         self.setWindowTitle("Timeline View")
-        self.setMinimumHeight(700)
-        self.setMinimumWidth(800)
+        self.setMinimumHeight(750)
+        self.setMinimumWidth(850)
         # sync stuff
         self.timestamp = ""
         self.timestampTrigger = False
@@ -150,7 +149,7 @@ class MainGUI(QMainWindow):
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
-                            child.clearSelection()
+                            #child.clearSelection()
                             child.selectRow(row)
                         #child.show()
         if self.timestampTrigger == False:
@@ -214,7 +213,7 @@ class MainGUI(QMainWindow):
     
     def keypresses_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(840,210)
         sub.setWindowTitle("Keypresses")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -226,10 +225,8 @@ class MainGUI(QMainWindow):
 
         count_row = 0
         self.tableWidget = QTableWidget (self)
-        ##NEW
         label = "keypresses"
         self.tableWidget = TextDataline(data, label, count_row, 4)
-
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidget.setObjectName("Keypresses")
@@ -243,7 +240,7 @@ class MainGUI(QMainWindow):
 
     def syscalls_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,200)
+        sub.resize(840,210)
         sub.setWindowTitle("System Calls")
 
         color = self.color_picker()
@@ -251,16 +248,13 @@ class MainGUI(QMainWindow):
 
         WiresharkColors(sub.windowTitle(), color.getRgb())
 
-
         sub.setWidget(QTextEdit())
         data =  self.sys_json
         count_row = 0
 
         self.tableWidget = QTableWidget (self)
-        ##NEW
         label = "systemcalls"
         self.tableWidget = TextDataline(data, label, count_row, 4)
-
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidget.setObjectName("Systemcalls")
@@ -271,22 +265,20 @@ class MainGUI(QMainWindow):
 
         self.tableWidget.show()
         sub.show()
-
+    
     def suricata_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(840,210)
         sub.setWindowTitle("Suricata")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
-
-        # WiresharkColors(sub.windowTitle(), color.getRgb())
 
         sub.setWidget(QTextEdit())
         data = self.suricata_json
 
         count_row = 0
         self.tableWidget = QTableWidget (self)
-        
+
         label = "suricata"
         self.tableWidget = TextDataline(data, label, count_row, 5)
 
@@ -294,7 +286,34 @@ class MainGUI(QMainWindow):
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidget.setObjectName("Suricata Alerts")
         self.tableWidget.cellClicked.connect(self.getCoords)
-        
+
+        sub.setWidget(self.tableWidget)
+        self.mdi.addSubWindow(sub)
+
+        self.tableWidget.show()
+        sub.show()
+
+    def packetComments_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,210)
+        sub.setWindowTitle("Packets Comments")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+
+        sub.setWidget(QTextEdit())
+        data = self.packetsComments_json
+
+        count_row = 0
+        self.tableWidget = QTableWidget (self)
+
+        label = "packetcomments"
+        self.tableWidget = TextDataline(data, label, count_row, 5)
+
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setObjectName("Packets Comments")
+        self.tableWidget.cellClicked.connect(self.getCoords)
+
         sub.setWidget(self.tableWidget)
         self.mdi.addSubWindow(sub)
 
@@ -303,7 +322,7 @@ class MainGUI(QMainWindow):
 
     def mouse_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(840,260)
         sub.setWindowTitle("Mouse Clicks")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -327,13 +346,12 @@ class MainGUI(QMainWindow):
 
     def timed_selected(self):
         sub = QMdiSubWindow()
-        sub.resize(700,150)
+        sub.resize(840,260)
         sub.setWindowTitle("Timed Screenshots")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
         WiresharkColors(sub.windowTitle(), color.getRgb())
-
 
         sub.setWidget(QTextEdit())
         df = self.timed_json
@@ -376,6 +394,7 @@ class MainGUI(QMainWindow):
                     syscalls_key = "auditd_id"
                     throughput_key = "traffic_xy_id"
                     suricata_key = "suricata_id"
+                    packetsComments_key = "packet_id"
 
                     if mouse_key in j:
                         self.mouse_json = json_chosen_path
@@ -401,6 +420,10 @@ class MainGUI(QMainWindow):
                         self.suricata_json = json_chosen_path
                         self.suricata_selected()
                         return
+                    elif packetsComments_key in j:
+                        self.packetsComments_json = json_chosen_path
+                        self.packetComments_selected()
+                        return
 
                 open_f.close()
                 
@@ -417,15 +440,15 @@ class MainGUI(QMainWindow):
 
     def load_throughput_complete(self):
         sub = QMdiSubWindow()
-        sub.resize(790,320)
+        sub.resize(840,320)
         sub.setWindowTitle("Throughput")
         loading_label = QLabel("Loading...")
         sub.setWidget(loading_label)
         self.mdi.addSubWindow(sub)
         sub.show()
         self.web.show()
-        sub.setWidget(self.web)     
-    
+        sub.setWidget(self.web)  
+
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
         self.progress.show()
@@ -456,6 +479,7 @@ class MainGUI(QMainWindow):
                 self.manager_instance.stopWebEngine()
             
             self.manager_instance.stopWireshark()
+            clearFilters()
             
         else:
             event.ignore()
