@@ -34,6 +34,7 @@ class MainGUI(QMainWindow):
         self.progress = ProgressBarDialog(self, 100)
         t = Timestamp()
         self.project_path = os.path.dirname(clicks)
+        self.throughput_open1 = False
 
         self.key_json = ''
         self.sys_json = ''
@@ -41,6 +42,11 @@ class MainGUI(QMainWindow):
         self.timed_json = ''
         self.suricata_json = ''
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
+
+        self.project_name = os.path.basename(self.project_path)
+
+        self.project_dict = {}
+        self.project_dict[self.project_name] = {"KeypressData": {}, "SystemCallsData": {}, "MouseClicksData": {}, "TimedData": {}, "ThroughputData": {}, "SuricataData": {}}
 
         #Get JSON Files        
         #get path for each file
@@ -200,156 +206,224 @@ class MainGUI(QMainWindow):
     def selectRows(self, selection: list):
         for i in selection: 
             self.tableWidget.selectRow(i)
+            self.tableWidgetMou.selectRow(i)
+            self.tableWidgetSur.selectRow(i)
+            self.tableWidgetSys.selectRow(i)
+            self.tableWidgetTime.selectRow(i)
 
     def throughput_selected(self):
-        #file that holds throughput file path and selected dataline color; this will be read by dash app
-        path = os.path.abspath("GUI/Dash/throughput_info.txt")
-        throughput_info_file = open(path, 'w')
-        throughput_info_file.write(self.throughput_json+"\n")
+        #check if dataline exists
+        if self.project_dict[self.project_name]["ThroughputData"] not in self.mdi.subWindowList() and self.throughput_open1 == False:
+            print("here")
+            #file that holds throughput file path and selected dataline color; this will be read by dash app
+            path = os.path.abspath("GUI/Dash/throughput_info.txt")
+            throughput_info_file = open(path, 'w')
+            throughput_info_file.write(self.throughput_json+"\n")
 
-        #get rgb values for graph background color
-        color = self.color_picker()
-        throughput_info_file.write(str(color.getRgb())+"\n")
-        throughput_info_file.close()
+            #get rgb values for graph background color
+            color = self.color_picker()
+            if color is None:
+                print("no color selected")
+                return 
+            else:
+                throughput_info_file.write(str(color.getRgb())+"\n")
+                throughput_info_file.close()
 
-        self.web = QWebEngineView()
-        self.manager_instance.runWebEngine() #start dash
-        self.web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser
-        self.web.loadStarted.connect(self.loadstarted)
-        self.web.loadProgress.connect(self.loadprogress)
-        self.web.loadFinished.connect(self.loadfinished)
+                self.web = QWebEngineView()
+                self.manager_instance.runWebEngine() #start dash
+                self.web.load(QUrl("http://127.0.0.1:8050")) #dash app rendered on browser
+                self.web.loadStarted.connect(self.loadstarted)
+                self.web.loadProgress.connect(self.loadprogress)
+                self.web.loadFinished.connect(self.loadfinished)
+
+        elif self.throughput_open1 == True:
+            print("here2")
+            self.checkHidden(self.subTh, self.web)
+        else:
+            #check if window is hidden
+            self.checkHidden(self.subTh, self.web)
     
     def keypresses_selected(self):
-        sub = QMdiSubWindow()
-        sub.resize(840,210)
-        sub.setWindowTitle("Keypresses")
-        color = self.color_picker()
-        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        if self.project_dict[self.project_name]["KeypressData"] not in self.mdi.subWindowList():
+            self.subK = QMdiSubWindow()
+            self.subK.resize(840,210)
+            self.subK.setWindowTitle("Keypresses")
+            color = self.color_picker()
+            if color is None:
+                print("no color selected")
+                return 
+            else:
+                self.subK.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-        WiresharkColors(sub.windowTitle(), color.getRgb())
+                WiresharkColors(self.subK.windowTitle(), color.getRgb())
 
-        sub.setWidget(QTextEdit())
-        data = self.key_json
+                self.subK.setWidget(QTextEdit())
+                data = self.key_json
 
-        count_row = 0
-        self.tableWidget = QTableWidget (self)
-        label = "keypresses"
-        self.tableWidget = TextDataline(data, label, count_row, 4)
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableWidget.setObjectName("Keypresses")
-        self.tableWidget.cellClicked.connect(self.getCoords)
-        
-        sub.setWidget(self.tableWidget)
-        self.mdi.addSubWindow(sub)
+                count_row = 0
+                self.tableWidget = QTableWidget (self)
+                label = "keypresses"
+                self.tableWidget = TextDataline(data, label, count_row, 4)
+                self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+                self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+                self.tableWidget.setObjectName("Keypresses")
+                self.tableWidget.cellClicked.connect(self.getCoords)
+                
+                self.subK.setWidget(self.tableWidget)
+                self.mdi.addSubWindow(self.subK)
 
-        self.tableWidget.show()
-        sub.show()
+                self.tableWidget.show()
+                self.subK.show()
+                self.project_dict[self.project_name]["KeypressData"] = self.subK
+
+        else:
+            #check if window is hidden
+            self.checkHidden(self.subK, self.tableWidget)
 
     def syscalls_selected(self):
-        sub = QMdiSubWindow()
-        sub.resize(840,210)
-        sub.setWindowTitle("System Calls")
+        if self.project_dict[self.project_name]["SystemCallsData"] not in self.mdi.subWindowList():
+            self.subSC = QMdiSubWindow()
+            self.subSC.resize(840,210)
+            self.subSC.setWindowTitle("System Calls")
 
-        color = self.color_picker()
-        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+            color = self.color_picker()
+            if color is None:
+                print("no color selected")
+                return 
+            else:
+                self.subSC.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-        WiresharkColors(sub.windowTitle(), color.getRgb())
+                WiresharkColors(self.subSC.windowTitle(), color.getRgb())
 
-        sub.setWidget(QTextEdit())
-        data =  self.sys_json
-        count_row = 0
+                self.subSC.setWidget(QTextEdit())
+                data =  self.sys_json
+                count_row = 0
 
-        self.tableWidget = QTableWidget (self)
-        label = "systemcalls"
-        self.tableWidget = TextDataline(data, label, count_row, 4)
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableWidget.setObjectName("Systemcalls")
-        self.tableWidget.cellClicked.connect(self.getCoords)
+                self.tableWidgetSys = QTableWidget (self)
+                label = "systemcalls"
+                self.tableWidgetSys = TextDataline(data, label, count_row, 4)
+                self.tableWidgetSys.setSelectionBehavior(QAbstractItemView.SelectRows)
+                self.tableWidgetSys.setSelectionMode(QAbstractItemView.SingleSelection)
+                self.tableWidgetSys.setObjectName("Systemcalls")
+                self.tableWidgetSys.cellClicked.connect(self.getCoords)
 
-        sub.setWidget(self.tableWidget)
-        self.mdi.addSubWindow(sub)
+                self.subSC.setWidget(self.tableWidgetSys)
+                self.mdi.addSubWindow(self.subSC)
 
-        self.tableWidget.show()
-        sub.show()
+                self.tableWidgetSys.show()
+                self.subSC.show()
+                self.project_dict[self.project_name]["SystemCallsData"] = self.subSC
+
+        else:
+            #check if window is hidden
+            self.checkHidden(self.subSC, self.tableWidgetSys)
     
     def suricata_selected(self):
-        sub = QMdiSubWindow()
-        sub.resize(840,210)
-        sub.setWindowTitle("Suricata")
-        color = self.color_picker()
-        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        if self.project_dict[self.project_name]["SuricataData"] not in self.mdi.subWindowList():
+            self.subS = QMdiSubWindow()
+            self.subS.resize(840,210)
+            self.subS.setWindowTitle("Suricata")
+            color = self.color_picker()
+            if color is None:
+                print("no color selected")
+                return 
+            else:
+                self.subS.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-        sub.setWidget(QTextEdit())
-        data = self.suricata_json
+                self.subS.setWidget(QTextEdit())
+                data = self.suricata_json
 
-        count_row = 0
-        self.tableWidget = QTableWidget (self)
+                count_row = 0
+                self.tableWidgetSur = QTableWidget (self)
 
-        label = "suricata"
-        self.tableWidget = TextDataline(data, label, count_row, 5)
+                label = "suricata"
+                self.tableWidgetSur = TextDataline(data, label, count_row, 5)
 
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableWidget.setObjectName("Suricata Alerts")
-        self.tableWidget.cellClicked.connect(self.getCoords)
+                self.tableWidgetSur.setSelectionBehavior(QAbstractItemView.SelectRows)
+                self.tableWidgetSur.setSelectionMode(QAbstractItemView.SingleSelection)
+                self.tableWidgetSur.setObjectName("Suricata Alerts")
+                self.tableWidgetSur.cellClicked.connect(self.getCoords)
 
-        sub.setWidget(self.tableWidget)
-        self.mdi.addSubWindow(sub)
+                self.subS.setWidget(self.tableWidgetSur)
+                self.mdi.addSubWindow(self.subS)
 
-        self.tableWidget.show()
-        sub.show()
+                self.tableWidgetSur.show()
+                self.subS.show()
+                self.project_dict[self.project_name]["SuricataData"] = self.subS
+
+        else:
+            #check if window is hidden
+            self.checkHidden(self.subS, self.tableWidgetSur)
 
     def mouse_selected(self):
-        sub = QMdiSubWindow()
-        sub.resize(840,260)
-        sub.setWindowTitle("Mouse Clicks")
-        color = self.color_picker()
-        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
-        WiresharkColors(sub.windowTitle(), color.getRgb())
+        if self.project_dict[self.project_name]["MouseClicksData"] not in self.mdi.subWindowList():
+            self.subM = QMdiSubWindow()
+            self.subM.resize(840,260)
+            self.subM.setWindowTitle("Mouse Clicks")
+            color = self.color_picker()
+            if color is None:
+                print("no color selected")
+                return 
+            else:
+                self.subM.setStyleSheet("QTableView { background-color: %s}" % color.name())
+                WiresharkColors(self.subM.windowTitle(), color.getRgb())
 
-        sub.setWidget(QTextEdit())
-        df = self.mouse_json
-        count_row = 0
+                self.subM.setWidget(QTextEdit())
+                df = self.mouse_json
+                count_row = 0
 
-        self.tableWidget = QTableWidget (self)
-        self.tableWidget = First(df, self.clicks_path, count_row, 5)
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableWidget.setObjectName("Mouseclicks")
-        self.tableWidget.cellClicked.connect(self.getCoords)
+                self.tableWidgetMou = QTableWidget (self)
+                self.tableWidgetMou = First(df, self.clicks_path, count_row, 5)
+                self.tableWidgetMou.setSelectionBehavior(QAbstractItemView.SelectRows)
+                self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
+                self.tableWidgetMou.setObjectName("Mouseclicks")
+                self.tableWidgetMou.cellClicked.connect(self.getCoords)
 
-        sub.setWidget(self.tableWidget)
-        self.mdi.addSubWindow(sub)
-        self.tableWidget.show()
-        sub.show()
+                self.subM.setWidget(self.tableWidgetMou)
+                self.mdi.addSubWindow(self.subM)
+                self.tableWidgetMou.show()
+                self.subM.show()
+                self.project_dict[self.project_name]["MouseClicksData"] = self.subM
+
+        else:
+            #check if window is hidden
+            self.checkHidden(self.subM, self.tableWidgetMou)
 
     def timed_selected(self):
-        sub = QMdiSubWindow()
-        sub.resize(840,260)
-        sub.setWindowTitle("Timed Screenshots")
-        color = self.color_picker()
-        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        if self.project_dict[self.project_name]["TimedData"] not in self.mdi.subWindowList():
+            self.subT = QMdiSubWindow()
+            self.subT.resize(840,260)
+            self.subT.setWindowTitle("Timed Screenshots")
+            color = self.color_picker()
+            if color is None:
+                print("no color selected")
+                return 
+            else:
+                self.subT.setStyleSheet("QTableView { background-color: %s}" % color.name())
 
-        WiresharkColors(sub.windowTitle(), color.getRgb())
+                WiresharkColors(self.subT.windowTitle(), color.getRgb())
 
-        sub.setWidget(QTextEdit())
-        df = self.timed_json
+                self.subT.setWidget(QTextEdit())
+                df = self.timed_json
 
-        count_row = 0
+                count_row = 0
 
-        self.tableWidget = QTableWidget (self)
-        self.tableWidget = Timed(df, self.timed_path, count_row, 5)
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableWidget.setObjectName("TimedScreenshots")
-        self.tableWidget.cellClicked.connect(self.getCoords)
+                self.tableWidgetTime = QTableWidget (self)
+                self.tableWidgetTime = Timed(df, self.timed_path, count_row, 5)
+                self.tableWidgetTime.setSelectionBehavior(QAbstractItemView.SelectRows)
+                self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
+                self.tableWidgetTime.setObjectName("TimedScreenshots")
+                self.tableWidgetTime.cellClicked.connect(self.getCoords)
 
-        sub.setWidget(self.tableWidget)
-        self.mdi.addSubWindow(sub)
-        self.tableWidget.show()
-        sub.show()
+                self.subT.setWidget(self.tableWidgetTime)
+                self.mdi.addSubWindow(self.subT)
+                self.tableWidgetTime.show()
+                self.subT.show()
+                self.project_dict[self.project_name]["TimedData"] = self.subT
+
+        else:
+            #check if window is hidden
+            self.checkHidden(self.subT, self.tableWidgetTime)
 
     def tile_selected(self):
         self.mdi.tileSubWindows() 
@@ -409,24 +483,35 @@ class MainGUI(QMainWindow):
 
     def color_picker(self):
         color = QColorDialog.getColor()
-        if color == '':
+        if not color.isValid():
             return 
         else:
             return color      
 
     def load_throughput_complete(self):
-        sub = QMdiSubWindow()
-        sub.resize(840,320)
-        sub.setWindowTitle("Throughput")
+        self.subTh = QMdiSubWindow()
+        self.subTh.resize(840,320)
+        self.subTh.setWindowTitle("Throughput")
         loading_label = QLabel("Loading...")
-        sub.setWidget(loading_label)
-        self.mdi.addSubWindow(sub)
-        sub.show()
+        self.subTh.setWidget(loading_label)
+        self.mdi.addSubWindow(self.subTh)
+        self.subTh.show()
         self.web.show()
-        sub.setWidget(self.web)  
+        self.subTh.setWidget(self.web) 
+        self.project_dict[self.project_name]["ThroughputData"] = self.subTh
+        self.throughput_open1 = True
+        print(self.mdi.subWindowList())
+        print(self.project_dict[self.project_name])
 
     def export_project(self):
         ExportDialog(self, self.project_path).exec()
+
+    def checkHidden(self, subW, content):
+        if subW.isHidden():
+            content.show()
+            subW.show()
+        else:
+            print("Dataline already open")
 
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
