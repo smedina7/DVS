@@ -10,6 +10,8 @@ from distutils.dir_util import copy_tree
 
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
+
+#PARSER
 from GUI.Widgets.commentsParser import commentsParser
 
 class NewProjectDialog(QtWidgets.QWidget):
@@ -131,8 +133,9 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.batch_thread.start()
             self.progress_dialog_overall.show()
 
-            #TRIGGER PACKET COMMENTS PARSER
-            packetscomments_jsonpath = self.project_data_path + "/ParsedLogs/"
+            #BIANCA
+            # #TRIGGER PACKET COMMENTS PARSER
+            packetscomments_jsonpath = self.project_data_path 
             commentsParser(packetscomments_jsonpath)
 
     def copy_dir(self, dir):

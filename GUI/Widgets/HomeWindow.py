@@ -11,7 +11,9 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-from GUI.Widgets.textdataline import TextDataline
+#RELOAD DATALINE
+from GUI.Widgets.textdataline import TextDataline, reloadDataline
+##
 from GUI.Widgets.commentsParser import commentsParser
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
@@ -20,6 +22,9 @@ from GUI.Widgets.Timestamp import Timestamp
 from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
+
+#PARSER
+from GUI.Widgets.commentsParser import commentsParser
 
 class MainGUI(QMainWindow):
     def __init__(self, json_files, clicks, timed, throughput, manager_inst, parent = None):
@@ -30,6 +35,10 @@ class MainGUI(QMainWindow):
         self.timed_path = timed
         self.manager_instance = manager_inst
         throughput_path = throughput
+        ##BIANCA
+        self.ProjectFolder = throughput.rsplit('/', 1)
+        self.PCAPpath = self.ProjectFolder[0] + "/PCAP/AnnotatedPCAP.pcapng"
+        ##
         self.web = ''
         self.progress = ProgressBarDialog(self, 100)
         t = Timestamp()
@@ -42,7 +51,6 @@ class MainGUI(QMainWindow):
         self.packetsComments_json = ''
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
 
-        # commentsParser()
 
         #Get JSON Files        
         #get path for each file
@@ -124,7 +132,8 @@ class MainGUI(QMainWindow):
         # sync stuff
         self.timestamp = ""
         self.timestampTrigger = False
-
+    
+    
     def file_changed(self):
         self.syncWindows(1)
 
@@ -196,6 +205,7 @@ class MainGUI(QMainWindow):
         for i in selection: 
             self.tableWidget.selectRow(i)
 
+    
     def throughput_selected(self):
         #file that holds throughput file path and selected dataline color; this will be read by dash app
         path = os.path.abspath("GUI/Dash/throughput_info.txt")
@@ -296,6 +306,46 @@ class MainGUI(QMainWindow):
         self.tableWidget.show()
         sub.show()
 
+
+    #####BIANCA
+    def _trigger_refresh(self):
+        sender = self.sender()
+        name = sender.objectName()
+        table = self.findChild(QTableWidget, name)
+        
+        print("Inside trigger PCAP changed")
+        #TRIGGER PACKET COMMENTS PARSER
+        
+
+        # Projectpath = "/home/kali/DVS_dev/ProjectData/testNov20"
+        Projectpath = self.ProjectFolder[0]
+        commentsParser(Projectpath)
+
+        print("JSON updated")
+        print("NAME", table)
+
+        
+        
+        # self.tableWidgetPackets.setRowCount(0) ##remove all rows 
+        # self.tableWidgetPackets.clearContents() #remove all content except the header
+
+        # path = "/home/kali/DVS_dev/GUI/Widgets/pcomments.json" 
+        packetscomments_jsonpath = self.packetsComments_json
+        label = "packetcomments"
+        count_row = 0
+        instance = self.tableWidgetPackets ##creating instance of table
+        reloadDataline.reloadDataline(instance, packetscomments_jsonpath, label)
+        return
+
+    def watch_PCAP(self):
+        self.file_watcher = QFileSystemWatcher()
+        # self.file_watcher.addPath('/home/kali/DVS_dev/GUI/Widgets/PCAPtest.txt') #listens for file changes
+        # PCAPpath = "/home/kali/DVS_dev/ProjectData/testNov20/PCAP/AnnotatedPCAP.pcapng"
+        self.file_watcher.addPath(self.PCAPpath) #listens for file changes
+        self.file_watcher.fileChanged.connect(self._trigger_refresh)
+    ########
+
+    
     def packetComments_selected(self):
         sub = QMdiSubWindow()
         sub.resize(840,210)
@@ -307,20 +357,23 @@ class MainGUI(QMainWindow):
         data = self.packetsComments_json
 
         count_row = 0
-        self.tableWidget = QTableWidget (self)
+        self.tableWidgetPackets = QTableWidget (self)
 
         label = "packetcomments"
-        self.tableWidget = TextDataline(data, label, count_row, 8)
+        self.tableWidgetPackets = TextDataline(data, label, count_row, 8)
 
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableWidget.setObjectName("Packets Comments")
-        self.tableWidget.cellClicked.connect(self.getCoords)
+        self.tableWidgetPackets.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidgetPackets.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidgetPackets.setObjectName("Packets Comments")
+        self.tableWidgetPackets.cellClicked.connect(self.getCoords)
+      
+        self.watch_PCAP() #WATCH PCAP CHANGE
 
-        sub.setWidget(self.tableWidget)
+
+        sub.setWidget(self.tableWidgetPackets)
         self.mdi.addSubWindow(sub)
 
-        self.tableWidget.show()
+        self.tableWidgetPackets.show()
         sub.show()
 
     def mouse_selected(self):
@@ -433,9 +486,7 @@ class MainGUI(QMainWindow):
             except IOError:
                 print("Cant Open File")
     
-    # #RUN Parser packets
-    # def packetscommentsparser(self):
-    #     os.system("/GUI/Widgets/test.py")
+  
 
     def color_picker(self):
         color = QColorDialog.getColor()

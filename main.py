@@ -12,6 +12,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.uic import loadUi
 from PyQt5 import QtCore
 
+#PARSER
+from GUI.Widgets.commentsParser import commentsParser
+
 class DVSstartUpPage(QMainWindow):
     def __init__(self):
         super(DVSstartUpPage, self).__init__()
@@ -83,6 +86,7 @@ class DVSstartUpPage(QMainWindow):
 
         if len(folder_chosen) > 0:
             self.project_folder = folder_chosen
+            commentsParser(folder_chosen)
             self.openHomeWindow()
             self.hide()
 

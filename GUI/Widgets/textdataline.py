@@ -78,3 +78,48 @@ class TextDataline(QTableWidget):
 
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
+
+
+
+class reloadDataline:
+    def reloadDataline(self, path, label):   
+        # QTableWidget.__init__(self, *args)
+        print("LABEL from reload dataline", label)
+        currentRowCount = self.rowCount()
+        totalcolumns = self.columnCount()
+        # print("From reload dataline", currentRowCount, totalcolumns)
+        self.clearContents()
+        keys = ["packet_id", "scope", "important-packet-identifier","program-used", "cmd", "description", "confidence","timestamp" ]
+
+        dfdata =  path
+        df = pd.read_json (dfdata)
+        row = 0
+
+        
+        for ind in df.index:
+            it = QtWidgets.QTableWidgetItem()
+            c = 0
+
+            if row == currentRowCount:
+                self.insertRow(self.rowCount())
+                for j in keys:
+                    val = df[j][ind]
+                    item = QTableWidgetItem(str(val))
+                    self.setItem(ind,c, item)
+                    c = c + 1
+                    row= row + 1
+
+            else: 
+                for j in keys:
+                    val = df[j][ind]
+                    item = QTableWidgetItem(str(val))
+                    self.setItem(ind,c, item)
+                    c = c + 1
+            
+            row = row + 1
+          
+
+
+                
+                
+                
