@@ -319,6 +319,7 @@ class MainGUI(QMainWindow):
 
         # Projectpath = "/home/kali/DVS_dev/ProjectData/testNov20"
         Projectpath = self.ProjectFolder[0]
+        print (Projectpath)
         commentsParser(Projectpath)
 
         print("JSON updated")
