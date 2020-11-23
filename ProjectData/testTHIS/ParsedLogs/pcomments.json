@@ -1,12 +1,22 @@
 [
     {
-        "packet_id": null,
-        "scope": null,
-        "important-packet-identifier": null,
+        "packet_id": "10",
+        "scope": "single",
+        "important-packet-identifier": "all-packet-payload",
         "program-used": null,
         "cmd": null,
         "description": null,
         "confidence": null,
-        "timestamp": null
+        "timestamp": "2020-10-06T22:02:05"
+    },
+    {
+        "packet_id": "12",
+        "scope": "single",
+        "important-packet-identifier": "all-packet-payload",
+        "program-used": null,
+        "cmd": null,
+        "description": null,
+        "confidence": null,
+        "timestamp": "2020-10-06T22:02:05"
     }
 ]
