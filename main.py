@@ -16,6 +16,9 @@ from PyQt5.uic import loadUi
 from PyQt5 import QtCore
 
 class DVSstartUpPage(QMainWindow):
+    #signal timelineview that cancel has been selected
+    new_canceled = QtCore.pyqtSignal(bool)
+
     def __init__(self):
         super(DVSstartUpPage, self).__init__()
         loadUi('GUI/src/DVSstartUpPage.ui', self)
@@ -39,6 +42,7 @@ class DVSstartUpPage(QMainWindow):
         QApplication.setPalette(palette)
 
         self.enabled_sync = False
+        self.hidden = False
         self.sync_margin = 0
         self.project_folder = ''
         self.setFixedSize(620,565)
@@ -60,6 +64,7 @@ class DVSstartUpPage(QMainWindow):
 
             if len(filenames) < 0:
                 logging.debug("File choose cancelled")
+                self.new_canceled.emit(True)
                 return
 
             if len(filenames) > 0:
@@ -104,9 +109,10 @@ class DVSstartUpPage(QMainWindow):
         clicks = self.manager.getClicks()
         timed = self.manager.getTimed()
         throughput = self.manager.getThroughput()
-        self.window = MainGUI(json_files, clicks, timed, throughput, self.manager)
+        self.window = MainGUI(json_files, clicks, timed, throughput, self.manager, self)
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
+        self.window.new_import.connect(self.new_import_selected)
 
     #Slot for when the user created the new project, path and configname
     @QtCore.pyqtSlot(str)
@@ -125,6 +131,11 @@ class DVSstartUpPage(QMainWindow):
         self.sync_margin = margin
         print("IN MAIN: Sync Margin Selected - " + str(self.sync_margin))
 
+    @QtCore.pyqtSlot(bool)
+    def new_import_selected(self, create):
+        if create == True:
+            self.createNewProject()
+
     def openDir(self):
         folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
 
@@ -136,9 +147,10 @@ class DVSstartUpPage(QMainWindow):
             self.project_folder = folder_chosen
             self.openHomeWindow()
             self.hide()
+            self.hidden = True
 
     def openSettings(self):
-        self.settings_popup = SettingsDialog(self.enabled_sync)
+        self.settings_popup = SettingsDialog(self.enabled_sync, self.sync_margin)
         self.settings_popup.sync_enabled.connect(self.sync_enabled)
         self.settings_popup.sync_config.connect(self.margin_selected)
         self.settings_popup.show() 
@@ -155,7 +167,7 @@ class DVSstartUpPage(QMainWindow):
         self.project_folder = self.new_project_path
         self.openHomeWindow()
         self.hide()
-
+        self.hidden = True
         logging.debug("unzip_complete(): Complete") 
 
     def closeEvent(self, event):

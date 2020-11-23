@@ -7,7 +7,7 @@ class SettingsDialog(QtWidgets.QWidget):
     sync_enabled = QtCore.pyqtSignal(bool)
     sync_config = QtCore.pyqtSignal(int)
 
-    def __init__(self, is_enabled):
+    def __init__(self, is_enabled, s_margin):
         QtWidgets.QWidget.__init__(self, parent=None)
 
         #Title of window
@@ -41,6 +41,8 @@ class SettingsDialog(QtWidgets.QWidget):
         self.comboBox.addItem("0")
         self.comboBox.addItem("1")
         self.comboBox.addItem("2")
+
+        self.comboBox.setCurrentText(str(s_margin))
 
         #buttons
         self.ok_button = QPushButton("OK")
@@ -79,6 +81,7 @@ class SettingsDialog(QtWidgets.QWidget):
     
     def margin_selected(self, margin):
         margin_int = int(margin)
+        self.comboBox.setCurrentText(margin)
         self.sync_config.emit(margin_int)
 
     def on_cancel_clicked(self, event):

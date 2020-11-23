@@ -2,12 +2,15 @@ import logging
 import subprocess
 import shlex
 import sys, traceback
+import os
 from PyQt5.QtCore import QThread
 
 class WiresharkRunner(QThread):
     def __init__(self, lua_scripts=None, pcap_filename=None):
         logging.debug('WiresharkRunner(): Instantiated')
         QThread.__init__(self)
+        self.stopTriggered = False
+
         try:
             if sys.platform == "linux" or sys.platform == "linux2":
 
@@ -43,6 +46,33 @@ class WiresharkRunner(QThread):
             logging.debug('WiresharkRunner.run(): Complete')
             
         except Exception as e:
+            if(self.stopTriggered == False):
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                logging.error('WiresharkRunner(): Error during Wireshark execution')
+                traceback.print_exception(exc_type, exc_value, exc_traceback)
+            else:
+                pass
+
+    def stop(self):
+        try:
+            if sys.platform == "linux" or sys.platform == "linux2":
+                python = "python3 "
+                path = os.getcwd()
+                os.system(python + path +"/GUI/PacketView/close_wireshark.py")
+                print("Quit Wireshark")
+                self.quit()
+            else:
+                python = "python "
+                path = os.getcwd()
+                os.system(python + path +"\GUI\PacketView\close_wireshark.py")
+                print("Quit Wireshark")
+                self.quit()
+
+        except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            logging.error('WiresharkRunner(): Error during Wireshark execution')
+            logging.error('RunWebEngine(): Error during Web Engine termination')
             traceback.print_exception(exc_type, exc_value, exc_traceback)
+
+    def stopTrigHandle(self):
+        self.stopTriggered = True
+        self.stop()
