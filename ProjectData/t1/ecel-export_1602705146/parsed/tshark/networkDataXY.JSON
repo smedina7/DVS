@@ -1,0 +1,8 @@
+[{ "traffic_xy_id" : 0, "className" : "trafficThroughput", "start":"2020-10-14T19:52:07", "y" : 9 },
+{ "traffic_xy_id" : 1, "className" : "trafficThroughput", "start":"2020-10-14T19:52:08", "y" : 2 },
+{ "traffic_xy_id" : 2, "className" : "trafficThroughput", "start":"2020-10-14T19:52:09", "y" : 2 },
+{ "traffic_xy_id" : 3, "className" : "trafficThroughput", "start":"2020-10-14T19:52:10", "y" : 2 },
+{ "traffic_xy_id" : 4, "className" : "trafficThroughput", "start":"2020-10-14T19:52:11", "y" : 2 },
+{ "traffic_xy_id" : 5, "className" : "trafficThroughput", "start":"2020-10-14T19:52:12", "y" : 2 },
+{ "traffic_xy_id" : 6, "className" : "trafficThroughput", "start":"2020-10-14T19:52:18", "y" : 37 }
+]

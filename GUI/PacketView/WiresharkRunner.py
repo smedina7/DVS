@@ -58,13 +58,13 @@ class WiresharkRunner(QThread):
             if sys.platform == "linux" or sys.platform == "linux2":
                 python = "python3 "
                 path = os.getcwd()
-                os.system(python + path +"/GUI/PacketView/close_wireshark.py")
+                os.system(python + path +"/GUI/PacketView/close_ws.py")
                 print("Quit Wireshark")
                 self.quit()
             else:
                 python = "python "
                 path = os.getcwd()
-                os.system(python + path +"\GUI\PacketView\close_wireshark.py")
+                os.system(python + path +"\GUI\PacketView\close_ws.py")
                 print("Quit Wireshark")
                 self.quit()
 

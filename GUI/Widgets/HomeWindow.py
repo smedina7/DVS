@@ -25,7 +25,7 @@ class MainGUI(QMainWindow):
     #Signal for when the user want to create a new project
     new_import = QtCore.pyqtSignal(bool)
 
-    def __init__(self, json_files, clicks, timed, throughput, manager_inst, main_inst, parent = None):
+    def __init__(self, json_files, clicks, timed, throughput, manager_inst, parent = None):
         logging.debug("MainGUI(): Instantiated")
         super(MainGUI, self).__init__(parent)
         json_file_list = json_files
@@ -38,8 +38,6 @@ class MainGUI(QMainWindow):
         t = Timestamp()
         self.project_path = os.path.dirname(clicks)
         self.throughput_open1 = False
-        self.cancel_new = False
-        self.main = main_inst
 
         self.key_json = ''
         self.sys_json = ''
@@ -605,22 +603,7 @@ class MainGUI(QMainWindow):
 
     def new_import_project(self):
         #reset cancel check, each time this function is called
-        self.new_canceled = False
         self.new_import.emit(True)
-        self.main.new_canceled.connect(self.new_canceled_mw)
-
-        if self.new_canceled == False:
-            #close wireshark since you'll be opening a new project
-            print("Quitting wireshark")
-            self.manager_instance.stopWireshark()
-
-            #close dash if open
-            if(self.web != ''):
-                self.web.close()
-                self.manager_instance.stopWebEngine()
-        
-        else:
-            return
 
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
@@ -630,10 +613,6 @@ class MainGUI(QMainWindow):
             count += 1
             time.sleep(0.02)
             self.progress.setBarValue(count)
-
-    @QtCore.pyqtSlot(bool)
-    def new_canceled_mw(self, cancel):
-        self.cancel_new = cancel
     
     @QtCore.pyqtSlot()
     def loadstarted(self):

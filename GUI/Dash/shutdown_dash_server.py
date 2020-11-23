@@ -5,7 +5,7 @@ import sys
 import logging
 import sys, traceback
 
-path = os.path.abspath("GUI/PacketView/dash_pid.txt")
+path = os.path.abspath("dash_pid.txt")
 
 try:
     if sys.platform == "linux" or sys.platform == "linux2":
@@ -13,7 +13,10 @@ try:
         f = open(path, 'r')
         p = f.read().split()
         pid = int(p[1])
-        os.kill(pid, signal.SIGTERM)
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except:
+            print("Dash is closed")
     else:
         os.system("taskkill /IM QtWebEngineProcess.exe /F")
         #os.kill(signal.CTRL_C_EVENT, 0)

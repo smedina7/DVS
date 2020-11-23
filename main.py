@@ -16,8 +16,6 @@ from PyQt5.uic import loadUi
 from PyQt5 import QtCore
 
 class DVSstartUpPage(QMainWindow):
-    #signal timelineview that cancel has been selected
-    new_canceled = QtCore.pyqtSignal(bool)
 
     def __init__(self):
         super(DVSstartUpPage, self).__init__()
@@ -43,6 +41,8 @@ class DVSstartUpPage(QMainWindow):
 
         self.enabled_sync = False
         self.hidden = False
+        self.startedOnce = False
+        self.clicks = ''
         self.sync_margin = 0
         self.project_folder = ''
         self.setFixedSize(620,565)
@@ -64,10 +64,28 @@ class DVSstartUpPage(QMainWindow):
 
             if len(filenames) < 0:
                 logging.debug("File choose cancelled")
-                self.new_canceled.emit(True)
                 return
 
             if len(filenames) > 0:
+                if self.startedOnce == True:
+                    #make sure you're in the correct dir
+                    p_path = os.path.dirname(self.clicks)
+                    g_dir = os.path.dirname(p_path)
+                    g_dir = os.path.dirname(g_dir)
+                    os.chdir(g_dir)
+                    #close wireshark since you'll be opening a new project
+                    print("Quitting wireshark")
+                    try:
+                        self.manager.stopWireshark()
+                    except:
+                        print("could not close wireshark")
+
+                    #close dash
+                    try:
+                        self.manager.stopWebEngine()
+                    except:
+                        print("closed")
+
                 zip_to_import = filenames[0]
                 file_name = os.path.basename(zip_to_import)
                 if(".zip" not in zip_to_import):
@@ -104,12 +122,13 @@ class DVSstartUpPage(QMainWindow):
             self.new_project_popup.show()
 
     def openHomeWindow(self):
+        self.startedOnce = True
         self.manager = PacketManager(self.project_folder)
         json_files = self.manager.getJSON()
-        clicks = self.manager.getClicks()
+        self.clicks = self.manager.getClicks()
         timed = self.manager.getTimed()
         throughput = self.manager.getThroughput()
-        self.window = MainGUI(json_files, clicks, timed, throughput, self.manager, self)
+        self.window = MainGUI(json_files, self.clicks, timed, throughput, self.manager)
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
         self.window.new_import.connect(self.new_import_selected)

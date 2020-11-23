@@ -13,7 +13,10 @@ try:
         f = open(path, 'r')
         p = f.read().split()
         pid = int(p[1])
-        os.kill(pid, signal.SIGTERM)
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except:
+            print("All is closed")
     else:
         os.system("taskkill /IM wireshark.exe /F")
         #os.kill(signal.CTRL_C_EVENT, 0)
