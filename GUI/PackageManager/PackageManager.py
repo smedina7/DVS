@@ -28,7 +28,7 @@ class PackageManager():
         os.mkdir(new_file_path)
         
         with zipfile.ZipFile(self.zip_file, 'r') as zip_ref:
-            zip_ref.extractall(self.main_path)
+            zip_ref.extractall(new_file_path)
 
         #for next steps of import.. 
         self.new_extracted_dir = os.path.dirname(self.file_name)

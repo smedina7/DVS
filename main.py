@@ -6,6 +6,9 @@ from GUI.Widgets.HomeWindow import MainGUI
 from GUI.PacketView.Manager import PacketManager
 from GUI.Dialogs.NewProjectDialog import NewProjectDialog
 from GUI.Dialogs.Settings import SettingsDialog
+from GUI.PackageManager.PackageManager import PackageManager
+from GUI.Threading.BatchThread import BatchThread
+from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
@@ -49,9 +52,51 @@ class DVSstartUpPage(QMainWindow):
         self.show()
 
     def createNewProject(self):
-        self.new_project_popup = NewProjectDialog()
-        self.new_project_popup.created.connect(self.project_created)
-        self.new_project_popup.show()
+        newPro = QMessageBox.question(self, 'Create or Import Project', 'Do you want to import a .zip file?', 
+                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if newPro == QMessageBox.Yes:
+            zip_file = QFileDialog()
+            filenames, _ = QFileDialog.getOpenFileNames(zip_file, "Select File")
+
+            if len(filenames) < 0:
+                logging.debug("File choose cancelled")
+                return
+
+            if len(filenames) > 0:
+                zip_to_import = filenames[0]
+                file_name = os.path.basename(zip_to_import)
+                if(".zip" not in zip_to_import):
+                    QMessageBox.warning(self,
+                                    "Not a .zip file",
+                                    "File selected is not a .zip file!",
+                                    QMessageBox.Ok)            
+                    return None
+
+                file_name = os.path.splitext(file_name)[0]
+                configname = file_name
+                working_dir = os.getcwd()
+                project_data_folder = os.path.join(working_dir, "ProjectData")
+                self.new_project_path = os.path.join(project_data_folder, configname)
+                if os.path.exists(self.new_project_path):
+                    QMessageBox.warning(self,
+                                    "Name Exists",
+                                    "The project name specified and directory already exists",
+                                    QMessageBox.Ok)            
+                    return None
+                else:
+                    package_mgr = PackageManager()
+                    self.batch_thread = BatchThread()
+                    self.batch_thread.progress_signal.connect(self.update_progress_bar)
+                    self.batch_thread.completion_signal.connect(self.unzip_complete)
+                    self.batch_thread.add_function(package_mgr.unzip, zip_to_import, file_name, project_data_folder)
+                    self.progress_dialog_overall = ProgressBarDialog(self, self.batch_thread.get_load_count())
+                    self.batch_thread.start()
+                    self.progress_dialog_overall.show()
+            
+        else:
+            self.new_project_popup = NewProjectDialog()
+            self.new_project_popup.created.connect(self.project_created)
+            self.new_project_popup.show()
 
     def openHomeWindow(self):
         self.manager = PacketManager(self.project_folder)
@@ -96,7 +141,22 @@ class DVSstartUpPage(QMainWindow):
         self.settings_popup = SettingsDialog(self.enabled_sync)
         self.settings_popup.sync_enabled.connect(self.sync_enabled)
         self.settings_popup.sync_config.connect(self.margin_selected)
-        self.settings_popup.show()    
+        self.settings_popup.show() 
+
+    def update_progress_bar(self):
+        logging.debug('update_progress_bar(): Instantiated')
+        self.progress_dialog_overall.update_progress()
+        logging.debug('update_progress_bar(): Complete')  
+
+    def unzip_complete(self):
+        logging.debug("unzip_complete(): Instantiated")
+        self.progress_dialog_overall.update_progress()
+        self.progress_dialog_overall.hide()
+        self.project_folder = self.new_project_path
+        self.openHomeWindow()
+        self.hide()
+
+        logging.debug("unzip_complete(): Complete") 
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Window', 'Are you sure you want to quit?', 

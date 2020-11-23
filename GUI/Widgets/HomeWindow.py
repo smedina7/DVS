@@ -103,23 +103,29 @@ class MainGUI(QMainWindow):
         preset_dataline = add_dataline.addMenu("Preset Dataline")
         custom_dataline = add_dataline.addAction("Choose JSON")
 
-        throughput = preset_dataline.addAction("Throughput")
-        keypress = preset_dataline.addAction("Keypresses")
-        syscalls = preset_dataline.addAction("System Calls")
-        mouse = preset_dataline.addAction("Mouse Clicks")
-        timed = preset_dataline.addAction("Timed Screenshots")
+        self.throughput = preset_dataline.addAction("Throughput")
+        self.keypress = preset_dataline.addAction("Keypresses")
+        self.syscalls = preset_dataline.addAction("System Calls")
+        self.mouse = preset_dataline.addAction("Mouse Clicks")
+        self.timed = preset_dataline.addAction("Timed Screenshots")
+
+        self.throughput.setCheckable(True)
+        self.keypress.setCheckable(True)
+        self.syscalls.setCheckable(True)
+        self.mouse.setCheckable(True)
+        self.timed.setCheckable(True)
         
         #dataline windows actions
-        throughput.triggered.connect(self.throughput_selected)
-        self.resizeEvent(throughput.triggered)
-        keypress.triggered.connect(self.keypresses_selected)
-        self.resizeEvent(keypress.triggered)
-        syscalls.triggered.connect(self.syscalls_selected)
-        self.resizeEvent(syscalls.triggered)
-        mouse.triggered.connect(self.mouse_selected)
-        self.resizeEvent(mouse.triggered)
-        timed.triggered.connect(self.timed_selected)
-        self.resizeEvent(timed.triggered)
+        self.throughput.triggered.connect(self.throughput_selected)
+        self.resizeEvent(self.throughput.triggered)
+        self.keypress.triggered.connect(self.keypresses_selected)
+        self.resizeEvent(self.keypress.triggered)
+        self.syscalls.triggered.connect(self.syscalls_selected)
+        self.resizeEvent(self.syscalls.triggered)
+        self.mouse.triggered.connect(self.mouse_selected)
+        self.resizeEvent(self.mouse.triggered)
+        self.timed.triggered.connect(self.timed_selected)
+        self.resizeEvent(self.timed.triggered)
 
         custom_dataline.triggered.connect(self.choose_json)
         self.resizeEvent(custom_dataline.triggered)
@@ -244,7 +250,7 @@ class MainGUI(QMainWindow):
             self.checkHidden(self.subTh, self.web)
     
     def keypresses_selected(self):
-        if self.project_dict[self.project_name]["KeypressData"] not in self.mdi.subWindowList():
+        if self.project_dict[self.project_name]["KeypressData"] not in self.mdi.subWindowList() and self.keypress.isChecked()==True:
             self.subK = QMdiSubWindow()
             self.subK.resize(840,210)
             self.subK.setWindowTitle("Keypresses")
@@ -275,13 +281,16 @@ class MainGUI(QMainWindow):
                 self.tableWidget.show()
                 self.subK.show()
                 self.project_dict[self.project_name]["KeypressData"] = self.subK
-
+        elif self.keypress.isChecked()==False:
+            self.mdi.setActiveSubWindow(self.subK)
+            self.mdi.closeActiveSubWindow()
+            self.subK.hide()
         else:
             #check if window is hidden
             self.checkHidden(self.subK, self.tableWidget)
 
     def syscalls_selected(self):
-        if self.project_dict[self.project_name]["SystemCallsData"] not in self.mdi.subWindowList():
+        if self.project_dict[self.project_name]["SystemCallsData"] not in self.mdi.subWindowList() and self.syscalls.isChecked()==True:
             self.subSC = QMdiSubWindow()
             self.subSC.resize(840,210)
             self.subSC.setWindowTitle("System Calls")
@@ -313,6 +322,10 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSys.show()
                 self.subSC.show()
                 self.project_dict[self.project_name]["SystemCallsData"] = self.subSC
+        elif self.syscalls.isChecked()==False:
+            self.mdi.setActiveSubWindow(self.subSC)
+            self.mdi.closeActiveSubWindow()
+            self.subSC.hide()
 
         else:
             #check if window is hidden
@@ -356,7 +369,7 @@ class MainGUI(QMainWindow):
             self.checkHidden(self.subS, self.tableWidgetSur)
 
     def mouse_selected(self):
-        if self.project_dict[self.project_name]["MouseClicksData"] not in self.mdi.subWindowList():
+        if self.project_dict[self.project_name]["MouseClicksData"] not in self.mdi.subWindowList() and self.mouse.isChecked()==True:
             self.subM = QMdiSubWindow()
             self.subM.resize(840,260)
             self.subM.setWindowTitle("Mouse Clicks")
@@ -384,13 +397,17 @@ class MainGUI(QMainWindow):
                 self.tableWidgetMou.show()
                 self.subM.show()
                 self.project_dict[self.project_name]["MouseClicksData"] = self.subM
+        elif self.mouse.isChecked()==False:
+            self.mdi.setActiveSubWindow(self.subM)
+            self.mdi.closeActiveSubWindow()
+            self.subM.hide()
 
         else:
             #check if window is hidden
             self.checkHidden(self.subM, self.tableWidgetMou)
 
     def timed_selected(self):
-        if self.project_dict[self.project_name]["TimedData"] not in self.mdi.subWindowList():
+        if self.project_dict[self.project_name]["TimedData"] not in self.mdi.subWindowList() and self.timed.isChecked()==True:
             self.subT = QMdiSubWindow()
             self.subT.resize(840,260)
             self.subT.setWindowTitle("Timed Screenshots")
@@ -420,6 +437,11 @@ class MainGUI(QMainWindow):
                 self.tableWidgetTime.show()
                 self.subT.show()
                 self.project_dict[self.project_name]["TimedData"] = self.subT
+
+        elif self.timed.isChecked()==False:
+            self.mdi.setActiveSubWindow(self.subT)
+            self.mdi.closeActiveSubWindow()
+            self.subT.hide()
 
         else:
             #check if window is hidden
@@ -480,14 +502,76 @@ class MainGUI(QMainWindow):
             except IOError:
                 print("Cant Open File")
 
-
     def color_picker(self):
         color = QColorDialog.getColor()
         if not color.isValid():
             return 
         else:
-            return color      
+            return color   
 
+    def contextMenuEvent(self, event):
+        menu = QMenu(self.tableWidget)
+        addRow = menu.addAction("Add Row")
+        addColumn = menu.addAction("Add Column")
+        delColumn = menu.addAction("Delete Column")
+        delRow = menu.addAction("Delete Row")
+        duplicateRow = menu.addAction("Duplicate Row")
+        duplicateColumn = menu.addAction("Duplicate Column")
+
+        action = menu.exec_(event.globalPos())
+        if action == addRow:
+            self.addRow()
+        elif action ==addColumn:
+            self.addColumn()
+        elif action == delColumn:
+            self.delColumn()
+        elif action == delRow:
+            self.delRow()
+        elif action == duplicateRow:
+            self.duplicateRow()
+        elif action == duplicateColumn:
+            self.duplicateColumn()
+
+    def addRow(self):
+        rowCount = self.tableWidget.rowCount()
+        self.tableWidget.insertRow(rowCount)
+        print("New Row Added")
+
+    def addColumn(self):
+        colCount = self.tableWidget.columnCount()
+        self.tableWidget.insertColumn(colCount)
+        print("New Column Added")
+    
+    def delRow(self):
+        if self.tableWidget.rowCount()>0:
+            self.tableWidget.removeRow(self.tableWidget.rowCount() -1)
+            print("Row deleted")
+    
+    def delColumn(self):
+        if self.tableWidget.columnCount()>0:
+            self.tableWidget.removeColumn(self.tableWidget.columnCount() -1)
+            print("Column deleted")
+
+    def duplicateRow(self):
+        self.tableWidget.insertRow(self.tableWidget.rowCount())
+        rowCount = self.tableWidget.rowCount()
+        columnCount = self.tableWidget.columnCount()
+
+        for j in range(columnCount):
+            if not self.tableWidget.item(rowCount-2, j) is None:
+                self.tableWidget.setItem(rowCount-1, j, QTableWidgetItem(self.tableWidget.item(rowCount-2, j).text()))
+        print("Row Duplicated")
+
+    def duplicateColumn(self):
+        self.tableWidget.insertColumn(self.tableWidget.columnCount())
+        columnCount = self.tableWidget.columnCount()
+        rowCount = self.tableWidget.rowCount()
+
+        for j in range(rowCount):
+            if not self.tableWidget.item(j, columnCount-2) is None:
+                self.tableWidget.setItem(j, columnCount-1, QTableWidgetItem(self.tableWidget.item(j, columnCount-2).text()))
+        print("Column Duplicated")
+    
     def load_throughput_complete(self):
         self.subTh = QMdiSubWindow()
         self.subTh.resize(840,320)
