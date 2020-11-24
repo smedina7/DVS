@@ -16,6 +16,7 @@ from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
 from GUI.Widgets.Timestamp import Timestamp
+from GUI.Widgets.sync_helper import sync_helper
 from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
@@ -33,6 +34,7 @@ class MainGUI(QMainWindow):
         self.progress = ProgressBarDialog(self, 100)
         t = Timestamp()
 
+        self.project_path = os.path.dirname(clicks)
         self.key_json = ''
         self.sys_json = ''
         self.mouse_json = ''
@@ -120,14 +122,32 @@ class MainGUI(QMainWindow):
         # sync stuff
         self.timestamp = ""
         self.timestampTrigger = False
+        self.wiresharkTrigger = False
+        self.sync_dict = {}
 
     def file_changed(self):
         self.syncWindows(1)
-
+    
+    def wire_to_DVS(self):
+        if(self.wiresharkTrigger == True):
+            time.sleep(0.5)
+            packet_num = sync_helper.get_wireshark_click()
+            dictionary_temp = self.sync_dict
+            timestamp_w = sync_helper.find_timestamp(packet_num,dictionary_temp)
+            if not timestamp_w == "":
+                Timestamp.update_timestamp(str(timestamp_w))
+            else: 
+                Timestamp.update_timestamp("0000-00-00T00:00:00")
+    
     def buttonaction_wireshark(self, b):
         if b == True:
             self.sync_button_wireshark.setText("Wireshark Sync : on")
             self.wiresharkTrigger = True
+            p_path = self.project_path
+            pcap_path = sync_helper.get_wireshark_info(p_path)
+            dictionary = sync_helper.json_to_dictionary(pcap_path)
+            self.sync_dict = dictionary
+
         else:
             self.sync_button_wireshark.setText("Wireshark Sync : off")
             self.wiresharkTrigger = False
@@ -147,16 +167,29 @@ class MainGUI(QMainWindow):
                             Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
+                        # temp = datetime.strptime(currTimeStamp,'%Y-%m-%dT%H:%M:%S')
+                        # ts_t1 = temp + timedelta(seconds=1)
+                        # ts_1 = datetime.strftime(ts_t1, '%Y-%m-%dT%H:%M:%S')
                         if indexTimeStamp == currTimeStamp:
-                            #child.clearSelection()
                             child.selectRow(row)
-                        #child.show()
+                        # if indexTimeStamp == ts_1:
+                        #     child.selectRow(row)
+
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.SingleSelection)
                 child.clearSelection()
-                #child.show()
+
+        if self.wiresharkTrigger == True:
+            dictionary = self.sync_dict  
+            timestamp = Timestamp.get_current_timestamp()
+            packet_num = sync_helper.find_packetnumber(timestamp, dictionary)
+            sync_helper.write_to_wireshark(packet_num)
+
+        if self.wiresharkTrigger == False:
+            sync_helper.stop_to_wireshark()
+            # print(os.getcwdb())
 
     def buttonaction_timestamp(self, b):
         if b == True:
@@ -165,6 +198,10 @@ class MainGUI(QMainWindow):
             self.file_watcher = QFileSystemWatcher()
             self.file_watcher.addPath('/home/kali/DVS/GUI/Dash/timestamp.txt') #listens for file changes
             self.file_watcher.fileChanged.connect(self.file_changed)
+            path = os.getcwd()+'/ws_click.txt'
+            self.ws_watcher = QFileSystemWatcher()
+            self.ws_watcher.addPath(path) #listens for file changes
+            self.ws_watcher.fileChanged.connect(self.wire_to_DVS)
             # redraw
             self.syncWindows(-1)
         else:
