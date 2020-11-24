@@ -40,7 +40,6 @@ class DVSstartUpPage(QMainWindow):
         QApplication.setPalette(palette)
 
         self.enabled_sync = False
-        self.hidden = False
         self.startedOnce = False
         self.clicks = ''
         self.sync_margin = 0
@@ -68,17 +67,16 @@ class DVSstartUpPage(QMainWindow):
 
             if len(filenames) > 0:
                 if self.startedOnce == True:
-                    #make sure you're in the correct dir
+                    #make sure you're in the correct dir to close dash and ws
                     p_path = os.path.dirname(self.clicks)
                     g_dir = os.path.dirname(p_path)
                     g_dir = os.path.dirname(g_dir)
                     os.chdir(g_dir)
                     #close wireshark since you'll be opening a new project
-                    print("Quitting wireshark")
                     try:
                         self.manager.stopWireshark()
                     except:
-                        print("could not close wireshark")
+                        print("ERROR: Could not close wireshark")
 
                     #close dash
                     try:
@@ -132,6 +130,7 @@ class DVSstartUpPage(QMainWindow):
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
         self.window.new_import.connect(self.new_import_selected)
+        self.window.open_prev.connect(self.open_prev_selected)
 
     #Slot for when the user created the new project, path and configname
     @QtCore.pyqtSlot(str)
@@ -155,6 +154,11 @@ class DVSstartUpPage(QMainWindow):
         if create == True:
             self.createNewProject()
 
+    @QtCore.pyqtSlot(bool)
+    def open_prev_selected(self, openP):
+        if openP == True:
+            self.openDir()
+
     def openDir(self):
         folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
 
@@ -166,7 +170,6 @@ class DVSstartUpPage(QMainWindow):
             self.project_folder = folder_chosen
             self.openHomeWindow()
             self.hide()
-            self.hidden = True
 
     def openSettings(self):
         self.settings_popup = SettingsDialog(self.enabled_sync, self.sync_margin)
@@ -186,7 +189,6 @@ class DVSstartUpPage(QMainWindow):
         self.project_folder = self.new_project_path
         self.openHomeWindow()
         self.hide()
-        self.hidden = True
         logging.debug("unzip_complete(): Complete") 
 
     def closeEvent(self, event):

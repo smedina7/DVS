@@ -22,8 +22,10 @@ from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Dialogs.ExportDialog import ExportDialog
 
 class MainGUI(QMainWindow):
-    #Signal for when the user want to create a new project
+    #Signal for when the user wants to create a new project
     new_import = QtCore.pyqtSignal(bool)
+    #Signal for when the user wants to open previous project
+    open_prev = QtCore.pyqtSignal(bool)
 
     def __init__(self, json_files, clicks, timed, throughput, manager_inst, parent = None):
         logging.debug("MainGUI(): Instantiated")
@@ -85,6 +87,7 @@ class MainGUI(QMainWindow):
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
+        self.mdi.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
 
         #add scrollbar
         self.mdi.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -95,12 +98,14 @@ class MainGUI(QMainWindow):
         file = bar.addMenu("File")
         save = file.addAction("Save")
         importProject = file.addAction("New Project/Import")
+        openPrevProject = file.addAction("Open Previous")
         exportProject = file.addAction("Export")
         quitDVS = file.addAction("Quit")
 
         quitDVS.triggered.connect(self.closeEvent)
         exportProject.triggered.connect(self.export_project)
         importProject.triggered.connect(self.new_import_project)
+        openPrevProject.triggered.connect(self.open_prev_project)
 
         #add default datalines
         add_dataline = bar.addMenu("Add Dataline")
@@ -139,7 +144,8 @@ class MainGUI(QMainWindow):
         adjust.triggered[QAction].connect(self.tile_selected)
 
         #Home Window Widget Configuration
-        self.setWindowTitle("Timeline View")
+        window_title = "Timeline View - " + self.project_name
+        self.setWindowTitle(window_title)
         self.setMinimumHeight(750)
         self.setMinimumWidth(850)
         # sync stuff
@@ -224,7 +230,7 @@ class MainGUI(QMainWindow):
     def throughput_selected(self):
         #check if dataline exists
         if self.project_dict[self.project_name]["ThroughputData"] not in self.mdi.subWindowList() and self.throughput_open1 == False:
-            print("here")
+            print("First IF")
             #file that holds throughput file path and selected dataline color; this will be read by dash app
             path = os.path.abspath("GUI/Dash/throughput_info.txt")
             throughput_info_file = open(path, 'w')
@@ -247,9 +253,11 @@ class MainGUI(QMainWindow):
                 self.web.loadFinished.connect(self.loadfinished)
 
         elif self.throughput_open1 == True:
-            print("here2")
+            print("Second IF")
             self.checkHidden(self.subTh, self.web)
+            
         else:
+            print("Third IF")
             #check if window is hidden
             self.checkHidden(self.subTh, self.web)
     
@@ -588,8 +596,7 @@ class MainGUI(QMainWindow):
         self.subTh.setWidget(self.web) 
         self.project_dict[self.project_name]["ThroughputData"] = self.subTh
         self.throughput_open1 = True
-        print(self.mdi.subWindowList())
-        print(self.project_dict[self.project_name])
+        print(self.throughput_open1)
 
     def export_project(self):
         ExportDialog(self, self.project_path).exec()
@@ -604,6 +611,10 @@ class MainGUI(QMainWindow):
     def new_import_project(self):
         #reset cancel check, each time this function is called
         self.new_import.emit(True)
+    
+    def open_prev_project(self):
+        #self.open_prev.emit(True)
+        print("open prev triggered")
 
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
@@ -622,8 +633,9 @@ class MainGUI(QMainWindow):
     def loadfinished(self):
         self.progress.hide()
         print(time.time(), ": load finished")
-        #load the dataline
-        self.load_throughput_complete()
+        if self.throughput_open1 == False:
+            #load the dataline
+            self.load_throughput_complete()
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
