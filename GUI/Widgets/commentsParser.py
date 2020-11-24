@@ -12,7 +12,7 @@ class commentsParser:
             self.pcappath = path + "/PCAP/AnnotatedPCAP.pcapng"
         else:
             # temp = path + "\\PCAP\\AnnotatedPCAP.pcapng"
-            self.pcappath += "\\PCAP\\AnnotatedPCAP.pcapng"
+            self.pcappath = path + "\\PCAP\\AnnotatedPCAP.pcapng"
 
 
         self.comments_path = os.path.abspath("GUI/Widgets/pcomments.txt")
