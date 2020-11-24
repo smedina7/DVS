@@ -63,7 +63,7 @@ class TextDataline(QTableWidget):
 
                 elif j == "confidence":
                     tableid = str(ser_confidence[ind])
-                    if tableid !='nan':
+                    if tableid !='No Data':
                         it.setData(QtCore.Qt.DisplayRole, (tableid))
 
                 elif j == "timestamp":

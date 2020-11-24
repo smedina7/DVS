@@ -4,6 +4,7 @@ import time
 from re import search
 import subprocess
 import json
+import sys
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -322,8 +323,17 @@ class MainGUI(QMainWindow):
         
 
         # Projectpath = "/home/kali/DVS_dev/ProjectData/testNov20"
-        Projectpath = self.ProjectFolder[0]
-        print (Projectpath)
+        if sys.platform == "linux" or sys.platform == "linux2":
+            Projectpath = self.ProjectFolder[0]
+        
+        else:
+            temp = self.ProjectFolder[0].rsplit('\\',1)
+            Projectpath = temp[0]
+
+        
+        
+        
+        # print ("home window", Projectpath)
         commentsParser(Projectpath)
 
         print("JSON updated")
@@ -348,6 +358,12 @@ class MainGUI(QMainWindow):
         self.file_watcher = QFileSystemWatcher()
         # self.file_watcher.addPath('/home/kali/DVS_dev/GUI/Widgets/PCAPtest.txt') #listens for file changes
         # PCAPpath = "/home/kali/DVS_dev/ProjectData/testNov20/PCAP/AnnotatedPCAP.pcapng"
+        if sys.platform == "linux" or sys.platform == "linux2":
+            pass
+        else:
+            temp = self.ProjectFolder[0].rsplit('\\',1)
+            self.PCAPpath = temp[0]
+            
         self.file_watcher.addPath(self.PCAPpath) #listens for file changes
         self.file_watcher.fileChanged.connect(self.trigger_refresh)
     

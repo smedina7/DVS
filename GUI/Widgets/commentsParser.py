@@ -11,7 +11,9 @@ class commentsParser:
         if sys.platform == "linux" or sys.platform == "linux2":
             self.pcappath = path + "/PCAP/AnnotatedPCAP.pcapng"
         else:
-            self.pcappath = PureWindowsPath (path + "\\PCAP\\AnnotatedPCAP.pcapng")
+            # temp = path + "\\PCAP\\AnnotatedPCAP.pcapng"
+            self.pcappath = + "\\PCAP\\AnnotatedPCAP.pcapng"
+
 
         self.comments_path = os.path.abspath("GUI/Widgets/pcomments.txt")
         self.multikeys = []
@@ -26,6 +28,13 @@ class commentsParser:
         cmd += pcappath
         cmd += " -Y frame.comment -T fields -E header=y -e frame.number -e frame.comment -e frame.time > "
         cmd += self.comments_path
+
+        if sys.platform == "linux" or sys.platform == "linux2":
+            pass
+        else:
+            temp = cmd
+            temp2 = PureWindowsPath (temp)
+            cmd = str (temp2)
 
         os.system(cmd)
 
