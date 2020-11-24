@@ -586,7 +586,7 @@ class MainGUI(QMainWindow):
     
     def load_throughput_complete(self):
         self.subTh = QMdiSubWindow()
-        self.subTh.resize(840,320)
+        self.subTh.resize(840,330)
         self.subTh.setWindowTitle("Throughput")
         loading_label = QLabel("Loading...")
         self.subTh.setWidget(loading_label)
@@ -636,6 +636,9 @@ class MainGUI(QMainWindow):
         if self.throughput_open1 == False:
             #load the dataline
             self.load_throughput_complete()
+        else:
+            self.subTh.showMaximized()
+            self.subTh.showNormal()
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
