@@ -1,5 +1,6 @@
 import json
 import os.path
+import sys
 from datetime import datetime
 
 
@@ -80,7 +81,11 @@ class commentsParser:
                     index = index + 1
 
         json_object = json.dumps(self.multikeys, indent=4)
-        jsonpath = path + "/ParsedLogs/pcomments.json"
+        if sys.platform == "linux" or sys.platform == "linux2":
+            jsonpath = path + "/ParsedLogs/pcomments.json"
+        
+        else:
+            jsonpath = path + "\\ParsedLogs\\pcomments.json"
 
         with open(jsonpath, 'w') as outfile:
             outfile.write(json_object)
