@@ -10,8 +10,8 @@ class commentsParser:
         if sys.platform == "linux" or sys.platform == "linux2":
             self.pcappath = path + "/PCAP/AnnotatedPCAP.pcapng"
         else:
-            self.pcappath = path + "\\PCAP\\AnnotatedPCAP.pcapng"
-            
+            self.pcappath = os.path.abspath(path) + "\\PCAP\\AnnotatedPCAP.pcapng"
+
         self.comments_path = os.path.abspath("GUI/Widgets/pcomments.txt")
         self.multikeys = []
         self.listKeys = ["packet_id", "scope", "important-packet-identifier", "program-used", "cmd", "description",
