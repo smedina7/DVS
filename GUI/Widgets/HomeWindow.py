@@ -235,6 +235,7 @@ class MainGUI(QMainWindow):
             path = os.path.abspath("GUI/Dash/throughput_info.txt")
             throughput_info_file = open(path, 'w')
             throughput_info_file.write(self.throughput_json+"\n")
+            self.throughput.setChecked(True)
 
             #get rgb values for graph background color
             color = self.color_picker()
@@ -253,16 +254,18 @@ class MainGUI(QMainWindow):
                 self.web.loadFinished.connect(self.loadfinished)
 
         elif self.throughput_open1 == True:
-            print("Second IF")
-            self.checkHidden(self.subTh, self.web)
+            if self.throughput.isChecked() == False:
+                self.checkHidden(self.subTh, self.web)
+                self.throughput.setChecked(True)
             
-        else:
-            print("Third IF")
-            #check if window is hidden
-            self.checkHidden(self.subTh, self.web)
+            else:
+                self.mdi.setActiveSubWindow(self.subTh)
+                self.mdi.closeActiveSubWindow()
+                self.subTh.hide()
     
     def keypresses_selected(self):
         if self.project_dict[self.project_name]["KeypressData"] not in self.mdi.subWindowList() and self.keypress.isChecked()==True:
+            self.keypress.setChecked(True)
             self.subK = QMdiSubWindow()
             self.subK.resize(840,210)
             self.subK.setWindowTitle("Keypresses")
@@ -293,6 +296,10 @@ class MainGUI(QMainWindow):
                 self.tableWidget.show()
                 self.subK.show()
                 self.project_dict[self.project_name]["KeypressData"] = self.subK
+                
+                if self.subK.windowStateChanged:
+                    self.window_changed("K")
+
         elif self.keypress.isChecked()==False:
             self.mdi.setActiveSubWindow(self.subK)
             self.mdi.closeActiveSubWindow()
@@ -303,6 +310,7 @@ class MainGUI(QMainWindow):
 
     def syscalls_selected(self):
         if self.project_dict[self.project_name]["SystemCallsData"] not in self.mdi.subWindowList() and self.syscalls.isChecked()==True:
+            self.syscalls.setChecked(True)
             self.subSC = QMdiSubWindow()
             self.subSC.resize(840,210)
             self.subSC.setWindowTitle("System Calls")
@@ -334,6 +342,10 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSys.show()
                 self.subSC.show()
                 self.project_dict[self.project_name]["SystemCallsData"] = self.subSC
+                
+                if self.subSC.windowStateChanged:
+                    self.window_changed("Sy")
+
         elif self.syscalls.isChecked()==False:
             self.mdi.setActiveSubWindow(self.subSC)
             self.mdi.closeActiveSubWindow()
@@ -382,6 +394,7 @@ class MainGUI(QMainWindow):
 
     def mouse_selected(self):
         if self.project_dict[self.project_name]["MouseClicksData"] not in self.mdi.subWindowList() and self.mouse.isChecked()==True:
+            self.mouse.setChecked(True)
             self.subM = QMdiSubWindow()
             self.subM.resize(840,260)
             self.subM.setWindowTitle("Mouse Clicks")
@@ -409,6 +422,10 @@ class MainGUI(QMainWindow):
                 self.tableWidgetMou.show()
                 self.subM.show()
                 self.project_dict[self.project_name]["MouseClicksData"] = self.subM
+
+                if self.subSC.windowStateChanged:
+                    self.window_changed("MC")
+
         elif self.mouse.isChecked()==False:
             self.mdi.setActiveSubWindow(self.subM)
             self.mdi.closeActiveSubWindow()
@@ -420,6 +437,7 @@ class MainGUI(QMainWindow):
 
     def timed_selected(self):
         if self.project_dict[self.project_name]["TimedData"] not in self.mdi.subWindowList() and self.timed.isChecked()==True:
+            self.timed.setChecked(True)
             self.subT = QMdiSubWindow()
             self.subT.resize(840,260)
             self.subT.setWindowTitle("Timed Screenshots")
@@ -449,6 +467,9 @@ class MainGUI(QMainWindow):
                 self.tableWidgetTime.show()
                 self.subT.show()
                 self.project_dict[self.project_name]["TimedData"] = self.subT
+                
+                if self.subSC.windowStateChanged:
+                    self.window_changed("Ti")
 
         elif self.timed.isChecked()==False:
             self.mdi.setActiveSubWindow(self.subT)
@@ -596,7 +617,8 @@ class MainGUI(QMainWindow):
         self.subTh.setWidget(self.web) 
         self.project_dict[self.project_name]["ThroughputData"] = self.subTh
         self.throughput_open1 = True
-        print(self.throughput_open1)
+        if self.subTh.windowStateChanged:
+            self.window_changed("Th")
 
     def export_project(self):
         ExportDialog(self, self.project_path).exec()
@@ -615,6 +637,33 @@ class MainGUI(QMainWindow):
     def open_prev_project(self):
         #self.open_prev.emit(True)
         print("open prev triggered")
+    
+    def window_changed(self, dataline):
+        if dataline == "K":
+            if self.subK.isHidden() == True:
+                self.keypress.setChecked(False)
+            else:
+                self.keypress.setChecked(True)
+        elif dataline == "Sy":
+            if self.subSC.isHidden() == True:
+                self.syscalls.setChecked(False)
+            else:
+                self.syscalls.setChecked(True)
+        elif dataline == "MC":
+            if self.subM.isHidden() == True:
+                self.mouse.setChecked(False)
+            else:
+                self.mouse.setChecked(True)
+        elif dataline == "Ti":
+            if self.subT.isHidden() == True:
+                self.timed.setChecked(False)
+            else:
+                self.timed.setChecked(True)
+        elif dataline == "Th":
+            if self.subTh.isHidden() == True:
+                self.throughput.setChecked(False)
+            else:
+                self.throughput.setChecked(True)
 
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
