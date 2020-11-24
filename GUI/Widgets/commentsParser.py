@@ -6,7 +6,12 @@ from datetime import datetime
 
 class commentsParser:
     def __init__(self, path):
-        self.pcappath = path + "/PCAP/AnnotatedPCAP.pcapng"
+
+        if sys.platform == "linux" or sys.platform == "linux2":
+            self.pcappath = path + "/PCAP/AnnotatedPCAP.pcapng"
+        else:
+            self.pcappath = path + "\\PCAP\\AnnotatedPCAP.pcapng"
+            
         self.comments_path = os.path.abspath("GUI/Widgets/pcomments.txt")
         self.multikeys = []
         self.listKeys = ["packet_id", "scope", "important-packet-identifier", "program-used", "cmd", "description",
