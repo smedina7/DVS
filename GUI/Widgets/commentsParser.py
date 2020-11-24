@@ -28,7 +28,7 @@ class commentsParser:
 
         if num_lines < 2:
             dct = dict()
-            dct = dict(zip(self.listKeys, [None] * len(self.listKeys)))
+            dct = dict(zip(self.listKeys, ["No data"] * len(self.listKeys)))
             self.multikeys.append(dct)
             print(self.multikeys)
         else:

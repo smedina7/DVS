@@ -83,6 +83,13 @@ class MainGUI(QMainWindow):
         self.tb.addWidget(self.sync_button_timestamp)
         self.sync_button_timestamp.clicked.connect(self.buttonaction_timestamp)
 
+        #Refresh button for comments packets
+        self.refresh = QPushButton (self.tb)
+        self.refresh.setText("Refresh Comments Dataline")
+        self.tb.addWidget(self.refresh)
+        self.refresh.clicked.connect (self.trigger_refresh)
+
+
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
@@ -307,11 +314,8 @@ class MainGUI(QMainWindow):
         sub.show()
 
 
-    #####BIANCA
-    def _trigger_refresh(self):
-        sender = self.sender()
-        name = sender.objectName()
-        table = self.findChild(QTableWidget, name)
+    #####PACKETS COMMENTS
+    def trigger_refresh(self):
         
         print("Inside trigger PCAP changed")
         #TRIGGER PACKET COMMENTS PARSER
@@ -323,7 +327,7 @@ class MainGUI(QMainWindow):
         commentsParser(Projectpath)
 
         print("JSON updated")
-        print("NAME", table)
+        
 
         
         
@@ -334,17 +338,19 @@ class MainGUI(QMainWindow):
         packetscomments_jsonpath = self.packetsComments_json
         label = "packetcomments"
         count_row = 0
-        instance = self.tableWidgetPackets ##creating instance of table
+        instance = self.tableWidgetPackets ##creating instance of table 
+
+
         reloadDataline.reloadDataline(instance, packetscomments_jsonpath, label)
-        return
+        
 
     def watch_PCAP(self):
         self.file_watcher = QFileSystemWatcher()
         # self.file_watcher.addPath('/home/kali/DVS_dev/GUI/Widgets/PCAPtest.txt') #listens for file changes
         # PCAPpath = "/home/kali/DVS_dev/ProjectData/testNov20/PCAP/AnnotatedPCAP.pcapng"
         self.file_watcher.addPath(self.PCAPpath) #listens for file changes
-        self.file_watcher.fileChanged.connect(self._trigger_refresh)
-    ########
+        self.file_watcher.fileChanged.connect(self.trigger_refresh)
+    
 
     
     def packetComments_selected(self):
@@ -353,7 +359,6 @@ class MainGUI(QMainWindow):
         sub.setWindowTitle("Packets Comments")
         color = self.color_picker()
         sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
-
         sub.setWidget(QTextEdit())
         data = self.packetsComments_json
 
@@ -376,7 +381,7 @@ class MainGUI(QMainWindow):
 
         self.tableWidgetPackets.show()
         sub.show()
-
+    ########
     def mouse_selected(self):
         sub = QMdiSubWindow()
         sub.resize(840,260)

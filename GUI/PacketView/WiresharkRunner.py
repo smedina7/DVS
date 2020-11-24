@@ -11,7 +11,7 @@ class WiresharkRunner(QThread):
         try:
             if sys.platform == "linux" or sys.platform == "linux2":
 
-                WIRESHARK_FILENAME = "/usr/local/bin/wireshark"
+                WIRESHARK_FILENAME = "/home/kali/eceld-wireshark/wireshark-3.2.0/build/run/wireshark"
             else:
                 WIRESHARK_FILENAME = "C:\\Program Files\\Wireshark\\Wireshark.exe"
 

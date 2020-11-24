@@ -1,5 +1,1 @@
 frame.number	frame.comment	frame.time
-6	scope=single**important-packet-identifier=all-packet-payload**program-used=test	Sep  2, 2020 17:55:36.876923000 EDT
-7	scope=single**important-packet-identifier=all-packet-payload**program-used=test1	Sep  2, 2020 17:55:36.877132000 EDT
-10	scope=single**important-packet-identifier=all-packet-payload**program-used=this program**cmd=this command**description=this description**confidence=2	Sep  2, 2020 17:55:38.030700000 EDT
-12	scope=single**important-packet-identifier=test**program-used=test**cmd=test**description=BIANCA**confidence=1	Sep  2, 2020 17:55:38.960746000 EDT
