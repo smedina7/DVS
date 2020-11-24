@@ -2,6 +2,7 @@ import json
 import os.path
 import sys
 from datetime import datetime
+from pathlib import Path, PureWindowsPath
 
 
 class commentsParser:
@@ -10,7 +11,7 @@ class commentsParser:
         if sys.platform == "linux" or sys.platform == "linux2":
             self.pcappath = path + "/PCAP/AnnotatedPCAP.pcapng"
         else:
-            self.pcappath = os.path.abspath(path) + "\\PCAP\\AnnotatedPCAP.pcapng"
+            self.pcappath = PureWindowsPath (path + "\\PCAP\\AnnotatedPCAP.pcapng")
 
         self.comments_path = os.path.abspath("GUI/Widgets/pcomments.txt")
         self.multikeys = []
