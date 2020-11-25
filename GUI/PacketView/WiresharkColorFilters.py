@@ -40,6 +40,7 @@ class WiresharkColors():
             newRule = "@"+"MouseClicks Log"+"@"+"mouseclicks"+"@"+tty_standard_color+blacktext
 
         self.appendToColorFilterFile(newRule+"\n")
+        self.createWiresharkProfile(newRule+"\n")
         
     def appendToColorFilterFile(self, newRule):
         path = os.path.abspath("GUI/PacketView/colorFilters.txt")
@@ -55,7 +56,37 @@ class WiresharkColors():
             _file.write(newRule)
 
         _file.close()
+    
+    def createWiresharkProfile(self, newRule):
+        path = os.path.dirname(os.getcwd())+"/eceld-wireshark/wireshark-3.2.0/profiles/DVS/"
+        try:
+            os.mkdir(path)
+        except:
+            pass
 
+        path = path+"colorfilters"
+
+        if not os.path.exists(path):
+            fi = open(path, "w+")
+            fi.close()
+           
+        if "New coloring rule" in newRule:
+            _file = open(path, 'r+')
+            existingRules = _file.read()
+            _file.seek(0,0)
+            _file.write(newRule)
+            _file.write(existingRules)
+        else:
+            _file = open(path, 'a+')
+            _file.write(newRule)
+
+        _file.close()
+        
 def clearFilters():
-    path = os.path.abspath("GUI/PacketView/colorFilters.txt")
-    _file = open(path, 'w').close()
+    ws_path = os.path.dirname(os.getcwd())+"/eceld-wireshark/wireshark-3.2.0/profiles/DVS/colorfilters"
+    dvs_path = os.path.abspath("GUI/PacketView/colorFilters.txt")
+    try:
+        f = open(ws_path, 'w').close()
+        fi = open(dvs_path, 'w').close()
+    except:
+        print("Error clearing colorfilter file")

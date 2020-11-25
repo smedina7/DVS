@@ -47,18 +47,31 @@ def Throughput(df):
                         daq.BooleanSwitch(
                             on=False,
                             id='switch',
-                            label="Sync",
-                            labelPosition="left",
+                            label=" ",
+                            labelPosition="right",
                             #className='sync-control',
-                            style= {'float':'right','padding': '5px'}
+                            style= {'float':'left','display':'inline-block','padding': '5px'}
                         ),
                         html.Div(id='switch-container')
+                    ]),
+                    html.Div([
+                    html.Label(
+                        id='legend',
+                        children =' ',
+                        style={'width': '90%', 'height': '10','float':'left', 'display':'inline-block', 'background-color':'#303030','color':'white'})
                     ])
                   ]),
                 html.Div([
                     dcc.Graph(id='live-graph', #throughput graph
                     style={'width': '100%','float':'left', 'padding': '10px'}),
                     
+                ]),
+                html.Div([
+                    dcc.Textarea(
+                        id='legend-bottom',
+                        disabled = True,
+                        value=' ',
+                        style={'width': '100%', 'height': '100%','float':'left', 'background-color':'#303030'})
                 ]),
                 html.Div([
                     dcc.Interval(

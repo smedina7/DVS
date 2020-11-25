@@ -1,0 +1,22 @@
+[
+	{"timed_id" : 0,
+	"type" : "point",
+	"classname" : "imgPoint",
+	"content" : "\/home\/kali\/eceld-netsys\/eceld\/plugins\/collectors\/pykeylogger\/raw\/timed_screenshots\/1602705117.9667175_screenshot.png",
+	"start" : "2020-10-14T19:51:57"
+	},
+
+	{"timed_id" : 1,
+	"type" : "point",
+	"classname" : "imgPoint",
+	"content" : "\/home\/kali\/eceld-netsys\/eceld\/plugins\/collectors\/pykeylogger\/raw\/timed_screenshots\/1602705139.6247003_screenshot.png",
+	"start" : "2020-10-14T19:52:19"
+	},
+
+	{"timed_id" : 2,
+	"type" : "point",
+	"classname" : "imgPoint",
+	"content" : "\/home\/kali\/eceld-netsys\/eceld\/plugins\/collectors\/pykeylogger\/raw\/timed_screenshots\/1602705128.7775126_screenshot.png",
+	"start" : "2020-10-14T19:52:08"
+	}
+]
