@@ -22,6 +22,8 @@ from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Dialogs.ExportDialog import ExportDialog
+import time
+import datetime
 
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
@@ -657,13 +659,11 @@ class MainGUI(QMainWindow):
             return color   
 
     def contextMenuEvent(self, event):
-        menu = QMenu(self.tableWidget)
+        menu = QMenu(self)
         addRow = menu.addAction("Add Row")
         addColumn = menu.addAction("Add Column")
         delColumn = menu.addAction("Delete Column")
         delRow = menu.addAction("Delete Row")
-        duplicateRow = menu.addAction("Duplicate Row")
-        duplicateColumn = menu.addAction("Duplicate Column")
 
         action = menu.exec_(event.globalPos())
         if action == addRow:
@@ -674,51 +674,118 @@ class MainGUI(QMainWindow):
             self.delColumn()
         elif action == delRow:
             self.delRow()
-        elif action == duplicateRow:
-            self.duplicateRow()
-        elif action == duplicateColumn:
-            self.duplicateColumn()
 
     def addRow(self):
-        rowCount = self.tableWidget.rowCount()
-        self.tableWidget.insertRow(rowCount)
-        print("New Row Added")
+        active = self.mdi.activeSubWindow()
+        current = time.time()
+        col_timestamp = datetime.datetime.fromtimestamp(current).strftime('%Y-%m-%dT%H:%M:%S')
+        cellinfo = QTableWidgetItem(col_timestamp)
+
+        if active == self.subK:
+            self.tableWidget.insertRow(self.tableWidget.currentRow())
+            print("New Row Added in the Keypresses Dataline")
+            self.tableWidget.setItem(self.tableWidget.currentRow()-1, self.tableWidget.columnCount()-1, cellinfo)
+        elif active == self.subSC:
+            self.tableWidgetSys.insertRow(self.tableWidgetSys.currentRow())
+            print("New Row Added in the SystemCalls Dataline")
+            self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, self.tableWidgetSys.columnCount()-1, cellinfo)
+        elif active == self.subM:
+            self.tableWidgetMou.insertRow(self.tableWidgetMou.currentRow())
+            print("New Row Added in the Mouse Clicks Dataline")
+            self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, self.tableWidgetMou.columnCount()-1, cellinfo)
+        elif active == self.subT:
+            self.tableWidgetTime.insertRow(self.tableWidgetTime.currentRow())
+            print("New Row Added in the timed screenshots Dataline")
+            self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, self.tableWidgetTime.columnCount()-1, cellinfo)
+        elif active == self.subS:
+            self.tableWidgetSur.insertRow(self.tableWidgetSur.currentRow())
+            print("New Row Added in the Suricata Dataline")
+            self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, self.tableWidgetSur.columnCount()-1, cellinfo)
 
     def addColumn(self):
-        colCount = self.tableWidget.columnCount()
-        self.tableWidget.insertColumn(colCount)
-        print("New Column Added")
+        active = self.mdi.activeSubWindow()
+        if active == self.subK:
+            self.tableWidget.insertColumn(self.tableWidget.currentColumn())
+            print("New Column Added in the Keypresses Dataline")
+        elif active == self.subSC:
+            self.tableWidgetSys.insertColumn(self.tableWidgetSys.currentColumn())
+            print("New Column Added in the SystemCalls Dataline")
+        elif active == self.subM:
+            self.tableWidgetMou.insertColumn(self.tableWidgetMou.currentColumn())
+            print("New Column Added in the Mouse Clicks Dataline")
+        elif active == self.subT:
+            self.tableWidgetTime.insertColumn(self.tableWidgetTime.currentColumn())
+            print("New Column Added in the timed screenshots Dataline")
+        elif active == self.subS:
+            self.tableWidgetSur.insertColumn(self.tableWidgetSur.currentColumn())
+            print("New Column Added in the Suricata Dataline")
     
     def delRow(self):
-        if self.tableWidget.rowCount()>0:
-            self.tableWidget.removeRow(self.tableWidget.rowCount() -1)
-            print("Row deleted")
+        active = self.mdi.activeSubWindow()
+        if active == self.subK:
+            if self.tableWidget.rowCount() > 0:
+                self.tableWidget.removeRow(self.tableWidget.currentRow())
+                print("Row removed in the Keypresses Dataline")
+            else:
+                print("No row to be deleted")
+        elif active == self.subSC:
+            if self.tableWidgetSys.rowCount() > 0:
+                self.tableWidgetSys.removeRow(self.tableWidgetSys.currentRow())
+                print("Row removed in the SystemCalls Dataline")
+            else:
+                print("No row to be deleted")
+        elif active == self.subM:
+            if self.tableWidgetMou.rowCount() > 0:
+                self.tableWidgetMou.removeRow(self.tableWidgetMou.currentRow())
+                print("Row removed in the Mouse Clicks Dataline")
+            else:
+                print("No row to be deleted")
+        elif active == self.subT:
+            if self.tableWidgetTime.rowCount() > 0:
+                self.tableWidgetTime.removeRow(self.tableWidgetTime.currentRow())
+                print("Row removed in the timed screenshots Dataline")
+            else:
+                print("No row to be deleted")
+        elif active == self.subS:
+            if self.tableWidgetSur.rowCount() > 0:
+                self.tableWidgetSur.removeRow(self.tableWidgetSur.currentRow())
+                print("Row removed in the Suricata Dataline")
+            else:
+                print("No row to be deleted")
     
     def delColumn(self):
-        if self.tableWidget.columnCount()>0:
-            self.tableWidget.removeColumn(self.tableWidget.columnCount() -1)
-            print("Column deleted")
+        active = self.mdi.activeSubWindow()
+        if active == self.subK:
+            if self.tableWidget.columnCount() > 0:
+                self.tableWidget.removeColumn(self.tableWidget.currentColumn())
+                print("Column removed in the Keypresses Dataline")
+            else:
+                print("No column to be deleted")
+        elif active == self.subSC:
+            if self.tableWidgetSys.columnCount() > 0:
+                self.tableWidgetSys.removeColumn(self.tableWidgetSys.currentColumn())
+                print("Column removed Added in the SystemCalls Dataline")
+            else:
+                print("No column to be deleted")
+        elif active == self.subM:
+            if self.tableWidgetMou.columnCount() > 0:
+                self.tableWidgetMou.removeColumn(self.tableWidgetMou.currentColumn())
+                print("Column removed Added in the Mouse Clicks Dataline")
+            else:
+                print("No column to be deleted")
+        elif active == self.subT:
+            if self.tableWidgetTime.columnCount() > 0:
+                self.tableWidgetTime.removeColumn(self.tableWidgetTime.currentColumn())
+                print("Column removed Added in the timed screenshots Dataline")
+            else:
+                print("No column to be deleted")
+        elif active == self.subS:
+            if self.tableWidgetSu.columnCount() > 0:
+                self.tableWidgetSur.removeColumn(self.tableWidgetSur.currentColumn())
+                print("Column removed Added in the Suricata Dataline")
+            else:
+                print("No column to be deleted")
 
-    def duplicateRow(self):
-        self.tableWidget.insertRow(self.tableWidget.rowCount())
-        rowCount = self.tableWidget.rowCount()
-        columnCount = self.tableWidget.columnCount()
-
-        for j in range(columnCount):
-            if not self.tableWidget.item(rowCount-2, j) is None:
-                self.tableWidget.setItem(rowCount-1, j, QTableWidgetItem(self.tableWidget.item(rowCount-2, j).text()))
-        print("Row Duplicated")
-
-    def duplicateColumn(self):
-        self.tableWidget.insertColumn(self.tableWidget.columnCount())
-        columnCount = self.tableWidget.columnCount()
-        rowCount = self.tableWidget.rowCount()
-
-        for j in range(rowCount):
-            if not self.tableWidget.item(j, columnCount-2) is None:
-                self.tableWidget.setItem(j, columnCount-1, QTableWidgetItem(self.tableWidget.item(j, columnCount-2).text()))
-        print("Column Duplicated")
-    
     def load_throughput_complete(self):
         self.subTh = QMdiSubWindow()
         self.subTh.resize(840,330)
