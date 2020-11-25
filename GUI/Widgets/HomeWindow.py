@@ -4,6 +4,7 @@ import time
 from re import search
 import subprocess
 import json
+import sys
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -11,7 +12,9 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-from GUI.Widgets.textdataline import TextDataline
+#RELOAD DATALINE
+from GUI.Widgets.textdataline import TextDataline, reloadDataline
+##
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
@@ -20,6 +23,9 @@ from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Dialogs.ExportDialog import ExportDialog
+
+#PARSER
+from GUI.Widgets.commentsParser import commentsParser
 
 class MainGUI(QMainWindow):
     #Signal for when the user wants to create a new project
@@ -40,6 +46,8 @@ class MainGUI(QMainWindow):
         t = Timestamp()
         self.project_path = os.path.dirname(clicks)
         self.throughput_open1 = False
+        self.ProjectFolder = throughput.rsplit('/', 1)
+        self.PCAPpath = self.ProjectFolder[0] + "/PCAP/AnnotatedPCAP.pcapng"
 
         self.key_json = ''
         self.sys_json = ''
@@ -83,6 +91,12 @@ class MainGUI(QMainWindow):
         self.sync_button_timestamp.setText("Timestamp Sync: off")
         self.tb.addWidget(self.sync_button_timestamp)
         self.sync_button_timestamp.clicked.connect(self.buttonaction_timestamp)
+
+        #Refresh button for comments packets
+        self.refresh = QPushButton (self.tb)
+        self.refresh.setText("Refresh Comments Dataline")
+        self.tb.addWidget(self.refresh)
+        self.refresh.clicked.connect (self.trigger_refresh)
 
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
@@ -392,6 +406,66 @@ class MainGUI(QMainWindow):
             #check if window is hidden
             self.checkHidden(self.subS, self.tableWidgetSur)
 
+    def trigger_refresh(self):
+        #TRIGGER PACKET COMMENTS PARSER
+
+        if sys.platform == "linux" or sys.platform == "linux2":
+            Projectpath = self.ProjectFolder[0]
+        
+        else:
+            temp = self.ProjectFolder[0].rsplit('\\',1)
+            Projectpath = temp[0]
+
+        commentsParser(Projectpath)
+
+        packetscomments_jsonpath = self.packetsComments_json
+        label = "packetcomments"
+        count_row = 0
+        instance = self.tableWidgetPackets ##creating instance of table
+
+        reloadDataline.reloadDataline(instance, packetscomments_jsonpath, label)
+
+    def watch_PCAP(self):
+        self.file_watcher = QFileSystemWatcher()
+        # self.file_watcher.addPath('/home/kali/DVS_dev/GUI/Widgets/PCAPtest.txt') #listens for file changes
+        # PCAPpath = "/home/kali/DVS_dev/ProjectData/testNov20/PCAP/AnnotatedPCAP.pcapng"
+        if sys.platform == "linux" or sys.platform == "linux2":
+            pass
+        else:
+            temp = self.ProjectFolder[0].rsplit('\\',1)
+            self.PCAPpath = temp[0]
+            
+        self.file_watcher.addPath(self.PCAPpath) #listens for file changes
+        self.file_watcher.fileChanged.connect(self.trigger_refresh)
+    
+    def packetComments_selected(self):
+        sub = QMdiSubWindow()
+        sub.resize(840,210)
+        sub.setWindowTitle("Packets Comments")
+        color = self.color_picker()
+        sub.setStyleSheet("QTableView { background-color: %s}" % color.name())
+        sub.setWidget(QTextEdit())
+        data = self.packetsComments_json
+
+        count_row = 0
+        self.tableWidgetPackets = QTableWidget (self)
+
+        label = "packetcomments"
+        self.tableWidgetPackets = TextDataline(data, label, count_row, 8)
+
+        self.tableWidgetPackets.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidgetPackets.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidgetPackets.setObjectName("Packets Comments")
+        self.tableWidgetPackets.cellClicked.connect(self.getCoords)
+      
+        self.watch_PCAP() #WATCH PCAP CHANGE
+
+        sub.setWidget(self.tableWidgetPackets)
+        self.mdi.addSubWindow(sub)
+
+        self.tableWidgetPackets.show()
+        sub.show()
+
     def mouse_selected(self):
         if self.project_dict[self.project_name]["MouseClicksData"] not in self.mdi.subWindowList() and self.mouse.isChecked()==True:
             self.mouse.setChecked(True)
@@ -504,6 +578,7 @@ class MainGUI(QMainWindow):
                     syscalls_key = "auditd_id"
                     throughput_key = "traffic_xy_id"
                     suricata_key = "suricata_id"
+                    packetsComments_key = "packet_id"
 
                     if mouse_key in j:
                         self.mouse_json = json_chosen_path
@@ -528,6 +603,10 @@ class MainGUI(QMainWindow):
                     elif suricata_key in j:
                         self.suricata_json = json_chosen_path
                         self.suricata_selected()
+                        return
+                    elif packetsComments_key in j:
+                        self.packetsComments_json = json_chosen_path
+                        self.packetComments_selected()
                         return
 
                 open_f.close()

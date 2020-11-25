@@ -48,38 +48,46 @@ class TextDataline(QTableWidget):
                 if j == "keypresses_id":
                     tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "auditd_id":
                     tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "suricata_id":
                     tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "packet_id":
                     tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "confidence":
                     tableid = str(ser_confidence[ind])
-                    if tableid !='nan':
+                    if tableid !='No Data':
                         it.setData(QtCore.Qt.DisplayRole, (tableid))
+
+                elif j == "start":
+                    it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "timestamp":
                     tableid = str(ser_timestamp[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
 
                 self.setItem(ind, c, it)
+                
                 c= c+1
 
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
-
-
 
 class reloadDataline:
     def reloadDataline(self, path, label):   
@@ -94,7 +102,6 @@ class reloadDataline:
         dfdata =  path
         df = pd.read_json (dfdata)
         row = 0
-
         
         for ind in df.index:
             it = QtWidgets.QTableWidgetItem()
@@ -105,6 +112,7 @@ class reloadDataline:
                 for j in keys:
                     val = df[j][ind]
                     item = QTableWidgetItem(str(val))
+                    
                     self.setItem(ind,c, item)
                     c = c + 1
                     row= row + 1
