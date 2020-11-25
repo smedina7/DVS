@@ -12,13 +12,12 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
-#RELOAD DATALINE
 from GUI.Widgets.textdataline import TextDataline, reloadDataline
-##
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
 import pandas as pd
 from GUI.Widgets.Timestamp import Timestamp
+from GUI.Widgets.sync_helper import sync_helper
 from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
@@ -82,6 +81,8 @@ class MainGUI(QMainWindow):
         self.sync_button_wireshark = QPushButton(self.tb)
         self.sync_button_wireshark.setCheckable(True)
         self.sync_button_wireshark.setText("Wireshark Sync : off")
+        self.sync_button_wireshark.setEnabled(False)
+        self.sync_button_wireshark.setStyleSheet("QPushButton {background-color: rgb(156,145,145); color: gray;}")
         self.tb.addWidget(self.sync_button_wireshark)
         self.sync_button_wireshark.clicked.connect(self.buttonaction_wireshark)
 
@@ -165,14 +166,30 @@ class MainGUI(QMainWindow):
         # sync stuff
         self.timestamp = ""
         self.timestampTrigger = False
+        self.wiresharkTrigger = False
+        self.sync_dict = {}
 
     def file_changed(self):
         self.syncWindows(1)
+
+    def wire_to_DVS(self):
+        if(self.wiresharkTrigger == True):
+            time.sleep(0.5)
+            packet_num = sync_helper.get_wireshark_click()
+            dictionary_temp = self.sync_dict
+            timestamp_w = sync_helper.find_timestamp(packet_num,dictionary_temp)
+            if not timestamp_w == "":
+                Timestamp.update_timestamp(str(timestamp_w))
 
     def buttonaction_wireshark(self, b):
         if b == True:
             self.sync_button_wireshark.setText("Wireshark Sync : on")
             self.wiresharkTrigger = True
+            p_path = self.project_path
+            pcap_path = sync_helper.get_wireshark_info(p_path)
+            dictionary = sync_helper.json_to_dictionary(pcap_path)
+            self.sync_dict = dictionary
+
         else:
             self.sync_button_wireshark.setText("Wireshark Sync : off")
             self.wiresharkTrigger = False
@@ -193,28 +210,45 @@ class MainGUI(QMainWindow):
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
-                            #child.clearSelection()
                             child.selectRow(row)
-                        #child.show()
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
                 child.setSelectionMode(QAbstractItemView.SingleSelection)
                 child.clearSelection()
-                #child.show()
+
+        if self.wiresharkTrigger == True:
+            dictionary = self.sync_dict  
+            timestamp = Timestamp.get_current_timestamp()
+            packet_num = sync_helper.find_packetnumber(timestamp, dictionary)
+            sync_helper.write_to_wireshark(packet_num)
+
+        if self.wiresharkTrigger == False:
+            sync_helper.stop_to_wireshark()
 
     def buttonaction_timestamp(self, b):
         if b == True:
             self.sync_button_timestamp.setText("Timestamp Sync : on")
             self.timestampTrigger = True
+            self.sync_button_wireshark.setEnabled(True)
+            self.sync_button_wireshark.setStyleSheet("QPushButton {background-color: #353535}")
             self.file_watcher = QFileSystemWatcher()
-            self.file_watcher.addPath('/home/kali/DVS/GUI/Dash/timestamp.txt') #listens for file changes
+            ts_path = os.path.abspath("GUI/Dash/timestamp.txt")
+            self.file_watcher.addPath(ts_path) #listens for file changes
             self.file_watcher.fileChanged.connect(self.file_changed)
+            path = os.getcwd()+'/ws_click.txt'
+            self.ws_watcher = QFileSystemWatcher()
+            self.ws_watcher.addPath(path) #listens for file changes
+            self.ws_watcher.fileChanged.connect(self.wire_to_DVS)
             # redraw
             self.syncWindows(-1)
         else:
             self.sync_button_timestamp.setText("Timestamp Sync : off")
             self.timestampTrigger = False
+            self.sync_button_wireshark.setText("Wireshark Sync : off")
+            self.sync_button_wireshark.setEnabled(False)
+            self.sync_button_wireshark.setStyleSheet("QPushButton {background-color: rgb(156,145,145); color: gray;}")
+            self.wiresharkTrigger = False
             # undraw
             self.timestamp = ""
             self.syncWindows(-1)
@@ -266,6 +300,7 @@ class MainGUI(QMainWindow):
                 self.web.loadStarted.connect(self.loadstarted)
                 self.web.loadProgress.connect(self.loadprogress)
                 self.web.loadFinished.connect(self.loadfinished)
+                throughput_info_file.close()
 
         elif self.throughput_open1 == True:
             if self.throughput.isChecked() == False:
