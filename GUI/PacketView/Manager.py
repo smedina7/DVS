@@ -91,7 +91,7 @@ class PacketManager():
         self.wireshark_thread.start()
     
     def stopWireshark(self):
-        self.wireshark_thread.quit()
+        self.wireshark_thread.stopTrigHandle()
 
     def runWebEngine(self):
         self.web_engine_thread = RunWebEngine()

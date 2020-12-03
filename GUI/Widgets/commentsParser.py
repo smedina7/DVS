@@ -4,14 +4,12 @@ import sys
 from datetime import datetime
 from pathlib import Path, PureWindowsPath
 
-
 class commentsParser:
     def __init__(self, path):
 
         if sys.platform == "linux" or sys.platform == "linux2":
             self.pcappath = path + "/PCAP/AnnotatedPCAP.pcapng"
         else:
-            # temp = path + "\\PCAP\\AnnotatedPCAP.pcapng"
             self.pcappath = path + "\\PCAP\\AnnotatedPCAP.pcapng"
 
 
@@ -46,7 +44,7 @@ class commentsParser:
             dct = dict()
             dct = dict(zip(self.listKeys, ["No data"] * len(self.listKeys)))
             self.multikeys.append(dct)
-            print(self.multikeys)
+
         else:
             index = 0
             dct = dict()
@@ -68,11 +66,8 @@ class commentsParser:
 
                             if substring_one in fullstring:
                                 step_3 = fullstring.split("\t")
-                                # print(step_3)
                                 dct["packet_id"] = step_3[0]
                                 dct[step_3[1]] = step_2[1]
-
-                                print(dct["packet_id"])
 
                             elif substring_one in fullstring_two:
                                 step_3 = fullstring_two.split("\t")

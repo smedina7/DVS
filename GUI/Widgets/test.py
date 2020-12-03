@@ -15,16 +15,12 @@ from datetime import datetime
 command = "tshark -r /home/kali/DVS_dev/ProjectData/t0/PCAP/AnnotatedPCAP.pcapng -Y frame.comment -T fields -E header=y -e frame.number -e frame.comment -e frame.time >> outfile.txt"
 os.system(command)
 
-
 #####OPEN FILE & CREATING DICTIONARY
-
 # List of keys 
 # listKeys = ["frame.number", "frame.comment", "scope", "important-packet-identifier","program-used", "cmd", "description" "confidence" ] 
 # using zip() function to create a dictionary 
 # with keys and same length None value  
 # dct = dict(zip(listKeys, [None]*len(listKeys))) 
-
-
 
 file = open("outfile.txt")
 previous = ""
@@ -64,10 +60,7 @@ for line in file:
                 # print ("Found!")
                 # print(step_3)
                 dct[step_2[0]]  = step_3[0]
-                
-
-                
-                
+    
                 # "2020-09-02T21:55:21"
                 #STEPS to convert timestamp
                 temp = step_3[1]
@@ -78,21 +71,16 @@ for line in file:
                 timestamp = timestamp.replace(' ','T')
                 dct["timestamp"] = timestamp
                
-                
-
             else:
                 dct[step_2[0]]  = step_2[1]
 
-        
         multikeys.append(dct)
         print("-----------DICT---------")
         print(dct)
         dct = dict ()
     index =  index + 1
-   
 
 file.close()
-
 
 print("-----------LIST---------")
 print(multikeys)

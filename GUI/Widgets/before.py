@@ -3,7 +3,6 @@ import os.path
 import sys
 from datetime import datetime
 
-
 class commentsParser:
     def __init__(self, path): 
 
@@ -14,7 +13,6 @@ class commentsParser:
             pcappath = path + "\\PCAP\\AnnotatedPCAP.pcapng"
 
         file_path = os.path.abspath("GUI/Widgets/pcomments.txt")
-        # file_path = "/home/kali/DVS_dev/GUI/Widgets/pcomments.txt"
         if os.path.isfile(file_path):
             file = open(file_path,"r+")
             file.truncate(0)
@@ -27,22 +25,10 @@ class commentsParser:
             os.system(command)
             file = open(file_path,"r+")
 
-
-
-
-
         #####OPEN FILE & CREATING DICTIONARY
-
-
         # Define List of keys/columns 
         listKeys = ["packet_id", "scope", "important-packet-identifier","program-used", "cmd", "description", "confidence","timestamp" ] 
-        # listKeys = ["packet_id", "scope", "important-packet-identifier","program-used", "cmd", "description", "confidence","advanced", "customSuricataRule","timestamp" ] 
-
-
-
         num_lines = sum(1 for line in open(file_path))
-        print(num_lines)
-
         index = 0
         multikeys = []
         dct = dict ()
@@ -52,7 +38,6 @@ class commentsParser:
             multikeys.append(dct)
 
         else: 
-
             with open(file_path) as file_in:
                 for line in file:
                     # using zip() function to create a dictionary 
@@ -92,32 +77,20 @@ class commentsParser:
                                 timestamp = str(date_object)
                                 timestamp = timestamp.replace(' ','T')
                                 dct["timestamp"] = timestamp
-                            
-                                
 
                             else:
                                 dct[step_2[0]]  = step_2[1]
 
-                        
                         multikeys.append(dct)
-                        # print("-----------DICT---------")
-                        # print(dct)
                         dct = dict ()
                     index =  index + 1
             
-
         file.close()
 
-
-        # print("-----------LIST---------")
-        # print(multikeys)
-
         #############################
-
         # Data to be written 
         # Serializing json  
         json_object = json.dumps(multikeys, indent = 4) 
-        # print(path)
 
         if sys.platform == "linux" or sys.platform == "linux2":  
             jsonpath = path + "/ParsedLogs/pcomments.json"

@@ -182,4 +182,3 @@ class NewProjectDialog(QtWidgets.QWidget):
         if len(self.folder_chosen) > 0:
             self.folder_chosen = os.path.abspath(self.folder_chosen)
             self.pathLineEdit.setText(self.folder_chosen)
-            

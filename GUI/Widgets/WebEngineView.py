@@ -42,21 +42,23 @@ def display_page(pathname):
 
 @app.callback(Output('switch', 'on'), Input('live-graph', 'clickData'))
 def disable_interval(click):
+    
     if click is not None:
         x = click["points"]
         for d in x:
             timestamp = d['x'].replace(' ','T')
             Timestamp.update_timestamp(timestamp)
+            
     return False
     
 #this call back method allows to update graph based on the selected value in the dropdown menu
 #we can have multiple callbacks (probably one for each dataline) --this is most likely how we can acheive the sync behavior 
-@app.callback([Output('live-graph', 'figure'), Output('interval', 'disabled')],
+@app.callback([Output('live-graph', 'figure'), Output('interval', 'disabled'), Output('legend', 'children')],
                [Input('interval','n_intervals'),Input('live-graph', 'clickData'), Input('switch','on')])
 def update_live_graph(intervals, click, on):
     df = throughput_df
     disabled = not on
-    #switch = on
+    
     start_time = df.loc[0,'start']
     key = 0
 
@@ -68,8 +70,9 @@ def update_live_graph(intervals, click, on):
 
     plot_color = h[0]+","+h[1]+","+h[2]+","+",.2)"
     info.close()
-
+    legend = 'Enable switch to sync graph with corresponding data from other datalines'
     if(on):
+        legend = ''
         currTimestamp = Timestamp.get_current_timestamp()
         timestamp = currTimestamp
         #for clickable graph actions during sync
@@ -154,7 +157,7 @@ def update_live_graph(intervals, click, on):
             'text': {'color': 'Black'}
             
         }
-    }, disabled
+    }, disabled, legend
 
 
 if __name__ == '__main__':

@@ -89,8 +89,6 @@ class TextDataline(QTableWidget):
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
 
-
-
 class reloadDataline:
     def reloadDataline(self, path, label):   
         # QTableWidget.__init__(self, *args)
@@ -104,7 +102,6 @@ class reloadDataline:
         dfdata =  path
         df = pd.read_json (dfdata)
         row = 0
-
         
         for ind in df.index:
             it = QtWidgets.QTableWidgetItem()
@@ -128,9 +125,3 @@ class reloadDataline:
                     c = c + 1
             
             row = row + 1
-          
-
-
-                
-                
-                
