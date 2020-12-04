@@ -25,6 +25,8 @@ from GUI.Dialogs.ExportDialog import ExportDialog
 import time
 import datetime
 
+from GUI.Dialogs.DateTimePicker import DateTimePicker
+
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
 
@@ -258,7 +260,7 @@ class MainGUI(QMainWindow):
     def resizeEvent(self, event):
         self.sizeHint()
 
-    def getCoords(self, r , c):
+    def getCoords(self, r, c):
         sender = self.sender()
         name = sender.objectName()
         table = self.findChild(QTableWidget, name)
@@ -268,6 +270,20 @@ class MainGUI(QMainWindow):
             self.timestamp = indexTimeStamp
             Timestamp.update_timestamp(self.timestamp) #writes to timestamp.txt (updates timestamp)
             self.syncWindows(-1)
+
+    def update_timestamp(self, r):
+        sender = self.sender()
+        name = sender.objectName()
+        table = self.findChild(QTableWidget, name)
+        current_timestamp = table.item(r.row(), r.column()).text()
+        if r.column() == table.columnCount()-1:
+            datepicker = DateTimePicker()
+            timestamp = datepicker.get_timestamp()
+            if not len(timestamp) == 1:
+                table.setItem(r.row(), r.column(), QTableWidgetItem(timestamp))
+            else:
+                table.setItem(r.row(), r.column(), QTableWidgetItem(current_timestamp))
+
 
     def selectRows(self, selection: list):
         for i in selection: 
@@ -340,6 +356,7 @@ class MainGUI(QMainWindow):
                 self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidget.setObjectName("Keypresses")
                 self.tableWidget.cellClicked.connect(self.getCoords)
+                self.tableWidget.doubleClicked.connect(self.update_timestamp)
                 
                 self.subK.setWidget(self.tableWidget)
                 self.mdi.addSubWindow(self.subK)
@@ -386,6 +403,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSys.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSys.setObjectName("Systemcalls")
                 self.tableWidgetSys.cellClicked.connect(self.getCoords)
+                self.tableWidgetSys.doubleClicked.connect(self.update_timestamp)
 
                 self.subSC.setWidget(self.tableWidgetSys)
                 self.mdi.addSubWindow(self.subSC)
@@ -431,6 +449,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSur.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSur.setObjectName("Suricata Alerts")
                 self.tableWidgetSur.cellClicked.connect(self.getCoords)
+                self.tableWidgetSur.doubleClicked.connect(self.update_timestamp)
 
                 self.subS.setWidget(self.tableWidgetSur)
                 self.mdi.addSubWindow(self.subS)
@@ -444,22 +463,31 @@ class MainGUI(QMainWindow):
             self.checkHidden(self.subS, self.tableWidgetSur)
 
     def trigger_refresh(self):
-        #TRIGGER PACKET COMMENTS PARSER
-        if sys.platform == "linux" or sys.platform == "linux2":
-            Projectpath = self.ProjectFolder[0]
-        
-        else:
-            temp = self.ProjectFolder[0].rsplit('\\',1)
-            Projectpath = temp[0]
+        try:
+            # TRIGGER PACKET COMMENTS PARSER
+            if sys.platform == "linux" or sys.platform == "linux2":
+                Projectpath = self.ProjectFolder[0]
 
-        commentsParser(Projectpath)
+            else:
+                temp = self.ProjectFolder[0].rsplit('\\', 1)
+                Projectpath = temp[0]
 
-        packetscomments_jsonpath = self.packetsComments_json
-        label = "packetcomments"
-        count_row = 0
-        instance = self.tableWidgetPackets ##creating instance of table
+            commentsParser(Projectpath)
 
-        reloadDataline.reloadDataline(instance, packetscomments_jsonpath, label)
+            packetscomments_jsonpath = self.packetsComments_json
+            label = "packetcomments"
+            count_row = 0
+            instance = self.tableWidgetPackets  ##creating instance of table
+
+            reloadDataline.reloadDataline(instance, packetscomments_jsonpath, label)
+        except:
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Critical)
+            msgBox.setText("Error")
+            msgBox.setWindowTitle("Error")
+            msgBox.setInformativeText("Please open the comments dataline first!")
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.exec_()
 
     def watch_PCAP(self):
         self.file_watcher = QFileSystemWatcher()
@@ -491,6 +519,7 @@ class MainGUI(QMainWindow):
         self.tableWidgetPackets.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidgetPackets.setObjectName("Packets Comments")
         self.tableWidgetPackets.cellClicked.connect(self.getCoords)
+        self.tableWidgetPackets.doubleClicked.connect(self.update_timestamp)
       
         self.watch_PCAP() #WATCH PCAP CHANGE
 
@@ -524,6 +553,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetMou.setObjectName("Mouseclicks")
                 self.tableWidgetMou.cellClicked.connect(self.getCoords)
+                self.tableWidgetMou.doubleClicked.connect(self.update_timestamp)
 
                 self.subM.setWidget(self.tableWidgetMou)
                 self.mdi.addSubWindow(self.subM)
@@ -569,6 +599,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetTime.setObjectName("TimedScreenshots")
                 self.tableWidgetTime.cellClicked.connect(self.getCoords)
+                self.tableWidgetTime.doubleClicked.connect(self.update_timestamp)
 
                 self.subT.setWidget(self.tableWidgetTime)
                 self.mdi.addSubWindow(self.subT)
@@ -674,9 +705,10 @@ class MainGUI(QMainWindow):
 
     def addRow(self):
         active = self.mdi.activeSubWindow()
-        current = time.time()
-        col_timestamp = datetime.datetime.fromtimestamp(current).strftime('%Y-%m-%dT%H:%M:%S')
+        datepicker = DateTimePicker()
+        col_timestamp = datepicker.get_timestamp()
         cellinfo = QTableWidgetItem(col_timestamp)
+        cellinfo.setFlags(QtCore.Qt.ItemIsEnabled)
 
         if active == self.subK:
             self.tableWidget.insertRow(self.tableWidget.currentRow())
