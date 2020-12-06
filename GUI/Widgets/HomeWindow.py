@@ -467,12 +467,52 @@ class MainGUI(QMainWindow):
     ####SAVE
     def saveDataline(self):
 
-        instanceTableSys = self.tableWidgetSys
-        instanceTableKeyp = self.tableWidget
+        active = self.mdi.activeSubWindow()
         Projectpath = self.ProjectFolder[0]
 
-        save.save(instanceTableSys, "systemcalls", Projectpath)
-        save.save(instanceTableKeyp, "keypresses", Projectpath)
+        # if active == self.subK:
+        #     instanceTableKeyp = self.tableWidget
+        #     save.save(instanceTableKeyp, "keypresses", Projectpath)
+
+        # elif active == self.subSC:
+        #     instanceTableSys = self.tableWidgetSys
+        #     save.save(instanceTableSys, "systemcalls", Projectpath)
+        
+        # elif active == self.subM:
+        #     instanceTableMou = self.tableWidgetMou
+        #     save.save(instanceTableMou, "mouseclicks", Projectpath)
+        
+        # elif active == self.subT:
+        #     instanceTableTimed = self.tableWidgetTime
+        #     save.save(instanceTableTimed, "timed", Projectpath)
+
+        try:
+            instanceTableKeyp = self.tableWidget
+            save.save(instanceTableKeyp, "keypresses", Projectpath)
+        except:
+            pass
+
+        try:
+            instanceTableSys = self.tableWidgetSys
+            save.save(instanceTableSys, "systemcalls", Projectpath)
+        except:
+            pass
+
+        try:
+            instanceTableMou = self.tableWidgetMou
+            save.save(instanceTableMou, "mouseclicks", Projectpath)
+        except:
+            pass
+
+        try:
+            instanceTableTimed = self.tableWidgetTime
+            save.save(instanceTableTimed, "timed", Projectpath)
+
+        except:
+            pass
+
+
+
 
 
     def trigger_refresh(self):
@@ -550,8 +590,8 @@ class MainGUI(QMainWindow):
                 df = self.mouse_json
                 count_row = 0
 
-                self.tableWidgetMou = QTableWidget (self)
-                self.tableWidgetMou = First(df, self.clicks_path, count_row, 5)
+                self.tableWidgetMou = QTableWidget (self) 
+                self.tableWidgetMou = First(df, self.clicks_path, count_row, 6)
                 self.tableWidgetMou.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetMou.setObjectName("Mouseclicks")
@@ -596,7 +636,7 @@ class MainGUI(QMainWindow):
                 count_row = 0
 
                 self.tableWidgetTime = QTableWidget (self)
-                self.tableWidgetTime = Timed(df, self.timed_path, count_row, 5)
+                self.tableWidgetTime = Timed(df, self.timed_path, count_row, 6)
                 self.tableWidgetTime.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetTime.setObjectName("TimedScreenshots")
@@ -690,8 +730,6 @@ class MainGUI(QMainWindow):
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         addRow = menu.addAction("Add Row")
-        addColumn = menu.addAction("Add Column")
-        delColumn = menu.addAction("Delete Column")
         delRow = menu.addAction("Delete Row")
         tagAction = menu.addAction("Add Tag")
 
@@ -699,10 +737,6 @@ class MainGUI(QMainWindow):
         action = menu.exec_(event.globalPos())
         if action == addRow:
             self.addRow()
-        elif action ==addColumn:
-            self.addColumn()
-        elif action == delColumn:
-            self.delColumn()
         elif action == delRow:
             self.delRow()
         elif action ==tagAction:
@@ -791,90 +825,40 @@ class MainGUI(QMainWindow):
         else: 
             return
 
-
-    def addColumn(self):
-        active = self.mdi.activeSubWindow()
-        if active == self.subK:
-            self.tableWidget.insertColumn(self.tableWidget.currentColumn())
-            print("New Column Added in the Keypresses Dataline")
-        elif active == self.subSC:
-            self.tableWidgetSys.insertColumn(self.tableWidgetSys.currentColumn())
-            print("New Column Added in the SystemCalls Dataline")
-        elif active == self.subM:
-            self.tableWidgetMou.insertColumn(self.tableWidgetMou.currentColumn())
-            print("New Column Added in the Mouse Clicks Dataline")
-        elif active == self.subT:
-            self.tableWidgetTime.insertColumn(self.tableWidgetTime.currentColumn())
-            print("New Column Added in the timed screenshots Dataline")
-        elif active == self.subS:
-            self.tableWidgetSur.insertColumn(self.tableWidgetSur.currentColumn())
-            print("New Column Added in the Suricata Dataline")
     
     def delRow(self):
         active = self.mdi.activeSubWindow()
         if active == self.subK:
             if self.tableWidget.rowCount() > 0:
                 self.tableWidget.removeRow(self.tableWidget.currentRow())
-                print("Row removed in the Keypresses Dataline")
             else:
                 print("No row to be deleted")
         elif active == self.subSC:
             if self.tableWidgetSys.rowCount() > 0:
                 self.tableWidgetSys.removeRow(self.tableWidgetSys.currentRow())
-                print("Row removed in the SystemCalls Dataline")
+    
             else:
                 print("No row to be deleted")
         elif active == self.subM:
             if self.tableWidgetMou.rowCount() > 0:
                 self.tableWidgetMou.removeRow(self.tableWidgetMou.currentRow())
-                print("Row removed in the Mouse Clicks Dataline")
+                
             else:
                 print("No row to be deleted")
         elif active == self.subT:
             if self.tableWidgetTime.rowCount() > 0:
                 self.tableWidgetTime.removeRow(self.tableWidgetTime.currentRow())
-                print("Row removed in the timed screenshots Dataline")
+                
             else:
                 print("No row to be deleted")
         elif active == self.subS:
             if self.tableWidgetSur.rowCount() > 0:
                 self.tableWidgetSur.removeRow(self.tableWidgetSur.currentRow())
-                print("Row removed in the Suricata Dataline")
+                
             else:
                 print("No row to be deleted")
     
-    def delColumn(self):
-        active = self.mdi.activeSubWindow()
-        if active == self.subK:
-            if self.tableWidget.columnCount() > 0:
-                self.tableWidget.removeColumn(self.tableWidget.currentColumn())
-                print("Column removed in the Keypresses Dataline")
-            else:
-                print("No column to be deleted")
-        elif active == self.subSC:
-            if self.tableWidgetSys.columnCount() > 0:
-                self.tableWidgetSys.removeColumn(self.tableWidgetSys.currentColumn())
-                print("Column removed Added in the SystemCalls Dataline")
-            else:
-                print("No column to be deleted")
-        elif active == self.subM:
-            if self.tableWidgetMou.columnCount() > 0:
-                self.tableWidgetMou.removeColumn(self.tableWidgetMou.currentColumn())
-                print("Column removed Added in the Mouse Clicks Dataline")
-            else:
-                print("No column to be deleted")
-        elif active == self.subT:
-            if self.tableWidgetTime.columnCount() > 0:
-                self.tableWidgetTime.removeColumn(self.tableWidgetTime.currentColumn())
-                print("Column removed Added in the timed screenshots Dataline")
-            else:
-                print("No column to be deleted")
-        elif active == self.subS:
-            if self.tableWidgetSu.columnCount() > 0:
-                self.tableWidgetSur.removeColumn(self.tableWidgetSur.currentColumn())
-                print("Column removed Added in the Suricata Dataline")
-            else:
-                print("No column to be deleted")
+    
 
     def load_throughput_complete(self):
         self.subTh = QMdiSubWindow()
@@ -964,6 +948,16 @@ class MainGUI(QMainWindow):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            reply2 = QMessageBox.question(self, 'Close Timeline View', 'Do you want to save your progress?', 
+                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                self.saveDataline()
+
+            elif reply == QMessageBox.No and not type(event) == bool:
+                event.ignore()
+
+                                   
             if(self.web != ''):
                 self.web.close()
                 self.manager_instance.stopWebEngine()
