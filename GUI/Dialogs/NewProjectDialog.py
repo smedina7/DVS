@@ -10,6 +10,7 @@ from distutils.dir_util import copy_tree
 
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
+from GUI.PackageManager.PackageManager import PackageManager
 
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
@@ -22,6 +23,7 @@ class NewProjectDialog(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self, parent=None)
 
         self.folder_chosen = ''
+        self.file_chosen = ''
         
         #Title of window
         self.outerVertBoxPro = QtWidgets.QVBoxLayout()
@@ -37,6 +39,21 @@ class NewProjectDialog(QtWidgets.QWidget):
         labelFont.setBold(True)
         self.newProjectLabel.setFont(labelFont)
         self.newProjectLabel.setAlignment(Qt.AlignCenter)
+
+        self.zipHBox = QtWidgets.QHBoxLayout()
+        self.zipHBox.setObjectName("zip_file")
+        self.zip_file_label = QtWidgets.QLabel()
+        self.zip_file_label.setObjectName("zipLabel")
+        self.zip_file_label.setText("Import Zip File: ")
+        self.zipHBox.addWidget(self.zip_file_label)
+
+        self.zipLineEdit = QtWidgets.QLineEdit()
+        self.zipLineEdit.setAcceptDrops(False)
+        self.zipLineEdit.setReadOnly(True)
+        self.zipLineEdit.setObjectName("zipLineEdit") 
+
+        self.chooseFileButton = QPushButton("Choose File")
+        self.chooseFileButton.clicked.connect(self.on_choosefile_button_clicked)
 
         self.nameVerBoxPro = QtWidgets.QHBoxLayout()
         self.nameVerBoxPro.setObjectName("nameVerBoxPro")
@@ -66,9 +83,11 @@ class NewProjectDialog(QtWidgets.QWidget):
         
         #buttons
         self.create_project_button = QPushButton("Create")
+        self.import_project_button = QPushButton("Import")
         self.cancel_button = QPushButton("Cancel")
 
         #add on click events
+        self.import_project_button.clicked.connect(self.import_zip)
         self.create_project_button.clicked.connect(self.on_create_clicked)
         self.cancel_button.clicked.connect(self.on_cancel_clicked)
 
@@ -77,15 +96,19 @@ class NewProjectDialog(QtWidgets.QWidget):
 
         #put all components together
         self.labelVerBoxPro.addWidget(self.newProjectLabel)
+        self.zipHBox.addWidget(self.zipLineEdit)
+        self.zipHBox.addWidget(self.chooseFileButton)
         self.nameVerBoxPro.addWidget(self.project_name)
         self.pathHorBox.addWidget(self.selectedpathLabel)
         self.pathHorBox.addWidget(self.pathLineEdit)
         self.pathHorBox.addWidget(self.chooseFolderButton)
         self.bottomButtons_layout.addWidget(self.create_project_button)
+        self.bottomButtons_layout.addWidget(self.import_project_button)
         self.bottomButtons_layout.addWidget(self.cancel_button)
 
          #put all the components together
         self.outerVertBoxPro.addLayout(self.labelVerBoxPro)
+        self.outerVertBoxPro.addLayout(self.zipHBox)
         self.outerVertBoxPro.addLayout(self.nameVerBoxPro)
         self.outerVertBoxPro.addLayout(self.pathHorBox)
         self.outerVertBoxPro.addLayout(self.bottomButtons_layout)
@@ -93,6 +116,16 @@ class NewProjectDialog(QtWidgets.QWidget):
         self.outerVertBoxPro.addStretch()
 
         self.setLayout(self.outerVertBoxPro)
+
+    def import_zip(self):
+        package_mgr = PackageManager()
+        self.batch_thread = BatchThread()
+        self.batch_thread.progress_signal.connect(self.update_progress_bar)
+        self.batch_thread.completion_signal.connect(self.unzip_complete)
+        self.batch_thread.add_function(package_mgr.unzip, self.zip_to_import, self.file_name, self.project_data_folder)
+        self.progress_dialog_overall = ProgressBarDialog(self, self.batch_thread.get_load_count())
+        self.batch_thread.start()
+        self.progress_dialog_overall.show()
 
     def on_create_clicked(self): 
         working_dir = os.getcwd()
@@ -127,8 +160,6 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.batch_thread.completion_signal.connect(self.copy_dir_complete)
             self.batch_thread.add_function(self.copy_dir, self.project_data_path)
 
-            
-
             self.progress_dialog_overall = ProgressBarDialog(self, self.batch_thread.get_load_count())
             self.batch_thread.start()
             self.progress_dialog_overall.show()
@@ -154,6 +185,13 @@ class NewProjectDialog(QtWidgets.QWidget):
         #send signal to manager to start getting the files
         self.created.emit(self.project_data_path)
         self.close()
+
+    def unzip_complete(self):
+        logging.debug("unzip_complete(): Instantiated")
+        self.progress_dialog_overall.update_progress()
+        self.progress_dialog_overall.hide()
+        self.created.emit(self.new_project_path)
+        logging.debug("unzip_complete(): Complete") 
 
     def update_progress_bar(self):
         self.progress_dialog_overall.update_progress()
@@ -182,3 +220,50 @@ class NewProjectDialog(QtWidgets.QWidget):
         if len(self.folder_chosen) > 0:
             self.folder_chosen = os.path.abspath(self.folder_chosen)
             self.pathLineEdit.setText(self.folder_chosen)
+            self.zipLineEdit.setReadOnly(True)
+            self.zipLineEdit.setStyleSheet("background-color : grey")
+            self.chooseFileButton.setEnabled(False)
+            self.chooseFileButton.setStyleSheet("background-color : grey")
+            self.import_project_button.setEnabled(False)
+            self.import_project_button.setStyleSheet("background-color : grey")
+
+    def on_choosefile_button_clicked(self):
+        zip_file = QFileDialog()
+        filenames, _ = QFileDialog.getOpenFileNames(zip_file, "Select File")
+
+        if len(filenames) < 0:
+            logging.debug("File choose cancelled")
+            return
+
+        if len(filenames) > 0:
+            self.zip_to_import = filenames[0]
+            self.file_name = os.path.basename(self.zip_to_import)
+            if(".zip" not in self.zip_to_import):
+                QMessageBox.warning(self,
+                                "Not a .zip file",
+                                "File selected is not a .zip file!",
+                                QMessageBox.Ok)            
+                return None
+
+            self.file_name = os.path.splitext(self.file_name)[0]
+            configname = self.file_name
+            working_dir = os.getcwd()
+            self.project_data_folder = os.path.join(working_dir, "ProjectData")
+            self.new_project_path = os.path.join(self.project_data_folder, configname)
+            if os.path.exists(self.new_project_path):
+                QMessageBox.warning(self,
+                                "Name Exists",
+                                "The project name specified and directory already exists",
+                                QMessageBox.Ok)            
+                return None
+            else:
+                self.zipLineEdit.setText(self.new_project_path)
+                self.project_name.setReadOnly(True)
+                self.project_name.setStyleSheet("background-color : grey")
+                self.pathLineEdit.setReadOnly(True)
+                self.pathLineEdit.setStyleSheet("background-color : grey")
+                self.create_project_button.setEnabled(False)
+                self.create_project_button.setStyleSheet("background-color : grey")
+                self.chooseFolderButton.setEnabled(False)
+                self.chooseFolderButton.setStyleSheet("background-color : grey")
+                

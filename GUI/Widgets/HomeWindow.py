@@ -280,7 +280,6 @@ class MainGUI(QMainWindow):
     def throughput_selected(self):
         #check if dataline exists
         if self.project_dict[self.project_name]["ThroughputData"] not in self.mdi.subWindowList() and self.throughput_open1 == False:
-            print("First IF")
             #file that holds throughput file path and selected dataline color; this will be read by dash app
             path = os.path.abspath("GUI/Dash/throughput_info.txt")
             throughput_info_file = open(path, 'w')
@@ -290,7 +289,6 @@ class MainGUI(QMainWindow):
             #get rgb values for graph background color
             color = self.color_picker()
             if color is None:
-                print("no color selected")
                 return 
             else:
                 throughput_info_file.write(str(color.getRgb())+"\n")
@@ -322,7 +320,6 @@ class MainGUI(QMainWindow):
             self.subK.setWindowTitle("Keypresses")
             color = self.color_picker()
             if color is None:
-                print("no color selected")
                 return 
             else:
                 self.subK.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -368,7 +365,6 @@ class MainGUI(QMainWindow):
 
             color = self.color_picker()
             if color is None:
-                print("no color selected")
                 return 
             else:
                 self.subSC.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -413,7 +409,6 @@ class MainGUI(QMainWindow):
             self.subS.setWindowTitle("Suricata")
             color = self.color_picker()
             if color is None:
-                print("no color selected")
                 return 
             else:
                 self.subS.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -508,7 +503,6 @@ class MainGUI(QMainWindow):
             self.subM.setWindowTitle("Mouse Clicks")
             color = self.color_picker()
             if color is None:
-                print("no color selected")
                 return 
             else:
                 self.subM.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -551,7 +545,6 @@ class MainGUI(QMainWindow):
             self.subT.setWindowTitle("Timed Screenshots")
             color = self.color_picker()
             if color is None:
-                print("no color selected")
                 return 
             else:
                 self.subT.setStyleSheet("QTableView { background-color: %s}" % color.name())
@@ -680,108 +673,95 @@ class MainGUI(QMainWindow):
 
         if active == self.subK:
             self.tableWidget.insertRow(self.tableWidget.currentRow())
-            print("New Row Added in the Keypresses Dataline")
             self.tableWidget.setItem(self.tableWidget.currentRow()-1, self.tableWidget.columnCount()-1, cellinfo)
         elif active == self.subSC:
             self.tableWidgetSys.insertRow(self.tableWidgetSys.currentRow())
-            print("New Row Added in the SystemCalls Dataline")
             self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, self.tableWidgetSys.columnCount()-1, cellinfo)
         elif active == self.subM:
             self.tableWidgetMou.insertRow(self.tableWidgetMou.currentRow())
-            print("New Row Added in the Mouse Clicks Dataline")
             self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, self.tableWidgetMou.columnCount()-1, cellinfo)
         elif active == self.subT:
             self.tableWidgetTime.insertRow(self.tableWidgetTime.currentRow())
-            print("New Row Added in the timed screenshots Dataline")
             self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, self.tableWidgetTime.columnCount()-1, cellinfo)
         elif active == self.subS:
             self.tableWidgetSur.insertRow(self.tableWidgetSur.currentRow())
-            print("New Row Added in the Suricata Dataline")
             self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, self.tableWidgetSur.columnCount()-1, cellinfo)
 
     def addColumn(self):
         active = self.mdi.activeSubWindow()
         if active == self.subK:
             self.tableWidget.insertColumn(self.tableWidget.currentColumn())
-            print("New Column Added in the Keypresses Dataline")
         elif active == self.subSC:
             self.tableWidgetSys.insertColumn(self.tableWidgetSys.currentColumn())
-            print("New Column Added in the SystemCalls Dataline")
         elif active == self.subM:
             self.tableWidgetMou.insertColumn(self.tableWidgetMou.currentColumn())
-            print("New Column Added in the Mouse Clicks Dataline")
         elif active == self.subT:
             self.tableWidgetTime.insertColumn(self.tableWidgetTime.currentColumn())
-            print("New Column Added in the timed screenshots Dataline")
         elif active == self.subS:
             self.tableWidgetSur.insertColumn(self.tableWidgetSur.currentColumn())
-            print("New Column Added in the Suricata Dataline")
     
     def delRow(self):
         active = self.mdi.activeSubWindow()
         if active == self.subK:
             if self.tableWidget.rowCount() > 0:
                 self.tableWidget.removeRow(self.tableWidget.currentRow())
-                print("Row removed in the Keypresses Dataline")
             else:
-                print("No row to be deleted")
+                self.delete_pop_up()
         elif active == self.subSC:
             if self.tableWidgetSys.rowCount() > 0:
                 self.tableWidgetSys.removeRow(self.tableWidgetSys.currentRow())
-                print("Row removed in the SystemCalls Dataline")
             else:
-                print("No row to be deleted")
+                self.delete_pop_up()
         elif active == self.subM:
             if self.tableWidgetMou.rowCount() > 0:
                 self.tableWidgetMou.removeRow(self.tableWidgetMou.currentRow())
-                print("Row removed in the Mouse Clicks Dataline")
             else:
-                print("No row to be deleted")
+                self.delete_pop_up()
         elif active == self.subT:
             if self.tableWidgetTime.rowCount() > 0:
                 self.tableWidgetTime.removeRow(self.tableWidgetTime.currentRow())
-                print("Row removed in the timed screenshots Dataline")
             else:
-                print("No row to be deleted")
+                self.delete_pop_up()
         elif active == self.subS:
             if self.tableWidgetSur.rowCount() > 0:
                 self.tableWidgetSur.removeRow(self.tableWidgetSur.currentRow())
-                print("Row removed in the Suricata Dataline")
             else:
-                print("No row to be deleted")
+                self.delete_pop_up()
     
     def delColumn(self):
         active = self.mdi.activeSubWindow()
         if active == self.subK:
             if self.tableWidget.columnCount() > 0:
                 self.tableWidget.removeColumn(self.tableWidget.currentColumn())
-                print("Column removed in the Keypresses Dataline")
             else:
-                print("No column to be deleted")
+                self.delete_pop_up()
         elif active == self.subSC:
             if self.tableWidgetSys.columnCount() > 0:
                 self.tableWidgetSys.removeColumn(self.tableWidgetSys.currentColumn())
-                print("Column removed Added in the SystemCalls Dataline")
             else:
-                print("No column to be deleted")
+                self.delete_pop_up()
         elif active == self.subM:
             if self.tableWidgetMou.columnCount() > 0:
                 self.tableWidgetMou.removeColumn(self.tableWidgetMou.currentColumn())
-                print("Column removed Added in the Mouse Clicks Dataline")
             else:
-                print("No column to be deleted")
+                self.delete_pop_up()
         elif active == self.subT:
             if self.tableWidgetTime.columnCount() > 0:
                 self.tableWidgetTime.removeColumn(self.tableWidgetTime.currentColumn())
-                print("Column removed Added in the timed screenshots Dataline")
             else:
-                print("No column to be deleted")
+                self.delete_pop_up()
         elif active == self.subS:
             if self.tableWidgetSu.columnCount() > 0:
                 self.tableWidgetSur.removeColumn(self.tableWidgetSur.currentColumn())
-                print("Column removed Added in the Suricata Dataline")
             else:
-                print("No column to be deleted")
+                self.delete_pop_up()
+
+    def delete_pop_up(self):
+        QMessageBox.warning(self,
+                                "Nothing to delete",
+                                "There's nothing to delete",
+                                QMessageBox.Ok)            
+        return None
 
     def load_throughput_complete(self):
         self.subTh = QMdiSubWindow()
@@ -806,7 +786,7 @@ class MainGUI(QMainWindow):
             content.show()
             subW.show()
         else:
-            print("Dataline already open")
+            return
 
     def new_import_project(self):
         #reset cancel check, each time this function is called
@@ -814,7 +794,7 @@ class MainGUI(QMainWindow):
     
     def open_prev_project(self):
         #self.open_prev.emit(True)
-        print("open prev triggered")
+        return
     
     def window_changed(self, dataline):
         if dataline == "K":
