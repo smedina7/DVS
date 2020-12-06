@@ -98,7 +98,7 @@ class reloadDataline:
 
     def addTagColumn (datajson):
         path = datajson
-        datalines = ["keypresses", "systemcalls"]
+        datalines = ["keypresses", "systemcalls", "mouseclicks", "timed"]
         datalinepath = ""
 
         for label in datalines:
@@ -110,6 +110,14 @@ class reloadDataline:
             if (label == "systemcalls"):
                 keys = ["auditd_id", "content", "className", "start"]
                 datalinepath = "/ParsedLogs/SystemCalls.JSON"
+            
+            if(label == "mouseclicks"):
+                keys = ["clicks_id", "content", "type", "classname", "start"] 
+                datalinepath = "/ParsedLogs/MouseClicks.JSON"
+
+            if(label == "timed"):
+                keys = ["timed_id","type", "classname", "content", "start"]
+                datalinepath = "/ParsedLogs/TimedScreenshots.JSON"
 
                 
             dfdata = path + datalinepath
@@ -121,8 +129,14 @@ class reloadDataline:
             for i, row in df.iterrows():
                 for j in keys:
                     value = row [j]
-                    if(colInd == 3):
-                        dct["Tag"] = " "
+
+                    if(label == "mouseclicks" or label == "timed"):
+                        if(colInd == 4):
+                            dct["Tag"] = " "
+
+                    else:
+                        if(colInd == 3):
+                            dct["Tag"] = " "
 
                     dct[j] = value
                     colInd = colInd + 1

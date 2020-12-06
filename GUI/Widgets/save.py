@@ -4,7 +4,7 @@ import os.path
 import pandas as pd    
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap, QImage, QIcon
-from PyQt5.QtCore import QAbstractTableModel, Qt
+from PyQt5.QtCore import QAbstractTableModel, Qt, QVariant
 from PyQt5.QtWidgets import QTableWidget, QAction, QPushButton, QApplication, QTableView, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QTableWidgetItem
 from pathlib import Path, PureWindowsPath
 
@@ -24,7 +24,14 @@ class save:
         if (labelDataline == "systemcalls"):
             keys = ["auditd_id", "content", "className","Tag","start"]
             datalinepath = "/ParsedLogs/SystemCalls.JSON"
-           
+
+        if(label == "mouseclicks"):
+                keys = ["clicks_id", "content", "type", "classname", "Tag", "start"] 
+                datalinepath = "/ParsedLogs/MouseClicks.JSON"
+
+        if(label == "timed"):
+                keys = ["timed_id","type", "classname", "content","Tag", "start"]
+                datalinepath = "/ParsedLogs/TimedScreenshots.JSON"
 
 
         nb_row = self.rowCount()
@@ -40,6 +47,17 @@ class save:
             for j in keys:
                 # print(self.item(row, col).text())
                 value = self.item(row, col).text()
+                if(label == "mouseclicks" or label == "timed"):
+                    if(j == "content"):
+                        try:
+                            curData = self.item(row, col).data(Qt.UserRole)
+                            if (bool(curData and curData.strip())):
+                                value = curData
+                            else:
+                                value = self.item(row, col).text() 
+                        except:
+                            value = self.item(row, col).text()
+                
                 dct[j] = value
                 col = col + 1
 

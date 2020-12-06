@@ -29,34 +29,49 @@ class First(QTableWidget):
         dfdata = data
         self.clicks = clicks_path
 
-        keys = ["clicks_id", "content", "type", "classname", "start"]
+        keys = ["clicks_id", "content", "type", "classname" ,"Tag", "start"] 
+        
         labels = keys
         self.setHorizontalHeaderLabels(labels)
         df = pd.read_json (dfdata)
         pathclicks = ""
+        ser = pd.Series(df['clicks_id']) 
         
         for ind in df.index:
             c = 0
-            clicks_id = str(ind)
+            # clicks_id = str(ind)
             self.insertRow(self.rowCount())
             
             for j in keys:
                 it = QtWidgets.QTableWidgetItem()
                 if j == "clicks_id":
-                    it.setData(QtCore.Qt.DisplayRole, (clicks_id))
+                    tableid = str(ser[ind])
+                    it.setData(QtCore.Qt.DisplayRole, (tableid))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
                         
                 elif j == "content":
                     path = (df[j][ind])
-                    last = path.split('/')[-1]
-                    pathclicks = os.path.join(self.clicks, last)
-                    icon  = QtGui.QIcon(pathclicks)
-                    self.btn= QtWidgets.QToolButton()
-                    self.btn.setText(pathclicks)
-                    self.btn.setIcon(icon)
-                    self.btn.setIconSize(QtCore.QSize(200, 200))
-                    self.btn.setStyleSheet('QToolButton{border: 0px solid; font-size: 1px;padding-bottom: 1px; height: 100px; width: 200px;}')
-                    self.setCellWidget(ind,c,self.btn)
-                    self.btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
+
+                    try:
+                        
+                        last = path.split('/')[-1]
+                        pathclicks = os.path.join(self.clicks, last)
+                        if QtCore.QFile.exists(pathclicks):
+                            it.setData(QtCore.Qt.UserRole, (path))
+                        else:
+                            it.setData(QtCore.Qt.DisplayRole, (path))
+                            
+                        icon  = QtGui.QIcon(pathclicks)
+                        self.btn= QtWidgets.QToolButton()
+                        self.btn.setText(pathclicks)
+                        self.btn.setIcon(icon)
+                        self.btn.setIconSize(QtCore.QSize(200, 200))
+                        self.btn.setStyleSheet('QToolButton{border: 0px solid; font-size: 1px;padding-bottom: 1px; height: 100px; width: 200px;}')
+                        self.setCellWidget(ind,c,self.btn)
+                        self.btn.clicked.connect(lambda: self.on_pushButton_clicked(pathclicks))
+
+                    except:
+                        it.setData(QtCore.Qt.DisplayRole, (path))
 
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
