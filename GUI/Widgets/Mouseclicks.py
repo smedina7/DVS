@@ -15,7 +15,9 @@ class Second(QtWidgets.QMainWindow):
         label = QLabel(self)                                                                                                               
         pixmap = QPixmap(self.clicks) 
         pixmap4 = pixmap.scaled(1600, 1600, QtCore.Qt.KeepAspectRatio)                                                                                                       
-        label.setPixmap(pixmap4)                                                                                                          
+        label.setPixmap(pixmap4)
+        title = self.clicks
+        self.setWindowTitle(title)                                                                                                           
         self.setCentralWidget(label)                                                                                                       
         self.resize(200, 200)
         self.move(300, 200)   

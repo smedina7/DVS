@@ -1,0 +1,3 @@
+@New coloring rule@systemcalls and keypresses@[21356, 42713, 31909][0,0,0]
+@Keypress Log@keypresses@[21356, 21356, 0][0,0,0]
+@Keypress Log@keypresses@[21356, 21356, 31909][0,0,0]

@@ -63,7 +63,7 @@ class WiresharkColors():
 
         try:
             if sys.platform == "linux" or sys.platform == "linux2":
-                path = os.path.dirname(os.getcwd()) + "/eceld-wireshark/wireshark-3.2.0/profiles/DVS/"
+                path = "/home/kali/eceld-wireshark/wireshark-3.2.0/profiles/DVS/"
             else:
                 path = "C:\\Program Files\\Wireshark\\profiles\\DVS\\"
             os.mkdir(path)

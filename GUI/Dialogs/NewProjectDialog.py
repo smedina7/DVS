@@ -14,6 +14,9 @@ from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
 
+#TAGS
+from GUI.Widgets.textdataline import reloadDataline
+
 class NewProjectDialog(QtWidgets.QWidget):
     #Signal for when the user is done creating the new project
     created = QtCore.pyqtSignal(str)
@@ -135,8 +138,12 @@ class NewProjectDialog(QtWidgets.QWidget):
 
             #BIANCA
             # #TRIGGER PACKET COMMENTS PARSER
-            packetscomments_jsonpath = self.project_data_path 
-            commentsParser(packetscomments_jsonpath)
+            datalinepath = self.project_data_path 
+            commentsParser(datalinepath)
+
+            #TAG
+            reloadDataline.addTagColumn(datalinepath)
+
 
     def copy_dir(self, dir):
         try:

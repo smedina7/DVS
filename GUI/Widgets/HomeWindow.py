@@ -28,6 +28,9 @@ import datetime
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
 
+#SAVE
+from GUI.Widgets.save import save
+
 class MainGUI(QMainWindow):
     #Signal for when the user wants to create a new project
     new_import = QtCore.pyqtSignal(bool)
@@ -58,10 +61,14 @@ class MainGUI(QMainWindow):
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
 
         self.project_name = os.path.basename(self.project_path)
+        self.subK = QMdiSubWindow()
+        self.subSC = QMdiSubWindow()
+        self.subT = QMdiSubWindow()
+        self.subM = QMdiSubWindow()
 
         self.project_dict = {}
         self.project_dict[self.project_name] = {"KeypressData": {}, "SystemCallsData": {}, "MouseClicksData": {}, "TimedData": {}, "ThroughputData": {}, "SuricataData": {}}
-
+        
         #Get JSON Files        
         #get path for each file
         for file in json_file_list:
@@ -100,6 +107,14 @@ class MainGUI(QMainWindow):
         self.refresh.setText("Refresh Comments Dataline")
         self.tb.addWidget(self.refresh)
         self.refresh.clicked.connect (self.trigger_refresh)
+
+        ##SAVE
+        self.save = QPushButton('SAVE')
+        self.save.setFixedWidth(100)
+        self.tb.addWidget(self.save)
+        self.save.clicked.connect(self.saveDataline)
+
+        
 
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
@@ -170,6 +185,7 @@ class MainGUI(QMainWindow):
         self.timestampTrigger = False
         self.wiresharkTrigger = False
         self.sync_dict = {}
+
 
     def file_changed(self):
         self.syncWindows(1)
@@ -276,7 +292,7 @@ class MainGUI(QMainWindow):
             self.tableWidgetSur.selectRow(i)
             self.tableWidgetSys.selectRow(i)
             self.tableWidgetTime.selectRow(i)
-
+    
     def throughput_selected(self):
         #check if dataline exists
         if self.project_dict[self.project_name]["ThroughputData"] not in self.mdi.subWindowList() and self.throughput_open1 == False:
@@ -335,11 +351,12 @@ class MainGUI(QMainWindow):
                 count_row = 0
                 self.tableWidget = QTableWidget (self)
                 label = "keypresses"
-                self.tableWidget = TextDataline(data, label, count_row, 4)
+                self.tableWidget = TextDataline(data, label, count_row, 5)
                 self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidget.setObjectName("Keypresses")
                 self.tableWidget.cellClicked.connect(self.getCoords)
+                # self.tableWidget.setSortingEnabled(True)
                 
                 self.subK.setWidget(self.tableWidget)
                 self.mdi.addSubWindow(self.subK)
@@ -381,11 +398,13 @@ class MainGUI(QMainWindow):
 
                 self.tableWidgetSys = QTableWidget (self)
                 label = "systemcalls"
-                self.tableWidgetSys = TextDataline(data, label, count_row, 4)
+                self.tableWidgetSys = TextDataline(data, label, count_row, 5)
                 self.tableWidgetSys.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidgetSys.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSys.setObjectName("Systemcalls")
                 self.tableWidgetSys.cellClicked.connect(self.getCoords)
+                # self.tableWidgetSys.setSortingEnabled(True)
+
 
                 self.subSC.setWidget(self.tableWidgetSys)
                 self.mdi.addSubWindow(self.subSC)
@@ -442,6 +461,19 @@ class MainGUI(QMainWindow):
         else:
             #check if window is hidden
             self.checkHidden(self.subS, self.tableWidgetSur)
+    
+    
+    
+    ####SAVE
+    def saveDataline(self):
+
+        instanceTableSys = self.tableWidgetSys
+        instanceTableKeyp = self.tableWidget
+        Projectpath = self.ProjectFolder[0]
+
+        save.save(instanceTableSys, "systemcalls", Projectpath)
+        save.save(instanceTableKeyp, "keypresses", Projectpath)
+
 
     def trigger_refresh(self):
         #TRIGGER PACKET COMMENTS PARSER
@@ -531,7 +563,7 @@ class MainGUI(QMainWindow):
                 self.subM.show()
                 self.project_dict[self.project_name]["MouseClicksData"] = self.subM
 
-                if self.subSC.windowStateChanged:
+                if self.subM.windowStateChanged:
                     self.window_changed("MC")
 
         elif self.mouse.isChecked()==False:
@@ -576,7 +608,7 @@ class MainGUI(QMainWindow):
                 self.subT.show()
                 self.project_dict[self.project_name]["TimedData"] = self.subT
                 
-                if self.subSC.windowStateChanged:
+                if self.subT.windowStateChanged:
                     self.window_changed("Ti")
 
         elif self.timed.isChecked()==False:
@@ -661,6 +693,8 @@ class MainGUI(QMainWindow):
         addColumn = menu.addAction("Add Column")
         delColumn = menu.addAction("Delete Column")
         delRow = menu.addAction("Delete Row")
+        tagAction = menu.addAction("Add Tag")
+
 
         action = menu.exec_(event.globalPos())
         if action == addRow:
@@ -671,6 +705,9 @@ class MainGUI(QMainWindow):
             self.delColumn()
         elif action == delRow:
             self.delRow()
+        elif action ==tagAction:
+            print("add tag")
+
 
     def addRow(self):
         active = self.mdi.activeSubWindow()
@@ -679,25 +716,81 @@ class MainGUI(QMainWindow):
         cellinfo = QTableWidgetItem(col_timestamp)
 
         if active == self.subK:
+            # self.tableWidget.setSortingEnabled(False)
             self.tableWidget.insertRow(self.tableWidget.currentRow())
-            print("New Row Added in the Keypresses Dataline")
+            columns = self.tableWidget.columnCount()-1
+            rows = self.tableWidget.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidget.setItem(self.tableWidget.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidget.setItem(self.tableWidget.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidget.setItem(self.tableWidget.currentRow()-1, self.tableWidget.columnCount()-1, cellinfo)
+            # self.tableWidget.setSortingEnabled(True)
+
         elif active == self.subSC:
+            # self.tableWidgetSys.setSortingEnabled(False)
             self.tableWidgetSys.insertRow(self.tableWidgetSys.currentRow())
-            print("New Row Added in the SystemCalls Dataline")
+            columns = self.tableWidgetSys.columnCount()-1
+            rows = self.tableWidgetSys.rowCount()-1
+
+            it = QtWidgets.QTableWidgetItem()
+            tableid = int(rows)
+            it.setData(QtCore.Qt.DisplayRole, (tableid))
+
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, i, it)
+                else:
+                    self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, self.tableWidgetSys.columnCount()-1, cellinfo)
+            # self.tableWidgetSys.setSortingEnabled(True)
+
         elif active == self.subM:
+            # self.tableWidgetMou.setSortingEnabled(False)
             self.tableWidgetMou.insertRow(self.tableWidgetMou.currentRow())
-            print("New Row Added in the Mouse Clicks Dataline")
+            columns = self.tableWidgetMou.columnCount()-1
+            rows = self.tableWidgetMou.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, self.tableWidgetMou.columnCount()-1, cellinfo)
+            # self.tableWidgetMou.setSortingEnabled(True)
+        
         elif active == self.subT:
+            # self.tableWidgetTime.setSortingEnabled(False)
             self.tableWidgetTime.insertRow(self.tableWidgetTime.currentRow())
-            print("New Row Added in the timed screenshots Dataline")
+            columns = self.tableWidgetTime.columnCount()-1
+            rows = self.tableWidgetTime.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, self.tableWidgetTime.columnCount()-1, cellinfo)
+            # self.tableWidgetTime.setSortingEnabled(True)
+            
+        
         elif active == self.subS:
+            # self.tableWidgetSur.setSortingEnabled(False)
+            # self.tableWidgetSur.insertRow(self.tableWidgetSur.currentRow())
+            # self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, self.tableWidgetSur.columnCount()-1, cellinfo)
             self.tableWidgetSur.insertRow(self.tableWidgetSur.currentRow())
-            print("New Row Added in the Suricata Dataline")
+            columns = self.tableWidgetSur.columnCount()-1
+            rows = self.tableWidgetSur.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, self.tableWidgetSur.columnCount()-1, cellinfo)
+            # self.tableWidgetSur.setSortingEnabled(True)
+        
+        else: 
+            return
+
 
     def addColumn(self):
         active = self.mdi.activeSubWindow()
