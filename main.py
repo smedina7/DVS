@@ -6,7 +6,6 @@ from GUI.Widgets.HomeWindow import MainGUI
 from GUI.PacketView.Manager import PacketManager
 from GUI.Dialogs.NewProjectDialog import NewProjectDialog
 from GUI.Dialogs.Settings import SettingsDialog
-from GUI.PackageManager.PackageManager import PackageManager
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Widgets.commentsParser import commentsParser
@@ -56,69 +55,9 @@ class DVSstartUpPage(QMainWindow):
         self.show()
 
     def createNewProject(self):
-        newPro = QMessageBox.question(self, 'Create or Import Project', 'Do you want to import a .zip file?', 
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if newPro == QMessageBox.Yes:
-            zip_file = QFileDialog()
-            filenames, _ = QFileDialog.getOpenFileNames(zip_file, "Select File")
-
-            if len(filenames) < 0:
-                logging.debug("File choose cancelled")
-                return
-
-            if len(filenames) > 0:
-                if self.startedOnce == True:
-                    #make sure you're in the correct dir to close dash and ws
-                    p_path = os.path.dirname(self.clicks)
-                    g_dir = os.path.dirname(p_path)
-                    g_dir = os.path.dirname(g_dir)
-                    os.chdir(g_dir)
-                    #close wireshark since you'll be opening a new project
-                    try:
-                        self.manager.stopWireshark()
-                    except:
-                        print("ERROR: Could not close wireshark")
-
-                    #close dash
-                    try:
-                        self.manager.stopWebEngine()
-                    except:
-                        print("closed")
-
-                zip_to_import = filenames[0]
-                file_name = os.path.basename(zip_to_import)
-                if(".zip" not in zip_to_import):
-                    QMessageBox.warning(self,
-                                    "Not a .zip file",
-                                    "File selected is not a .zip file!",
-                                    QMessageBox.Ok)            
-                    return None
-
-                file_name = os.path.splitext(file_name)[0]
-                configname = file_name
-                working_dir = os.getcwd()
-                project_data_folder = os.path.join(working_dir, "ProjectData")
-                self.new_project_path = os.path.join(project_data_folder, configname)
-                if os.path.exists(self.new_project_path):
-                    QMessageBox.warning(self,
-                                    "Name Exists",
-                                    "The project name specified and directory already exists",
-                                    QMessageBox.Ok)            
-                    return None
-                else:
-                    package_mgr = PackageManager()
-                    self.batch_thread = BatchThread()
-                    self.batch_thread.progress_signal.connect(self.update_progress_bar)
-                    self.batch_thread.completion_signal.connect(self.unzip_complete)
-                    self.batch_thread.add_function(package_mgr.unzip, zip_to_import, file_name, project_data_folder)
-                    self.progress_dialog_overall = ProgressBarDialog(self, self.batch_thread.get_load_count())
-                    self.batch_thread.start()
-                    self.progress_dialog_overall.show()
-            
-        else:
-            self.new_project_popup = NewProjectDialog()
-            self.new_project_popup.created.connect(self.project_created)
-            self.new_project_popup.show()
+        self.new_project_popup = NewProjectDialog()
+        self.new_project_popup.created.connect(self.project_created)
+        self.new_project_popup.show()
 
     def openHomeWindow(self):
         self.startedOnce = True
@@ -137,6 +76,23 @@ class DVSstartUpPage(QMainWindow):
     @QtCore.pyqtSlot(str)
     def project_created(self, project_dir):
         self.project_folder = project_dir
+        if self.startedOnce == True:
+                #make sure you're in the correct dir to close dash and ws
+                p_path = os.path.dirname(self.clicks)
+                g_dir = os.path.dirname(p_path)
+                g_dir = os.path.dirname(g_dir)
+                os.chdir(g_dir)
+                #close wireshark since you'll be opening a new project
+                try:
+                    self.manager.stopWireshark()
+                except:
+                    print("ERROR: Could not close wireshark")
+
+                #close dash
+                try:
+                    self.manager.stopWebEngine()
+                except:
+                    print("closed")
         self.openHomeWindow()
         self.hide()
 
@@ -183,15 +139,6 @@ class DVSstartUpPage(QMainWindow):
         logging.debug('update_progress_bar(): Instantiated')
         self.progress_dialog_overall.update_progress()
         logging.debug('update_progress_bar(): Complete')  
-
-    def unzip_complete(self):
-        logging.debug("unzip_complete(): Instantiated")
-        self.progress_dialog_overall.update_progress()
-        self.progress_dialog_overall.hide()
-        self.project_folder = self.new_project_path
-        self.openHomeWindow()
-        self.hide()
-        logging.debug("unzip_complete(): Complete") 
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Window', 'Are you sure you want to quit?', 
