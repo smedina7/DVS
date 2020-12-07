@@ -283,6 +283,7 @@ class MainGUI(QMainWindow):
                 table.setItem(cell_obj.row(), cell_obj.column(), QTableWidgetItem(timestamp))
             else:
                 table.setItem(cell_obj.row(), cell_obj.column(), QTableWidgetItem(current_timestamp))
+            table.item(cell_obj.row(), cell_obj.column()).setFlags(QtCore.Qt.ItemIsEnabled)
 
 
     def selectRows(self, selection: list):
