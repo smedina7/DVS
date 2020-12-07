@@ -266,23 +266,23 @@ class MainGUI(QMainWindow):
         table = self.findChild(QTableWidget, name)
         columncount = table.columnCount()
         indexTimeStamp = table.item(r,columncount-1).text()
-        if (self.timestampTrigger):
+        if self.timestampTrigger:
             self.timestamp = indexTimeStamp
             Timestamp.update_timestamp(self.timestamp) #writes to timestamp.txt (updates timestamp)
             self.syncWindows(-1)
 
-    def update_timestamp(self, r):
+    def choose_timestamp(self, cell_obj):
         sender = self.sender()
         name = sender.objectName()
         table = self.findChild(QTableWidget, name)
-        current_timestamp = table.item(r.row(), r.column()).text()
-        if r.column() == table.columnCount()-1:
+        current_timestamp = table.item(cell_obj.row(), cell_obj.column()).text()
+        if cell_obj.column() == table.columnCount()-1:
             datepicker = DateTimePicker()
             timestamp = datepicker.get_timestamp()
             if not len(timestamp) == 1:
-                table.setItem(r.row(), r.column(), QTableWidgetItem(timestamp))
+                table.setItem(cell_obj.row(), cell_obj.column(), QTableWidgetItem(timestamp))
             else:
-                table.setItem(r.row(), r.column(), QTableWidgetItem(current_timestamp))
+                table.setItem(cell_obj.row(), cell_obj.column(), QTableWidgetItem(current_timestamp))
 
 
     def selectRows(self, selection: list):
@@ -356,7 +356,7 @@ class MainGUI(QMainWindow):
                 self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidget.setObjectName("Keypresses")
                 self.tableWidget.cellClicked.connect(self.getCoords)
-                self.tableWidget.doubleClicked.connect(self.update_timestamp)
+                self.tableWidget.doubleClicked.connect(self.choose_timestamp)
                 
                 self.subK.setWidget(self.tableWidget)
                 self.mdi.addSubWindow(self.subK)
@@ -403,7 +403,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSys.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSys.setObjectName("Systemcalls")
                 self.tableWidgetSys.cellClicked.connect(self.getCoords)
-                self.tableWidgetSys.doubleClicked.connect(self.update_timestamp)
+                self.tableWidgetSys.doubleClicked.connect(self.choose_timestamp)
 
                 self.subSC.setWidget(self.tableWidgetSys)
                 self.mdi.addSubWindow(self.subSC)
@@ -449,7 +449,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSur.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSur.setObjectName("Suricata Alerts")
                 self.tableWidgetSur.cellClicked.connect(self.getCoords)
-                self.tableWidgetSur.doubleClicked.connect(self.update_timestamp)
+                self.tableWidgetSur.doubleClicked.connect(self.choose_timestamp)
 
                 self.subS.setWidget(self.tableWidgetSur)
                 self.mdi.addSubWindow(self.subS)
@@ -519,7 +519,7 @@ class MainGUI(QMainWindow):
         self.tableWidgetPackets.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidgetPackets.setObjectName("Packets Comments")
         self.tableWidgetPackets.cellClicked.connect(self.getCoords)
-        self.tableWidgetPackets.doubleClicked.connect(self.update_timestamp)
+        self.tableWidgetPackets.doubleClicked.connect(self.choose_timestamp)
       
         self.watch_PCAP() #WATCH PCAP CHANGE
 
@@ -553,7 +553,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetMou.setObjectName("Mouseclicks")
                 self.tableWidgetMou.cellClicked.connect(self.getCoords)
-                self.tableWidgetMou.doubleClicked.connect(self.update_timestamp)
+                self.tableWidgetMou.doubleClicked.connect(self.choose_timestamp)
 
                 self.subM.setWidget(self.tableWidgetMou)
                 self.mdi.addSubWindow(self.subM)
@@ -599,7 +599,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetTime.setObjectName("TimedScreenshots")
                 self.tableWidgetTime.cellClicked.connect(self.getCoords)
-                self.tableWidgetTime.doubleClicked.connect(self.update_timestamp)
+                self.tableWidgetTime.doubleClicked.connect(self.choose_timestamp)
 
                 self.subT.setWidget(self.tableWidgetTime)
                 self.mdi.addSubWindow(self.subT)
