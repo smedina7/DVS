@@ -9,7 +9,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.textdataline import TextDataline, reloadDataline
@@ -216,24 +216,37 @@ class MainGUI(QMainWindow):
         if self.timestampTrigger:
             children = self.findChildren(QTableWidget)
             for child in children:
-                child.setSelectionMode(QAbstractItemView.MultiSelection)
+                # child.setSelectionMode(QAbstractItemView.MultiSelection)
                 columncount = child.columnCount()
-                child.clearSelection()
+                # child.clearSelection()
+                for row in range(child.rowCount()):
+                    for col in range (child.columnCount()):
+                        child.item(row, col).setBackground(QtGui.QColor(255, 255, 255, 0))
+
                 for row in range(child.rowCount()):
                     indexTimeStamp = child.item(row,columncount-1).text()
                     if b == -1:
                         if self.timestamp == indexTimeStamp:
-                            child.selectRow(row)
+                            # child.selectRow(row)
+                            for col in range (child.columnCount()):
+                                child.item(row, col).setBackground(QtGui.QColor(125,125,125))
                             Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
-                            child.selectRow(row)
+                            # child.selectRow(row)
+                            for col in range (child.columnCount()):
+                                child.item(row, col).setBackground(QtGui.QColor(125,125,125))
+
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
-                child.setSelectionMode(QAbstractItemView.SingleSelection)
-                child.clearSelection()
+                # child.setSelectionMode(QAbstractItemView.SingleSelection)
+                # child.clearSelection()
+                for row in range(child.rowCount()):
+                    for col in range (child.columnCount()):
+                        child.item(row, col).setBackground(QtGui.QColor(255, 255, 255, 0))
+                
 
         if self.wiresharkTrigger == True:
             dictionary = self.sync_dict  
