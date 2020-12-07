@@ -65,10 +65,10 @@ class WiresharkColors():
             if sys.platform == "linux" or sys.platform == "linux2":
                 path = os.path.dirname(os.getcwd()) + "/eceld-wireshark/wireshark-3.2.0/profiles/DVS/"
             else:
-                path = "C:\\Program Files\\Wireshark\\profiles\\DVS\\"
+                path = os.path.dirname(os.getcwd()) +'Program Files\\Wireshark\\profiles\\DVS\\'
             os.mkdir(path)
         except:
-            print("Error creating directory: already exists")
+            pass
 
         path = path + "colorfilters"
 
@@ -96,7 +96,7 @@ def clearFilters():
             ws_path = os.path.dirname(os.getcwd()) + "/eceld-wireshark/wireshark-3.2.0/profiles/DVS/colorfilters"
 
         else:
-            ws_path = "C:\\Program Files\\Wireshark\\profiles\\DVS\\colorfilters"
+            ws_path = "C:\Program Files\Wireshark\profiles\DVS\colorfilters"
 
         f = open(ws_path, 'w').close()
         fi = open(dvs_path, 'w').close()
