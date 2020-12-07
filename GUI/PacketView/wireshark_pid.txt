@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 root        9101  0.7  5.2 1800712 211860 pts/0  Sl+  23:06   0:01 /usr/local/bin/wireshark -r /home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/a/PCAP/AnnotatedPCAP.pcapng -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/a/GeneratedDissectors/TimedScreenshots.lua -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/a/GeneratedDissectors/SystemCalls.lua -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/a/GeneratedDissectors/MouseClicks.lua -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/a/GeneratedDissectors/Keypresses.lua
 root        9195  0.0  0.0   2392   760 pts/0    S+   23:10   0:00 sh -c ps aux | grep wireshark > /home/kali/DVS_bsalvarez/DVS/DVS/GUI/PacketView/wireshark_pid.txt
 root        9197  0.0  0.0   6216   892 pts/0    S+   23:10   0:00 grep wireshark
+=======
+root        7286  2.5  5.2 1800728 212344 pts/0  Sl+  17:53   0:01 /usr/local/bin/wireshark -r /home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/e/PCAP/AnnotatedPCAP.pcapng -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/e/GeneratedDissectors/TimedScreenshots.lua -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/e/GeneratedDissectors/SystemCalls.lua -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/e/GeneratedDissectors/MouseClicks.lua -Xlua_script:/home/kali/DVS_bsalvarez/DVS/DVS/ProjectData/e/GeneratedDissectors/Keypresses.lua
+root        7321  0.0  0.0   2392   760 pts/0    S+   17:54   0:00 sh -c ps aux | grep wireshark > /home/kali/DVS_bsalvarez/DVS/DVS/GUI/PacketView/wireshark_pid.txt
+root        7323  0.0  0.0   6216   956 pts/0    S+   17:54   0:00 grep wireshark
+>>>>>>> a6ec50768e839a2a410c9fdea3c00da648ef51e7

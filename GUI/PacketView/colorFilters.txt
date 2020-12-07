@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @New coloring rule@systemcalls and keypresses@[21356, 21356, 0][0,0,0]
 @New coloring rule@systemcalls and keypresses@[0, 21356, 64070][0,0,0]
 @New coloring rule@systemcalls and keypresses@[21356, 42713, 64070][0,0,0]
@@ -8,6 +9,8 @@
 @New coloring rule@systemcalls and keypresses@[64070, 21356, 64070][0,0,0]
 @New coloring rule@systemcalls and keypresses@[0, 42713, 64070][0,0,0]
 @New coloring rule@systemcalls and keypresses@[64070, 42713, 31909][0,0,0]
+=======
+>>>>>>> a6ec50768e839a2a410c9fdea3c00da648ef51e7
 @New coloring rule@systemcalls and keypresses@[42713, 21356, 64070][0,0,0]
 @New coloring rule@systemcalls and keypresses@[0, 21356, 64070][0,0,0]
 @New coloring rule@systemcalls and keypresses@[64070, 42713, 31909][0,0,0]
@@ -59,6 +62,7 @@
 @MouseClicks Log@mouseclicks@[42713, 21356, 31909][0,0,0]
 @TimedScreenshots Log@timedscreenshots@[21356, 21356, 31909][0,0,0]
 @MouseClicks Log@mouseclicks@[42713, 21356, 31909][0,0,0]
+<<<<<<< HEAD
 @MouseClicks Log@mouseclicks@[21356, 42713, 31909][0,0,0]
 @MouseClicks Log@mouseclicks@[21356, 64070, 31909][0,0,0]
 @MouseClicks Log@mouseclicks@[21356, 64070, 31909][0,0,0]
@@ -75,3 +79,5 @@
 @Keypress Log@keypresses@[21356, 64070, 31909][0,0,0]
 @MouseClicks Log@mouseclicks@[21356, 21356, 64070][0,0,0]
 @TimedScreenshots Log@timedscreenshots@[21356, 21356, 31909][0,0,0]
+=======
+>>>>>>> a6ec50768e839a2a410c9fdea3c00da648ef51e7
