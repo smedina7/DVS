@@ -24,8 +24,9 @@ from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Dialogs.ExportDialog import ExportDialog
 from GUI.Dialogs.EditTextDialog import EditTextDialog
 from GUI.Dialogs.DateTimePicker import DateTimePicker
+from datetime import datetime, timedelta
 import time
-import datetime
+
 
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
@@ -35,6 +36,10 @@ class MainGUI(QMainWindow):
     new_import = QtCore.pyqtSignal(bool)
     #Signal for when the user wants to open previous project
     open_prev = QtCore.pyqtSignal(bool)
+    #sync margin from settings
+    margin_selct = 0 #default
+    #sync enabled from settings
+    enabled_syncM = False
 
     def __init__(self, json_files, clicks, timed, throughput, manager_inst, parent = None):
         logging.debug("MainGUI(): Instantiated")
@@ -172,6 +177,9 @@ class MainGUI(QMainWindow):
         self.timestampTrigger = False
         self.wiresharkTrigger = False
         self.sync_dict = {}
+        if(self.enabled_syncM):
+            self.buttonaction_timestamp(True)
+            self.buttonaction_wireshark(True)
 
     def file_changed(self):
         self.syncWindows(1)
@@ -208,13 +216,25 @@ class MainGUI(QMainWindow):
                 for row in range(child.rowCount()):
                     indexTimeStamp = child.item(row,columncount-1).text()
                     if b == -1:
-                        if self.timestamp == indexTimeStamp:
-                            child.selectRow(row)
-                            Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
+                        if int(self.margin_selct) == 0:
+                            if self.timestamp == indexTimeStamp:
+                                child.selectRow(row)
+                                Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
                             child.selectRow(row)
+                        if (int(self.margin_selct) == 1 and self.timestamp != ""):
+                            temp = datetime.strptime(self.timestamp,'%Y-%m-%dT%H:%M:%S')
+                            ts_t1 = temp + timedelta(seconds=1)
+                            ts_1 = datetime.strftime(ts_t1, '%Y-%m-%dT%H:%M:%S')
+                            if ts_1 == indexTimeStamp:
+                                child.selectRow(row)
+
+                            ts_t2 = temp + timedelta(seconds=-1)
+                            ts_2 = datetime.strftime(ts_t2, '%Y-%m-%dT%H:%M:%S')
+                            if ts_2 == indexTimeStamp:
+                                child.selectRow(row)
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
@@ -567,7 +587,7 @@ class MainGUI(QMainWindow):
                 self.subM.show()
                 self.project_dict[self.project_name]["MouseClicksData"] = self.subM
 
-                if self.subSC.windowStateChanged:
+                if self.subM.windowStateChanged:
                     self.window_changed("MC")
 
         elif self.mouse.isChecked()==False:
@@ -611,7 +631,7 @@ class MainGUI(QMainWindow):
                 self.subT.show()
                 self.project_dict[self.project_name]["TimedData"] = self.subT
                 
-                if self.subSC.windowStateChanged:
+                if self.subT.windowStateChanged:
                     self.window_changed("Ti")
 
         elif self.timed.isChecked()==False:
