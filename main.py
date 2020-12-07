@@ -15,6 +15,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.uic import loadUi
 from PyQt5 import QtCore
 
+#TAGS
+from GUI.Widgets.textdataline import reloadDataline
+
 class DVSstartUpPage(QMainWindow):
 
     def __init__(self):
@@ -125,7 +128,8 @@ class DVSstartUpPage(QMainWindow):
 
         if len(folder_chosen) > 0:
             self.project_folder = folder_chosen
-            commentsParser(folder_chosen)
+            commentsParser(folder_chosen) 
+            reloadDataline.addTagColumn(folder_chosen)
             self.openHomeWindow()
             self.hide()
 
