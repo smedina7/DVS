@@ -77,7 +77,3 @@ class save:
         
         with open(jsonpath, 'w') as jsonfile:
             jsonfile.write(json_object)
-
-
-
-

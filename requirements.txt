@@ -1,9 +1,10 @@
+wheel
 PyQt5==5.15.1
 pandas
 plotly
 Flask
 cachetools
-dash==1.8.3
+dash
 PyQtWebEngine
 flask_caching
 dash_daq

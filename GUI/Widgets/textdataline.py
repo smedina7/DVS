@@ -157,7 +157,10 @@ class reloadDataline:
             
             else:
                 #fix windows paths
-                jsonpath = path + "\\ParsedLogs\\pcomments.json"
+                temp = path + datalinepath
+                temp2 = PureWindowsPath (temp)
+                # cmd = str (temp2)
+                jsonpath = temp2
 
             
             with open(jsonpath, 'w') as jsonfile:

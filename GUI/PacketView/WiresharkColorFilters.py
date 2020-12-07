@@ -1,7 +1,6 @@
 import os
 import sys
 
-
 class WiresharkColors():
     def __init__(self, dataline, color):
         rgb_val = str(color)
@@ -60,15 +59,15 @@ class WiresharkColors():
         _file.close()
 
     def createWiresharkProfile(self, newRule):
-
         try:
             if sys.platform == "linux" or sys.platform == "linux2":
-                path = "/home/kali/eceld-wireshark/wireshark-3.2.0/profiles/DVS/"
+                # path = os.path.dirname(os.getcwd()) + "/eceld-wireshark/wireshark-3.2.0/profiles/DVS/"
+                 path = "/home/kali/eceld-wireshark/wireshark-3.2.0/profiles/DVS/"
             else:
-                path = "C:\\Program Files\\Wireshark\\profiles\\DVS\\"
+                path = os.path.dirname(os.getcwd()) +'Program Files\\Wireshark\\profiles\\DVS\\'
             os.mkdir(path)
         except:
-            print("Error creating directory: already exists")
+            pass
 
         path = path + "colorfilters"
 
@@ -88,7 +87,6 @@ class WiresharkColors():
 
         _file.close()
 
-
 def clearFilters():
     dvs_path = os.path.abspath("GUI/PacketView/colorFilters.txt")
     try:
@@ -96,7 +94,7 @@ def clearFilters():
             ws_path = os.path.dirname(os.getcwd()) + "/eceld-wireshark/wireshark-3.2.0/profiles/DVS/colorfilters"
 
         else:
-            ws_path = "C:\\Program Files\\Wireshark\\profiles\\DVS\\colorfilters"
+            ws_path = "C:\Program Files\Wireshark\profiles\DVS\colorfilters"
 
         f = open(ws_path, 'w').close()
         fi = open(dvs_path, 'w').close()
