@@ -57,7 +57,6 @@ class sync_helper:
             if t == ts_2:
                 return packet_num
 
-
     def write_to_wireshark(packet_num):
         path = os.getcwd()+'/update_wireshark.txt'
         f = open(path,'w+')
@@ -80,7 +79,3 @@ class sync_helper:
         temp = int(packet_num)
         timestamp = dictionary.get(temp)
         return timestamp
-
-
-
-        

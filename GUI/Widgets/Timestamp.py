@@ -12,7 +12,6 @@ class Timestamp:
         _file = open(path, 'w')
         _file.write(ts)
         _file.close()
-        #return ts
 
     def get_current_timestamp():
         path = os.getcwd()+'/GUI/Dash/timestamp.txt'

@@ -6,6 +6,9 @@ from GUI.Widgets.HomeWindow import MainGUI
 from GUI.PacketView.Manager import PacketManager
 from GUI.Dialogs.NewProjectDialog import NewProjectDialog
 from GUI.Dialogs.Settings import SettingsDialog
+from GUI.Threading.BatchThread import BatchThread
+from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
+from GUI.Widgets.commentsParser import commentsParser
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
@@ -13,6 +16,7 @@ from PyQt5.uic import loadUi
 from PyQt5 import QtCore
 
 class DVSstartUpPage(QMainWindow):
+
     def __init__(self):
         super(DVSstartUpPage, self).__init__()
         loadUi('GUI/src/DVSstartUpPage.ui', self)
@@ -36,6 +40,9 @@ class DVSstartUpPage(QMainWindow):
         QApplication.setPalette(palette)
 
         self.enabled_sync = False
+        self.startedOnce = False
+        self.clicks = ''
+        self.sync_margin = 0
         self.project_folder = ''
         self.setFixedSize(620,565)
         self.setGeometry(500, 300, 500, 100)
@@ -53,19 +60,39 @@ class DVSstartUpPage(QMainWindow):
         self.new_project_popup.show()
 
     def openHomeWindow(self):
+        self.startedOnce = True
         self.manager = PacketManager(self.project_folder)
         json_files = self.manager.getJSON()
-        clicks = self.manager.getClicks()
+        self.clicks = self.manager.getClicks()
         timed = self.manager.getTimed()
         throughput = self.manager.getThroughput()
-        self.window = MainGUI(json_files, clicks, timed, throughput, self.manager)
+        self.window = MainGUI(json_files, self.clicks, timed, throughput, self.manager)
         self.window.setGeometry(500, 300, 500, 100)
         self.window.show()
+        self.window.new_import.connect(self.new_import_selected)
+        self.window.open_prev.connect(self.open_prev_selected)
 
     #Slot for when the user created the new project, path and configname
     @QtCore.pyqtSlot(str)
     def project_created(self, project_dir):
         self.project_folder = project_dir
+        if self.startedOnce == True:
+                #make sure you're in the correct dir to close dash and ws
+                p_path = os.path.dirname(self.clicks)
+                g_dir = os.path.dirname(p_path)
+                g_dir = os.path.dirname(g_dir)
+                os.chdir(g_dir)
+                #close wireshark since you'll be opening a new project
+                try:
+                    self.manager.stopWireshark()
+                except:
+                    print("ERROR: Could not close wireshark")
+
+                #close dash
+                try:
+                    self.manager.stopWebEngine()
+                except:
+                    print("closed")
         self.openHomeWindow()
         self.hide()
 
@@ -73,7 +100,22 @@ class DVSstartUpPage(QMainWindow):
     def sync_enabled(self, enabled):
         self.enabled_sync = enabled
         print("IN MAIN: Is Sync Enabled? - " + str(self.enabled_sync))
-        
+
+    @QtCore.pyqtSlot(int)
+    def margin_selected(self, margin):
+        self.sync_margin = margin
+        print("IN MAIN: Sync Margin Selected - " + str(self.sync_margin))
+
+    @QtCore.pyqtSlot(bool)
+    def new_import_selected(self, create):
+        if create == True:
+            self.createNewProject()
+
+    @QtCore.pyqtSlot(bool)
+    def open_prev_selected(self, openP):
+        if openP == True:
+            self.openDir()
+
     def openDir(self):
         folder_chosen = str(QFileDialog.getExistingDirectory(self, "Select Directory to Open Project"))
 
@@ -83,13 +125,20 @@ class DVSstartUpPage(QMainWindow):
 
         if len(folder_chosen) > 0:
             self.project_folder = folder_chosen
+            commentsParser(folder_chosen)
             self.openHomeWindow()
             self.hide()
 
     def openSettings(self):
-        self.settings_popup = SettingsDialog(self.enabled_sync)
+        self.settings_popup = SettingsDialog(self.enabled_sync, self.sync_margin)
         self.settings_popup.sync_enabled.connect(self.sync_enabled)
-        self.settings_popup.show()    
+        self.settings_popup.sync_config.connect(self.margin_selected)
+        self.settings_popup.show() 
+
+    def update_progress_bar(self):
+        logging.debug('update_progress_bar(): Instantiated')
+        self.progress_dialog_overall.update_progress()
+        logging.debug('update_progress_bar(): Complete')  
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Close Window', 'Are you sure you want to quit?', 
