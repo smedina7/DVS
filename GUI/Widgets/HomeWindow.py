@@ -103,12 +103,6 @@ class MainGUI(QMainWindow):
         self.tb.addWidget(self.refresh)
         self.refresh.clicked.connect (self.trigger_refresh)
 
-        #Test edit text
-        self.edit = QPushButton (self.tb)
-        self.edit.setText("Edit Text")
-        self.tb.addWidget(self.edit)
-        self.edit.clicked.connect (self.trigger_edit)
-
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
