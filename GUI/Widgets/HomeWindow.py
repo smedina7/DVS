@@ -22,6 +22,8 @@ from GUI.PacketView.WiresharkColorFilters import WiresharkColors, clearFilters
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Dialogs.ExportDialog import ExportDialog
+from GUI.Dialogs.EditTextDialog import EditTextDialog
+from GUI.Dialogs.DateTimePicker import DateTimePicker
 import time
 import datetime
 
@@ -100,6 +102,12 @@ class MainGUI(QMainWindow):
         self.refresh.setText("Refresh Comments Dataline")
         self.tb.addWidget(self.refresh)
         self.refresh.clicked.connect (self.trigger_refresh)
+
+        #Test edit text
+        self.edit = QPushButton (self.tb)
+        self.edit.setText("Edit Text")
+        self.tb.addWidget(self.edit)
+        self.edit.clicked.connect (self.trigger_edit)
 
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
@@ -269,6 +277,33 @@ class MainGUI(QMainWindow):
             Timestamp.update_timestamp(self.timestamp) #writes to timestamp.txt (updates timestamp)
             self.syncWindows(-1)
 
+    def table_clicked(self, cell_obj):
+        sender = self.sender()
+        name = sender.objectName()
+        table = self.findChild(QTableWidget, name)
+        current_timestamp = table.item(cell_obj.row(), cell_obj.column()).text()
+        columnname = "content"
+        headercount = table.columnCount()
+        row = table.currentItem().row()
+
+        if cell_obj.column() == table.columnCount()-1:
+            datepicker = DateTimePicker()
+            timestamp = datepicker.get_timestamp()
+            if not len(timestamp) == 1:
+                table.setItem(cell_obj.row(), cell_obj.column(), QTableWidgetItem(timestamp))
+            else:
+                table.setItem(cell_obj.row(), cell_obj.column(), QTableWidgetItem(current_timestamp))
+            table.item(cell_obj.row(), cell_obj.column()).setFlags(QtCore.Qt.ItemIsEnabled)
+
+        else:
+            for x in range(0,headercount,1):
+                headertext = table.horizontalHeaderItem(x).text()
+                if columnname == headertext:
+                    cell_text = table.item(row, x).text()   # get cell at row, col
+                    self.trigger_edit(cell_text, table, row, x)
+                else:
+                    pass
+
     def selectRows(self, selection: list):
         for i in selection: 
             self.tableWidget.selectRow(i)
@@ -337,7 +372,8 @@ class MainGUI(QMainWindow):
                 self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidget.setObjectName("Keypresses")
                 self.tableWidget.cellClicked.connect(self.getCoords)
-                
+                self.tableWidget.doubleClicked.connect(self.table_clicked)
+
                 self.subK.setWidget(self.tableWidget)
                 self.mdi.addSubWindow(self.subK)
 
@@ -382,6 +418,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSys.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSys.setObjectName("Systemcalls")
                 self.tableWidgetSys.cellClicked.connect(self.getCoords)
+                self.tableWidgetSys.doubleClicked.connect(self.table_clicked)
 
                 self.subSC.setWidget(self.tableWidgetSys)
                 self.mdi.addSubWindow(self.subSC)
@@ -426,6 +463,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSur.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSur.setObjectName("Suricata Alerts")
                 self.tableWidgetSur.cellClicked.connect(self.getCoords)
+                self.tableWidgetSur.doubleClicked.connect(self.table_clicked)
 
                 self.subS.setWidget(self.tableWidgetSur)
                 self.mdi.addSubWindow(self.subS)
@@ -439,22 +477,31 @@ class MainGUI(QMainWindow):
             self.checkHidden(self.subS, self.tableWidgetSur)
 
     def trigger_refresh(self):
-        #TRIGGER PACKET COMMENTS PARSER
-        if sys.platform == "linux" or sys.platform == "linux2":
-            Projectpath = self.ProjectFolder[0]
-        
-        else:
-            temp = self.ProjectFolder[0].rsplit('\\',1)
-            Projectpath = temp[0]
+        try:
+            # TRIGGER PACKET COMMENTS PARSER
+            if sys.platform == "linux" or sys.platform == "linux2":
+                Projectpath = self.ProjectFolder[0]
 
-        commentsParser(Projectpath)
+            else:
+                temp = self.ProjectFolder[0].rsplit('\\', 1)
+                Projectpath = temp[0]
 
-        packetscomments_jsonpath = self.packetsComments_json
-        label = "packetcomments"
-        count_row = 0
-        instance = self.tableWidgetPackets ##creating instance of table
+            commentsParser(Projectpath)
 
-        reloadDataline.reloadDataline(instance, packetscomments_jsonpath, label)
+            packetscomments_jsonpath = self.packetsComments_json
+            label = "packetcomments"
+            count_row = 0
+            instance = self.tableWidgetPackets  ##creating instance of table
+
+            reloadDataline.reloadDataline(instance, packetscomments_jsonpath, label)
+        except:
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Critical)
+            msgBox.setText("Error")
+            msgBox.setWindowTitle("Error")
+            msgBox.setInformativeText("Please open the comments dataline first!")
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.exec_()
 
     def watch_PCAP(self):
         self.file_watcher = QFileSystemWatcher()
@@ -486,6 +533,7 @@ class MainGUI(QMainWindow):
         self.tableWidgetPackets.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidgetPackets.setObjectName("Packets Comments")
         self.tableWidgetPackets.cellClicked.connect(self.getCoords)
+        self.tableWidgetPackets.doubleClicked.connect(self.table_clicked)
       
         self.watch_PCAP() #WATCH PCAP CHANGE
 
@@ -667,9 +715,10 @@ class MainGUI(QMainWindow):
 
     def addRow(self):
         active = self.mdi.activeSubWindow()
-        current = time.time()
-        col_timestamp = datetime.datetime.fromtimestamp(current).strftime('%Y-%m-%dT%H:%M:%S')
+        datepicker = DateTimePicker()
+        col_timestamp = datepicker.get_timestamp()
         cellinfo = QTableWidgetItem(col_timestamp)
+        cellinfo.setFlags(QtCore.Qt.ItemIsEnabled)
 
         if active == self.subK:
             self.tableWidget.insertRow(self.tableWidget.currentRow())
@@ -822,6 +871,18 @@ class MainGUI(QMainWindow):
                 self.throughput.setChecked(False)
             else:
                 self.throughput.setChecked(True)
+
+    def trigger_edit(self, text_to_edit, table, row, x):
+        self.tableEdit = table
+        self.rowEdit = row
+        self.xEdit = x
+        self.edit_text = EditTextDialog(text_to_edit)
+        self.edit_text.edited.connect(self.edit_done)
+        self.edit_text.show()
+
+    @QtCore.pyqtSlot(str)
+    def edit_done(self, edited_text):
+        self.tableEdit.setItem(self.rowEdit, self.xEdit, QTableWidgetItem(edited_text))
 
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
