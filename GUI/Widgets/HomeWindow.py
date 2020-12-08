@@ -519,13 +519,12 @@ class MainGUI(QMainWindow):
 
         except:
             pass
-
+               
     def trigger_refresh(self):
         try:
             # TRIGGER PACKET COMMENTS PARSER
             if sys.platform == "linux" or sys.platform == "linux2":
                 Projectpath = self.ProjectFolder[0]
-
             else:
                 temp = self.ProjectFolder[0].rsplit('\\', 1)
                 Projectpath = temp[0]
