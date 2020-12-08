@@ -52,7 +52,7 @@ class TextDataline(QTableWidget):
                     it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "auditd_id":
-                    tableid = int(ser[ind])
+                    tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
                     it.setFlags(QtCore.Qt.ItemIsEnabled)
 
@@ -130,6 +130,8 @@ class reloadDataline:
                             dct["Tag"] = " "
 
                     else:
+                        if(colInd == 0):
+                            value = int (row[j])
                         if(colInd == 3):
                             dct["Tag"] = " "
 
