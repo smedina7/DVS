@@ -615,7 +615,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetMou.setObjectName("Mouseclicks")
                 self.tableWidgetMou.cellClicked.connect(self.getCoords)
-                self.tableWidgetPackets.doubleClicked.connect(self.table_clicked)
+                self.tableWidgetMou.doubleClicked.connect(self.table_clicked)
 
                 self.subM.setWidget(self.tableWidgetMou)
                 self.mdi.addSubWindow(self.subM)
@@ -660,7 +660,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetTime.setObjectName("TimedScreenshots")
                 self.tableWidgetTime.cellClicked.connect(self.getCoords)
-                self.tableWidgetPackets.doubleClicked.connect(self.table_clicked)
+                self.tableWidgetTime.doubleClicked.connect(self.table_clicked)
 
                 self.subT.setWidget(self.tableWidgetTime)
                 self.mdi.addSubWindow(self.subT)
