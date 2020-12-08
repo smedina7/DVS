@@ -44,6 +44,9 @@ class save:
             for j in keys:
                 # print(self.item(row, col).text())
                 value = self.item(row, col).text()
+                if(j == "auditd_id" or j == "keypresses_id" or j == "clicks_id" or j == "timed_id"):
+                    value = int (self.item(row, col).text())
+
                 if(label == "mouseclicks" or label == "timed"):
                     if(j == "content"):
                         try:
@@ -68,7 +71,10 @@ class save:
         
         else:
             #fix windows paths
-            jsonpath = path + "\\ParsedLogs\\pcomments.json"
+            temp = path + datalinepath
+            temp2 = PureWindowsPath (temp)
+            
+            jsonpath = temp2
         
         with open(jsonpath, 'w') as jsonfile:
             jsonfile.write(json_object)

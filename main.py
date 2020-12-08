@@ -126,8 +126,11 @@ class DVSstartUpPage(QMainWindow):
 
         if len(folder_chosen) > 0:
             self.project_folder = folder_chosen
-            commentsParser(folder_chosen)
-            reloadDataline.addTagColumn(folder_chosen)
+            try:
+                commentsParser(folder_chosen)
+                reloadDataline.addTagColumn(folder_chosen)
+            except:
+                print("Path not found")
             self.openHomeWindow()
             self.hide()
 
