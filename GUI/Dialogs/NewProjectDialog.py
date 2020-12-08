@@ -210,6 +210,8 @@ class NewProjectDialog(QtWidgets.QWidget):
 
         except:
             print('Folder path not found')
+            
+        self.close()
         logging.debug("unzip_complete(): Complete") 
 
     def update_progress_bar(self):
