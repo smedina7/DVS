@@ -20,15 +20,14 @@ class PackageManager():
         #copy .zip file to corresponding directory first
         path_to_selected = os.path.dirname(os.path.realpath(self.file_path))
         os.chdir(path_to_selected)
-        self.copy_files(self.zip_file, self.main_path)
         
+        self.copy_files(self.zip_file, self.main_path)
+       
         os.chdir(self.main_path)
         new_file_path = os.path.join(self.main_path, self.file_name)
-
-        os.mkdir(new_file_path)
         
         with zipfile.ZipFile(self.zip_file, 'r') as zip_ref:
-            zip_ref.extractall(new_file_path)
+            zip_ref.extractall(self.main_path)
 
         #for next steps of import.. 
         self.new_extracted_dir = os.path.dirname(self.file_name)

@@ -9,6 +9,7 @@ from GUI.Dialogs.Settings import SettingsDialog
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Widgets.commentsParser import commentsParser
+from GUI.Widgets.textdataline import reloadDataline
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
@@ -99,12 +100,12 @@ class DVSstartUpPage(QMainWindow):
     @QtCore.pyqtSlot(bool)
     def sync_enabled(self, enabled):
         self.enabled_sync = enabled
-        MainGUI.enabled_syncM = True
+        print("IN MAIN: Is Sync Enabled? - " + str(self.enabled_sync))
 
     @QtCore.pyqtSlot(int)
     def margin_selected(self, margin):
         self.sync_margin = margin
-        MainGUI.margin_selct = self.sync_margin
+        print("IN MAIN: Sync Margin Selected - " + str(self.sync_margin))
 
     @QtCore.pyqtSlot(bool)
     def new_import_selected(self, create):
@@ -126,6 +127,7 @@ class DVSstartUpPage(QMainWindow):
         if len(folder_chosen) > 0:
             self.project_folder = folder_chosen
             commentsParser(folder_chosen)
+            reloadDataline.addTagColumn(folder_chosen)
             self.openHomeWindow()
             self.hide()
 

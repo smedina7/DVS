@@ -40,6 +40,7 @@ class SettingsDialog(QtWidgets.QWidget):
         self.comboBox = QComboBox()
         self.comboBox.addItem("0")
         self.comboBox.addItem("1")
+        self.comboBox.addItem("2")
 
         self.comboBox.setCurrentText(str(s_margin))
 
