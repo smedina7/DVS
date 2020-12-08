@@ -47,7 +47,7 @@ done
 
 ### Install dependencies
 REQUIRED_PROGRAMS="python3-pip python3-venv git"
-REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 dash dash-bootstrap-components==0.10.7rc1 plotly Flask pandas flask_caching PyQtWebEngine virtualenv dash_daq"
+REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 dash dash-bootstrap-components==0.10.7rc1 plotly Flask pandas flask_caching PyQtWebEngine virtualenv dash_daq tkcalendar"
 
 echo "+++++++++++++++++++++++++++++++++"
 echo "installing REQUIRED_PROGRAMS"

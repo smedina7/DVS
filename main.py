@@ -100,12 +100,12 @@ class DVSstartUpPage(QMainWindow):
     @QtCore.pyqtSlot(bool)
     def sync_enabled(self, enabled):
         self.enabled_sync = enabled
-        print("IN MAIN: Is Sync Enabled? - " + str(self.enabled_sync))
+        MainGUI.enabled_syncM = True
 
     @QtCore.pyqtSlot(int)
     def margin_selected(self, margin):
         self.sync_margin = margin
-        print("IN MAIN: Sync Margin Selected - " + str(self.sync_margin))
+        MainGUI.margin_selct = self.sync_margin
 
     @QtCore.pyqtSlot(bool)
     def new_import_selected(self, create):

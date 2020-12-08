@@ -25,19 +25,27 @@ from GUI.Dialogs.ExportDialog import ExportDialog
 from GUI.Dialogs.EditTextDialog import EditTextDialog
 from GUI.Dialogs.DateTimePicker import DateTimePicker
 from GUI.Dialogs.AddTag import AddTagDialog
+from datetime import datetime, timedelta
 import time
-import datetime
 
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
 #SAVE
 from GUI.Widgets.save import save
+#sync margin from settings
+margin_selct = 0 #default
+#sync enabled from settings
+enabled_syncM = False
 
 class MainGUI(QMainWindow):
     #Signal for when the user wants to create a new project
     new_import = QtCore.pyqtSignal(bool)
     #Signal for when the user wants to open previous project
     open_prev = QtCore.pyqtSignal(bool)
+    #sync margin from settings
+    margin_selct = 0 #default
+    #sync enabled from settings
+    enabled_syncM = False
 
     def __init__(self, json_files, clicks, timed, throughput, manager_inst, parent = None):
         logging.debug("MainGUI(): Instantiated")
@@ -185,6 +193,9 @@ class MainGUI(QMainWindow):
         self.timestampTrigger = False
         self.wiresharkTrigger = False
         self.sync_dict = {}
+        if(self.enabled_syncM):
+            self.buttonaction_timestamp(True)
+            self.buttonaction_wireshark(True)
 
     def file_changed(self):
         self.syncWindows(1)
@@ -226,12 +237,30 @@ class MainGUI(QMainWindow):
                         if self.timestamp == indexTimeStamp:
                             for col in range (child.columnCount()):
                                 child.item(row, col).setBackground(QtGui.QColor(125,125,125))
+                                child.selectRow(row)
                             Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
                     else:
+                            
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
                             for col in range (child.columnCount()):
                                 child.item(row, col).setBackground(QtGui.QColor(125,125,125))
+                                child.selectRow(row)
+                        if (int(self.margin_selct) == 1 and self.timestamp != ""):
+                            temp = datetime.strptime(self.timestamp,'%Y-%m-%dT%H:%M:%S')
+                            ts_t1 = temp + timedelta(seconds=1)
+                            ts_1 = datetime.strftime(ts_t1, '%Y-%m-%dT%H:%M:%S')
+                            if ts_1 == indexTimeStamp:
+                                for col in range (child.columnCount()):
+                                    child.item(row, col).setBackground(QtGui.QColor(125,125,125))
+                                    child.selectRow(row)
+
+                            ts_t2 = temp + timedelta(seconds=-1)
+                            ts_2 = datetime.strftime(ts_t2, '%Y-%m-%dT%H:%M:%S')
+                            if ts_2 == indexTimeStamp:
+                                for col in range (child.columnCount()):
+                                    child.item(row, col).setBackground(QtGui.QColor(125,125,125))
+                                    child.selectRow(row)
 
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
