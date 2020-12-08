@@ -97,7 +97,7 @@ class DVSstartUpPage(QMainWindow):
         self.openHomeWindow()
         self.hide()
 
-        @QtCore.pyqtSlot(bool)
+    @QtCore.pyqtSlot(bool)
     def sync_enabled(self, enabled):
         self.enabled_sync = enabled
         MainGUI.enabled_syncM = True
