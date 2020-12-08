@@ -11,7 +11,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWebEngineWidgets import *
-from GUI.Widgets.AbstractTable import pandasModel
+# from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.textdataline import TextDataline, reloadDataline
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
@@ -582,7 +582,7 @@ class MainGUI(QMainWindow):
         self.tableWidgetPackets.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tableWidgetPackets.setObjectName("Packets Comments")
         self.tableWidgetPackets.cellClicked.connect(self.getCoords)
-        self.tableWidgetPackets.doubleClicked.connect(self.table_clicked)
+        # self.tableWidgetPackets.doubleClicked.connect(self.table_clicked)
       
         self.watch_PCAP() #WATCH PCAP CHANGE
 
@@ -615,6 +615,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetMou.setObjectName("Mouseclicks")
                 self.tableWidgetMou.cellClicked.connect(self.getCoords)
+                self.tableWidgetPackets.doubleClicked.connect(self.table_clicked)
 
                 self.subM.setWidget(self.tableWidgetMou)
                 self.mdi.addSubWindow(self.subM)
@@ -659,6 +660,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetTime.setObjectName("TimedScreenshots")
                 self.tableWidgetTime.cellClicked.connect(self.getCoords)
+                self.tableWidgetPackets.doubleClicked.connect(self.table_clicked)
 
                 self.subT.setWidget(self.tableWidgetTime)
                 self.mdi.addSubWindow(self.subT)
