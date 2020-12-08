@@ -11,6 +11,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWebEngineWidgets import *
+from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.textdataline import TextDataline, reloadDataline
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
@@ -29,7 +30,6 @@ import datetime
 
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
-
 #SAVE
 from GUI.Widgets.save import save
 
@@ -67,7 +67,6 @@ class MainGUI(QMainWindow):
         self.subSC = QMdiSubWindow()
         self.subT = QMdiSubWindow()
         self.subM = QMdiSubWindow()
-
 
         self.project_dict = {}
         self.project_dict[self.project_name] = {"KeypressData": {}, "SystemCallsData": {}, "MouseClicksData": {}, "TimedData": {}, "ThroughputData": {}, "SuricataData": {}}
@@ -216,9 +215,9 @@ class MainGUI(QMainWindow):
         if self.timestampTrigger:
             children = self.findChildren(QTableWidget)
             for child in children:
-                # child.setSelectionMode(QAbstractItemView.MultiSelection)
+                child.setSelectionMode(QAbstractItemView.MultiSelection)
                 columncount = child.columnCount()
-                # child.clearSelection()
+                child.clearSelection()
                 for row in range(child.rowCount()):
                     for col in range (child.columnCount()):
                         child.item(row, col).setBackground(QtGui.QColor(255, 255, 255, 0))
@@ -227,27 +226,26 @@ class MainGUI(QMainWindow):
                     indexTimeStamp = child.item(row,columncount-1).text()
                     if b == -1:
                         if self.timestamp == indexTimeStamp:
-                            # child.selectRow(row)
+                            child.selectRow(row)
                             for col in range (child.columnCount()):
                                 child.item(row, col).setBackground(QtGui.QColor(125,125,125))
                             Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
-                            # child.selectRow(row)
+                            child.selectRow(row)
                             for col in range (child.columnCount()):
                                 child.item(row, col).setBackground(QtGui.QColor(125,125,125))
 
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
-                # child.setSelectionMode(QAbstractItemView.SingleSelection)
-                # child.clearSelection()
+                child.setSelectionMode(QAbstractItemView.SingleSelection)
+                child.clearSelection()
                 for row in range(child.rowCount()):
                     for col in range (child.columnCount()):
                         child.item(row, col).setBackground(QtGui.QColor(255, 255, 255, 0))
-                
-
+        
         if self.wiresharkTrigger == True:
             dictionary = self.sync_dict  
             timestamp = Timestamp.get_current_timestamp()
@@ -384,7 +382,6 @@ class MainGUI(QMainWindow):
 
                 self.subK.setWidget(QTextEdit())
                 data = self.key_json
-                print("Keys",data)
 
                 count_row = 0
                 self.tableWidget = QTableWidget (self)
@@ -498,7 +495,7 @@ class MainGUI(QMainWindow):
             #check if window is hidden
             self.checkHidden(self.subS, self.tableWidgetSur)
 
-     ####SAVE
+    ####SAVE
     def saveDataline(self):
 
         active = self.mdi.activeSubWindow()
@@ -528,15 +525,12 @@ class MainGUI(QMainWindow):
 
         except:
             pass
-
-
-
+               
     def trigger_refresh(self):
         try:
             # TRIGGER PACKET COMMENTS PARSER
             if sys.platform == "linux" or sys.platform == "linux2":
                 Projectpath = self.ProjectFolder[0]
-
             else:
                 temp = self.ProjectFolder[0].rsplit('\\', 1)
                 Projectpath = temp[0]
@@ -801,10 +795,6 @@ class MainGUI(QMainWindow):
         self.add_tag.added.connect(self.tag_done)
         self.add_tag.show()
 
-    @QtCore.pyqtSlot(str)
-    def tag_done(self, edited_text):
-        self.tableEdit.setItem(self.rowEdit, self.xEdit, QTableWidgetItem(edited_text))
-
     def addRow(self):
         active = self.mdi.activeSubWindow()
         current = time.time()
@@ -812,7 +802,6 @@ class MainGUI(QMainWindow):
         cellinfo = QTableWidgetItem(col_timestamp)
 
         if active == self.subK:
-            # self.tableWidget.setSortingEnabled(False)
             self.tableWidget.insertRow(self.tableWidget.currentRow())
             columns = self.tableWidget.columnCount()-1
             rows = self.tableWidget.rowCount()-1
@@ -822,10 +811,8 @@ class MainGUI(QMainWindow):
                 else:
                     self.tableWidget.setItem(self.tableWidget.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidget.setItem(self.tableWidget.currentRow()-1, self.tableWidget.columnCount()-1, cellinfo)
-            # self.tableWidget.setSortingEnabled(True)
 
         elif active == self.subSC:
-            # self.tableWidgetSys.setSortingEnabled(False)
             self.tableWidgetSys.insertRow(self.tableWidgetSys.currentRow())
             columns = self.tableWidgetSys.columnCount()-1
             rows = self.tableWidgetSys.rowCount()-1
@@ -840,10 +827,8 @@ class MainGUI(QMainWindow):
                 else:
                     self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, self.tableWidgetSys.columnCount()-1, cellinfo)
-            # self.tableWidgetSys.setSortingEnabled(True)
 
         elif active == self.subM:
-            # self.tableWidgetMou.setSortingEnabled(False)
             self.tableWidgetMou.insertRow(self.tableWidgetMou.currentRow())
             columns = self.tableWidgetMou.columnCount()-1
             rows = self.tableWidgetMou.rowCount()-1
@@ -853,10 +838,8 @@ class MainGUI(QMainWindow):
                 else:
                     self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, self.tableWidgetMou.columnCount()-1, cellinfo)
-            # self.tableWidgetMou.setSortingEnabled(True)
         
         elif active == self.subT:
-            # self.tableWidgetTime.setSortingEnabled(False)
             self.tableWidgetTime.insertRow(self.tableWidgetTime.currentRow())
             columns = self.tableWidgetTime.columnCount()-1
             rows = self.tableWidgetTime.rowCount()-1
@@ -866,13 +849,8 @@ class MainGUI(QMainWindow):
                 else:
                     self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, self.tableWidgetTime.columnCount()-1, cellinfo)
-            # self.tableWidgetTime.setSortingEnabled(True)
-            
-        
+    
         elif active == self.subS:
-            # self.tableWidgetSur.setSortingEnabled(False)
-            # self.tableWidgetSur.insertRow(self.tableWidgetSur.currentRow())
-            # self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, self.tableWidgetSur.columnCount()-1, cellinfo)
             self.tableWidgetSur.insertRow(self.tableWidgetSur.currentRow())
             columns = self.tableWidgetSur.columnCount()-1
             rows = self.tableWidgetSur.rowCount()-1
@@ -882,13 +860,9 @@ class MainGUI(QMainWindow):
                 else:
                     self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, self.tableWidgetSur.columnCount()-1, cellinfo)
-            # self.tableWidgetSur.setSortingEnabled(True)
         
         else: 
             return
-
-
-
     
     def delRow(self):
         active = self.mdi.activeSubWindow()
@@ -917,7 +891,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetSur.removeRow(self.tableWidgetSur.currentRow())
             else:
                 self.delete_pop_up()
- 
+
     def delete_pop_up(self):
         QMessageBox.warning(self,
                                 "Nothing to delete",
@@ -997,6 +971,10 @@ class MainGUI(QMainWindow):
     def edit_done(self, edited_text):
         self.tableEdit.setItem(self.rowEdit, self.xEdit, QTableWidgetItem(edited_text))
 
+    @QtCore.pyqtSlot(str)
+    def tag_done(self, edited_text):
+        self.tableEdit.setItem(self.rowEdit, self.xEdit, QTableWidgetItem(edited_text))
+
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
         self.progress.show()
@@ -1034,7 +1012,6 @@ class MainGUI(QMainWindow):
             elif reply == QMessageBox.No and not type(event) == bool:
                 event.ignore()
 
-                                   
             if(self.web != ''):
                 self.web.close()
                 self.manager_instance.stopWebEngine()

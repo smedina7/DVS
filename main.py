@@ -9,14 +9,12 @@ from GUI.Dialogs.Settings import SettingsDialog
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Widgets.commentsParser import commentsParser
+from GUI.Widgets.textdataline import reloadDataline
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
 from PyQt5.uic import loadUi
 from PyQt5 import QtCore
-
-#TAGS
-from GUI.Widgets.textdataline import reloadDataline
 
 class DVSstartUpPage(QMainWindow):
 
@@ -128,8 +126,11 @@ class DVSstartUpPage(QMainWindow):
 
         if len(folder_chosen) > 0:
             self.project_folder = folder_chosen
-            commentsParser(folder_chosen) 
-            reloadDataline.addTagColumn(folder_chosen)
+            try:
+                commentsParser(folder_chosen)
+                reloadDataline.addTagColumn(folder_chosen)
+            except:
+                print("Path not found")
             self.openHomeWindow()
             self.hide()
 

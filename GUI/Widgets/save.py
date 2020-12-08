@@ -8,7 +8,6 @@ from PyQt5.QtCore import QAbstractTableModel, Qt, QVariant
 from PyQt5.QtWidgets import QTableWidget, QAction, QPushButton, QApplication, QTableView, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QTableWidgetItem
 from pathlib import Path, PureWindowsPath
 
-
 class save:
     def save(self, label, Projectpath):
 
@@ -20,7 +19,6 @@ class save:
             keys = ["keypresses_id", "content", "className","Tag", "start"]
             datalinepath = "/ParsedLogs/Keypresses.JSON"
             
-
         if (labelDataline == "systemcalls"):
             keys = ["auditd_id", "content", "className","Tag","start"]
             datalinepath = "/ParsedLogs/SystemCalls.JSON"
@@ -32,7 +30,6 @@ class save:
         if(label == "timed"):
                 keys = ["timed_id","type", "classname", "content","Tag", "start"]
                 datalinepath = "/ParsedLogs/TimedScreenshots.JSON"
-
 
         nb_row = self.rowCount()
         nb_col = self.columnCount()
@@ -47,6 +44,9 @@ class save:
             for j in keys:
                 # print(self.item(row, col).text())
                 value = self.item(row, col).text()
+                if(j == "auditd_id" or j == "keypresses_id" or j == "clicks_id" or j == "timed_id"):
+                    value = int (self.item(row, col).text())
+
                 if(label == "mouseclicks" or label == "timed"):
                     if(j == "content"):
                         try:
@@ -64,7 +64,6 @@ class save:
             multikeys.append(dct)
             dct = dict()
 
-
         json_object = json.dumps(multikeys, indent=4)
             
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -73,7 +72,6 @@ class save:
         else:
             #fix windows paths
             jsonpath = path + "\\ParsedLogs\\pcomments.json"
-
         
         with open(jsonpath, 'w') as jsonfile:
             jsonfile.write(json_object)

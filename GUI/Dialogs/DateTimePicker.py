@@ -10,16 +10,15 @@ class DateTimePicker:
     timestamp = " "
 
     def __init__(self):
-        yy, mm, dd, hh, min, sec = self.get_current_timestamp()
         self.root = Tk()
-        self.cal = Calendar(self.root, selectmode="day", font="Arial 10", cursor="hand1", year=int(yy), month=int(mm), day=int(dd))
+        self.cal = Calendar(self.root, selectmode="day", font="Arial 10", cursor="hand1", year=2020, month=12, day=7)
         self.lbl = Label(self.root, text="Select time [HH:MM:SS]")
         self.select_btn = Button(self.root, text="Select Timestamp", command=self.grab_date)
-        self.hourstr = tk.StringVar(self.root, hh)
+        self.hourstr = tk.StringVar(self.root, '10')
         self.hour = tk.Spinbox(self.root, from_=0, to=23, wrap=True, textvariable=self.hourstr, width=5)
-        self.minstr = tk.StringVar(self.root, min)
+        self.minstr = tk.StringVar(self.root, '30')
         self.min = tk.Spinbox(self.root, from_=0, to=59, wrap=True, textvariable=self.minstr, width=5)
-        self.secstr = tk.StringVar(self.root, sec)
+        self.secstr = tk.StringVar(self.root, '00')
         self.sec = tk.Spinbox(self.root, from_=0, to=59, wrap=True, textvariable=self.secstr, width=5)
         self.create_widget()
 
@@ -59,16 +58,9 @@ class DateTimePicker:
     def get_timestamp(self):
         return self.timestamp
 
-    def get_current_timestamp(self):
-        dateTimeObj = datetime.now()
-        date, time = str(dateTimeObj).split(" ")
-        yy, mm, dd = str(date).split("-")
-        hh, min, sec = str(time).split(".")[0].split(":")
-        return yy, mm, dd, hh, min, sec
 
 if __name__ == '__main__':
     widget = DateTimePicker()
     timestamp = widget.get_timestamp()
-    widget.get_current_timestamp()
     print("FORMATTED TIMESTAMP")
     print(timestamp)

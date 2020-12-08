@@ -201,20 +201,15 @@ class NewProjectDialog(QtWidgets.QWidget):
         self.progress_dialog_overall.update_progress()
         self.progress_dialog_overall.hide()
         self.created.emit(self.new_project_path)
-        # print(self.new_project_path)
-
         try:
             # #TRIGGER PACKET COMMENTS PARSER
             datalinepath = self.new_project_path 
             commentsParser(datalinepath)
-
             #TAG
             reloadDataline.addTagColumn(datalinepath)
 
         except:
             print('Folder path not found')
-            
-
         logging.debug("unzip_complete(): Complete") 
 
     def update_progress_bar(self):
@@ -290,4 +285,3 @@ class NewProjectDialog(QtWidgets.QWidget):
                 self.create_project_button.setStyleSheet("background-color : grey")
                 self.chooseFolderButton.setEnabled(False)
                 self.chooseFolderButton.setStyleSheet("background-color : grey")
-                

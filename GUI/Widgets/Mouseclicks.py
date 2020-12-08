@@ -7,7 +7,6 @@ from PyQt5.QtGui import QPixmap, QImage, QIcon
 from PyQt5.QtCore import QAbstractTableModel, Qt
 from PyQt5.QtWidgets import QTableWidget, QPushButton, QApplication, QTableView, QWidget, QLabel, QHBoxLayout
  
- 
 class Second(QtWidgets.QMainWindow):
     def __init__(self, clicks_path, parent=None):
         super(Second, self).__init__(parent)
@@ -53,7 +52,6 @@ class First(QTableWidget):
                     path = (df[j][ind])
 
                     try:
-                        
                         last = path.split('/')[-1]
                         pathclicks = os.path.join(self.clicks, last)
                         if QtCore.QFile.exists(pathclicks):

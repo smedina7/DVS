@@ -26,15 +26,11 @@ class PackageManager():
         os.chdir(self.main_path)
         new_file_path = os.path.join(self.main_path, self.file_name)
         
-
-        # os.mkdir(new_file_path)
-        
         with zipfile.ZipFile(self.zip_file, 'r') as zip_ref:
             zip_ref.extractall(self.main_path)
 
         #for next steps of import.. 
         self.new_extracted_dir = os.path.dirname(self.file_name)
-        
         
         #once done, remove the zip file
         #keep only the extracted directory
@@ -42,8 +38,6 @@ class PackageManager():
 
         #change dir back
         og_path = os.path.dirname(self.main_path)
-        
-        
         os.chdir(og_path)
 
     def zip(self, output_path, project_to_compress, project_data_path):

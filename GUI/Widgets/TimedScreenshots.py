@@ -7,7 +7,6 @@ from PyQt5.QtGui import QPixmap, QImage, QIcon
 from PyQt5.QtCore import QAbstractTableModel, Qt
 from PyQt5.QtWidgets import QTableWidget, QPushButton, QApplication, QTableView, QWidget, QLabel, QHBoxLayout
  
- 
 class Second(QtWidgets.QMainWindow):
     def __init__(self, clicks_path, parent=None):
         super(Second, self).__init__(parent)
@@ -38,7 +37,6 @@ class Timed(QTableWidget):
         
         for ind in df.index:
             c = 0
-            # clicks_id = str(ind)
             self.insertRow(self.rowCount())
             
             for j in keys:
@@ -77,7 +75,6 @@ class Timed(QTableWidget):
 
                 self.setItem(ind, c, it)
                 c= c+1
-
        
         self.dialogs = list()
         self.resizeColumnsToContents()

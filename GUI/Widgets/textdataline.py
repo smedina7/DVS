@@ -18,9 +18,6 @@ class TextDataline(QTableWidget):
         
         # reloadDataline.addTagColumn(self,data,label)
         df = pd.read_json (dfdata)
-
-
-
         if(label == "keypresses"):
             keys = ["keypresses_id", "content", "className","Tag", "start"]
             ser = pd.Series(df['keypresses_id']) 
@@ -55,7 +52,7 @@ class TextDataline(QTableWidget):
                     it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "auditd_id":
-                    tableid = int(ser[ind])
+                    tableid = str(ser[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
                     it.setFlags(QtCore.Qt.ItemIsEnabled)
 
@@ -88,7 +85,6 @@ class TextDataline(QTableWidget):
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
                     it.setFlags(QtCore.Qt.ItemIsEnabled)
                     
-
                 self.setItem(ind, c, it)
                 
                 c= c+1
@@ -96,9 +92,7 @@ class TextDataline(QTableWidget):
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
 
-
 class reloadDataline:
-
     def addTagColumn (datajson):
         path = datajson
         datalines = ["keypresses", "systemcalls", "mouseclicks", "timed"]
@@ -122,7 +116,6 @@ class reloadDataline:
                 keys = ["timed_id","type", "classname", "content", "start"]
                 datalinepath = "/ParsedLogs/TimedScreenshots.JSON"
 
-                
             dfdata = path + datalinepath
 
             dct = dict()
@@ -137,6 +130,8 @@ class reloadDataline:
                             dct["Tag"] = " "
 
                     else:
+                        if(colInd == 0):
+                            value = int (row[j])
                         if(colInd == 3):
                             dct["Tag"] = " "
 
@@ -162,7 +157,6 @@ class reloadDataline:
             
             with open(jsonpath, 'w') as jsonfile:
                 jsonfile.write(json_object)
-
 
     def reloadDataline(self, path, label):   
         # QTableWidget.__init__(self, *args)
