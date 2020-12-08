@@ -15,6 +15,9 @@ from GUI.PackageManager.PackageManager import PackageManager
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
 
+#TAGS
+from GUI.Widgets.textdataline import reloadDataline
+
 class NewProjectDialog(QtWidgets.QWidget):
     #Signal for when the user is done creating the new project
     created = QtCore.pyqtSignal(str)
@@ -164,10 +167,17 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.batch_thread.start()
             self.progress_dialog_overall.show()
 
-            #BIANCA
-            # #TRIGGER PACKET COMMENTS PARSER
-            packetscomments_jsonpath = self.project_data_path 
-            commentsParser(packetscomments_jsonpath)
+            
+            try:
+                # #TRIGGER PACKET COMMENTS PARSER
+                datalinepath = self.project_data_path 
+                commentsParser(datalinepath)
+
+                #TAG
+                reloadDataline.addTagColumn(datalinepath)
+
+            except:
+                print('Folder path not found')
 
     def copy_dir(self, dir):
         try:
@@ -191,6 +201,17 @@ class NewProjectDialog(QtWidgets.QWidget):
         self.progress_dialog_overall.update_progress()
         self.progress_dialog_overall.hide()
         self.created.emit(self.new_project_path)
+
+        try:
+            # #TRIGGER PACKET COMMENTS PARSER
+            datalinepath = self.new_project_path 
+            commentsParser(datalinepath)
+            #TAG
+            reloadDataline.addTagColumn(datalinepath)
+
+        except:
+            print('Folder path not found')
+
         logging.debug("unzip_complete(): Complete") 
 
     def update_progress_bar(self):
@@ -266,4 +287,3 @@ class NewProjectDialog(QtWidgets.QWidget):
                 self.create_project_button.setStyleSheet("background-color : grey")
                 self.chooseFolderButton.setEnabled(False)
                 self.chooseFolderButton.setStyleSheet("background-color : grey")
-                

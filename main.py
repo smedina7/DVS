@@ -9,6 +9,7 @@ from GUI.Dialogs.Settings import SettingsDialog
 from GUI.Threading.BatchThread import BatchThread
 from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Widgets.commentsParser import commentsParser
+from GUI.Widgets.textdataline import reloadDataline
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QFileDialog
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
@@ -126,6 +127,7 @@ class DVSstartUpPage(QMainWindow):
         if len(folder_chosen) > 0:
             self.project_folder = folder_chosen
             commentsParser(folder_chosen)
+            reloadDataline.addTagColumn(folder_chosen)
             self.openHomeWindow()
             self.hide()
 

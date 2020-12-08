@@ -9,7 +9,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWebEngineWidgets import *
 from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.textdataline import TextDataline, reloadDataline
@@ -24,11 +24,14 @@ from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Dialogs.ExportDialog import ExportDialog
 from GUI.Dialogs.EditTextDialog import EditTextDialog
 from GUI.Dialogs.DateTimePicker import DateTimePicker
+from GUI.Dialogs.AddTag import AddTagDialog
 import time
 import datetime
 
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
+#SAVE
+from GUI.Widgets.save import save
 
 class MainGUI(QMainWindow):
     #Signal for when the user wants to create a new project
@@ -60,6 +63,10 @@ class MainGUI(QMainWindow):
         self.throughput_json = throughput_path + '/parsed/tshark/networkDataXY.JSON'
 
         self.project_name = os.path.basename(self.project_path)
+        self.subK = QMdiSubWindow()
+        self.subSC = QMdiSubWindow()
+        self.subT = QMdiSubWindow()
+        self.subM = QMdiSubWindow()
 
         self.project_dict = {}
         self.project_dict[self.project_name] = {"KeypressData": {}, "SystemCallsData": {}, "MouseClicksData": {}, "TimedData": {}, "ThroughputData": {}, "SuricataData": {}}
@@ -102,6 +109,12 @@ class MainGUI(QMainWindow):
         self.refresh.setText("Refresh Comments Dataline")
         self.tb.addWidget(self.refresh)
         self.refresh.clicked.connect (self.trigger_refresh)
+
+        ##SAVE
+        self.save = QPushButton('SAVE')
+        self.save.setFixedWidth(100)
+        self.tb.addWidget(self.save)
+        self.save.clicked.connect(self.saveDataline)
 
         #Set area for where datalines are going to show
         self.mdi = QMdiArea()
@@ -202,25 +215,31 @@ class MainGUI(QMainWindow):
         if self.timestampTrigger:
             children = self.findChildren(QTableWidget)
             for child in children:
-                child.setSelectionMode(QAbstractItemView.MultiSelection)
                 columncount = child.columnCount()
-                child.clearSelection()
+                for row in range(child.rowCount()):
+                    for col in range (child.columnCount()):
+                        child.item(row, col).setBackground(QtGui.QColor(255, 255, 255, 0))
+
                 for row in range(child.rowCount()):
                     indexTimeStamp = child.item(row,columncount-1).text()
                     if b == -1:
                         if self.timestamp == indexTimeStamp:
-                            child.selectRow(row)
+                            for col in range (child.columnCount()):
+                                child.item(row, col).setBackground(QtGui.QColor(125,125,125))
                             Timestamp.update_timestamp(self.timestamp)#writes to timestamp.txt
                     else:
                         currTimeStamp = Timestamp.get_current_timestamp()#reads timestamp.txt
                         if indexTimeStamp == currTimeStamp:
-                            child.selectRow(row)
+                            for col in range (child.columnCount()):
+                                child.item(row, col).setBackground(QtGui.QColor(125,125,125))
+
         if self.timestampTrigger == False:
             children = self.findChildren(QTableWidget)
             for child in children:
-                child.setSelectionMode(QAbstractItemView.SingleSelection)
-                child.clearSelection()
-
+                for row in range(child.rowCount()):
+                    for col in range (child.columnCount()):
+                        child.item(row, col).setBackground(QtGui.QColor(255, 255, 255, 0))
+        
         if self.wiresharkTrigger == True:
             dictionary = self.sync_dict  
             timestamp = Timestamp.get_current_timestamp()
@@ -361,7 +380,7 @@ class MainGUI(QMainWindow):
                 count_row = 0
                 self.tableWidget = QTableWidget (self)
                 label = "keypresses"
-                self.tableWidget = TextDataline(data, label, count_row, 4)
+                self.tableWidget = TextDataline(data, label, count_row, 5)
                 self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidget.setObjectName("Keypresses")
@@ -407,7 +426,7 @@ class MainGUI(QMainWindow):
 
                 self.tableWidgetSys = QTableWidget (self)
                 label = "systemcalls"
-                self.tableWidgetSys = TextDataline(data, label, count_row, 4)
+                self.tableWidgetSys = TextDataline(data, label, count_row, 5)
                 self.tableWidgetSys.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidgetSys.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetSys.setObjectName("Systemcalls")
@@ -469,6 +488,37 @@ class MainGUI(QMainWindow):
         else:
             #check if window is hidden
             self.checkHidden(self.subS, self.tableWidgetSur)
+
+    ####SAVE
+    def saveDataline(self):
+
+        active = self.mdi.activeSubWindow()
+        Projectpath = self.ProjectFolder[0]
+
+        try:
+            instanceTableKeyp = self.tableWidget
+            save.save(instanceTableKeyp, "keypresses", Projectpath)
+        except:
+            pass
+
+        try:
+            instanceTableSys = self.tableWidgetSys
+            save.save(instanceTableSys, "systemcalls", Projectpath)
+        except:
+            pass
+
+        try:
+            instanceTableMou = self.tableWidgetMou
+            save.save(instanceTableMou, "mouseclicks", Projectpath)
+        except:
+            pass
+
+        try:
+            instanceTableTimed = self.tableWidgetTime
+            save.save(instanceTableTimed, "timed", Projectpath)
+
+        except:
+            pass
 
     def trigger_refresh(self):
         try:
@@ -555,7 +605,7 @@ class MainGUI(QMainWindow):
                 count_row = 0
 
                 self.tableWidgetMou = QTableWidget (self)
-                self.tableWidgetMou = First(df, self.clicks_path, count_row, 5)
+                self.tableWidgetMou = First(df, self.clicks_path, count_row, 6)
                 self.tableWidgetMou.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetMou.setObjectName("Mouseclicks")
@@ -599,7 +649,7 @@ class MainGUI(QMainWindow):
                 count_row = 0
 
                 self.tableWidgetTime = QTableWidget (self)
-                self.tableWidgetTime = Timed(df, self.timed_path, count_row, 5)
+                self.tableWidgetTime = Timed(df, self.timed_path, count_row, 6)
                 self.tableWidgetTime.setSelectionBehavior(QAbstractItemView.SelectRows)
                 self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetTime.setObjectName("TimedScreenshots")
@@ -693,55 +743,121 @@ class MainGUI(QMainWindow):
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         addRow = menu.addAction("Add Row")
-        addColumn = menu.addAction("Add Column")
-        delColumn = menu.addAction("Delete Column")
         delRow = menu.addAction("Delete Row")
+        addTag = menu.addAction ("Add Tag")
 
         action = menu.exec_(event.globalPos())
         if action == addRow:
             self.addRow()
-        elif action ==addColumn:
-            self.addColumn()
-        elif action == delColumn:
-            self.delColumn()
         elif action == delRow:
             self.delRow()
+        elif action == addTag:
+            self.addTagSignal()
+
+    def addTagSignal(self):
+        active = self.mdi.activeSubWindow()
+
+        if active == self.subK:
+            table = self.tableWidget
+        elif active == self.subSC:
+            table = self.tableWidgetSys
+
+        elif active == self.subM:
+            table = self.tableWidgetMou
+        
+        elif active == self.subT:
+           table = self.tableWidgetTime
+        
+        else: 
+            return
+        
+        headercount = table.columnCount()
+        row = table.currentItem().row()
+
+        for x in range(0,headercount,1):
+            headertext = table.horizontalHeaderItem(x).text()
+            if "Tag" == headertext:
+                cell_text = table.item(row, x).text()   # get cell at row, col
+                self.trigger_tag(cell_text, table, row, x)
+            else:
+                pass
+
+    def trigger_tag(self, text_to_edit, table, row, x):
+        self.tableEdit = table
+        self.rowEdit = row
+        self.xEdit = x
+        self.add_tag = AddTagDialog(text_to_edit)
+        self.add_tag.added.connect(self.tag_done)
+        self.add_tag.show()
 
     def addRow(self):
         active = self.mdi.activeSubWindow()
-        datepicker = DateTimePicker()
-        col_timestamp = datepicker.get_timestamp()
+        current = time.time()
+        col_timestamp = datetime.datetime.fromtimestamp(current).strftime('%Y-%m-%dT%H:%M:%S')
         cellinfo = QTableWidgetItem(col_timestamp)
-        cellinfo.setFlags(QtCore.Qt.ItemIsEnabled)
 
         if active == self.subK:
             self.tableWidget.insertRow(self.tableWidget.currentRow())
+            columns = self.tableWidget.columnCount()-1
+            rows = self.tableWidget.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidget.setItem(self.tableWidget.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidget.setItem(self.tableWidget.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidget.setItem(self.tableWidget.currentRow()-1, self.tableWidget.columnCount()-1, cellinfo)
+
         elif active == self.subSC:
             self.tableWidgetSys.insertRow(self.tableWidgetSys.currentRow())
+            columns = self.tableWidgetSys.columnCount()-1
+            rows = self.tableWidgetSys.rowCount()-1
+
+            it = QtWidgets.QTableWidgetItem()
+            tableid = int(rows)
+            it.setData(QtCore.Qt.DisplayRole, (tableid))
+
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, i, it)
+                else:
+                    self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetSys.setItem(self.tableWidgetSys.currentRow()-1, self.tableWidgetSys.columnCount()-1, cellinfo)
+
         elif active == self.subM:
             self.tableWidgetMou.insertRow(self.tableWidgetMou.currentRow())
+            columns = self.tableWidgetMou.columnCount()-1
+            rows = self.tableWidgetMou.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetMou.setItem(self.tableWidgetMou.currentRow()-1, self.tableWidgetMou.columnCount()-1, cellinfo)
+        
         elif active == self.subT:
             self.tableWidgetTime.insertRow(self.tableWidgetTime.currentRow())
+            columns = self.tableWidgetTime.columnCount()-1
+            rows = self.tableWidgetTime.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetTime.setItem(self.tableWidgetTime.currentRow()-1, self.tableWidgetTime.columnCount()-1, cellinfo)
+    
         elif active == self.subS:
             self.tableWidgetSur.insertRow(self.tableWidgetSur.currentRow())
+            columns = self.tableWidgetSur.columnCount()-1
+            rows = self.tableWidgetSur.rowCount()-1
+            for i in range(columns):
+                if i == 0:
+                    self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, i, QTableWidgetItem(str(rows)))
+                else:
+                    self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, i, QTableWidgetItem(""))
             self.tableWidgetSur.setItem(self.tableWidgetSur.currentRow()-1, self.tableWidgetSur.columnCount()-1, cellinfo)
-
-    def addColumn(self):
-        active = self.mdi.activeSubWindow()
-        if active == self.subK:
-            self.tableWidget.insertColumn(self.tableWidget.currentColumn())
-        elif active == self.subSC:
-            self.tableWidgetSys.insertColumn(self.tableWidgetSys.currentColumn())
-        elif active == self.subM:
-            self.tableWidgetMou.insertColumn(self.tableWidgetMou.currentColumn())
-        elif active == self.subT:
-            self.tableWidgetTime.insertColumn(self.tableWidgetTime.currentColumn())
-        elif active == self.subS:
-            self.tableWidgetSur.insertColumn(self.tableWidgetSur.currentColumn())
+        
+        else: 
+            return
     
     def delRow(self):
         active = self.mdi.activeSubWindow()
@@ -768,34 +884,6 @@ class MainGUI(QMainWindow):
         elif active == self.subS:
             if self.tableWidgetSur.rowCount() > 0:
                 self.tableWidgetSur.removeRow(self.tableWidgetSur.currentRow())
-            else:
-                self.delete_pop_up()
-    
-    def delColumn(self):
-        active = self.mdi.activeSubWindow()
-        if active == self.subK:
-            if self.tableWidget.columnCount() > 0:
-                self.tableWidget.removeColumn(self.tableWidget.currentColumn())
-            else:
-                self.delete_pop_up()
-        elif active == self.subSC:
-            if self.tableWidgetSys.columnCount() > 0:
-                self.tableWidgetSys.removeColumn(self.tableWidgetSys.currentColumn())
-            else:
-                self.delete_pop_up()
-        elif active == self.subM:
-            if self.tableWidgetMou.columnCount() > 0:
-                self.tableWidgetMou.removeColumn(self.tableWidgetMou.currentColumn())
-            else:
-                self.delete_pop_up()
-        elif active == self.subT:
-            if self.tableWidgetTime.columnCount() > 0:
-                self.tableWidgetTime.removeColumn(self.tableWidgetTime.currentColumn())
-            else:
-                self.delete_pop_up()
-        elif active == self.subS:
-            if self.tableWidgetSu.columnCount() > 0:
-                self.tableWidgetSur.removeColumn(self.tableWidgetSur.currentColumn())
             else:
                 self.delete_pop_up()
 
@@ -878,6 +966,10 @@ class MainGUI(QMainWindow):
     def edit_done(self, edited_text):
         self.tableEdit.setItem(self.rowEdit, self.xEdit, QTableWidgetItem(edited_text))
 
+    @QtCore.pyqtSlot(str)
+    def tag_done(self, edited_text):
+        self.tableEdit.setItem(self.rowEdit, self.xEdit, QTableWidgetItem(edited_text))
+
     @QtCore.pyqtSlot(int)
     def loadprogress(self, progress):
         self.progress.show()
@@ -906,6 +998,15 @@ class MainGUI(QMainWindow):
         reply = QMessageBox.question(self, 'Close Timeline View', 'Are you sure you want to exit?', 
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            reply2 = QMessageBox.question(self, 'Close Timeline View', 'Do you want to save your progress?', 
+                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                self.saveDataline()
+
+            elif reply == QMessageBox.No and not type(event) == bool:
+                event.ignore()
+
             if(self.web != ''):
                 self.web.close()
                 self.manager_instance.stopWebEngine()
