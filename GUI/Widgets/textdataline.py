@@ -73,18 +73,21 @@ class TextDataline(QTableWidget):
                     tableid = str(ser_confidence[ind])
                     if tableid !='No Data':
                         it.setData(QtCore.Qt.DisplayRole, (tableid))
+                        it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "start":
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
-                    # it.setFlags(QtCore.Qt.ItemIsEnabled)
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 elif j == "timestamp":
                     tableid = str(ser_timestamp[ind])
                     it.setData(QtCore.Qt.DisplayRole, (tableid))
-                    # it.setFlags(QtCore.Qt.ItemIsEnabled)
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
+                    
 
                 self.setItem(ind, c, it)
                 
@@ -121,8 +124,7 @@ class reloadDataline:
 
                 
             dfdata = path + datalinepath
-            # if (label == "suricata"):
-            #     keys = ["suricata_id", "suricata_rule_id", "content", "className", "start"]
+
             dct = dict()
             colInd = 0
             df = pd.read_json (dfdata)
@@ -144,11 +146,6 @@ class reloadDataline:
                 multikeys.append(dct)
                 colInd = 0
                 dct = dict()
-
-            # print("MultiKEYS")
-            # print(multikeys)
-
-            # path= "/home/kali/DVS_branches/DVS_bsalvarez/DVS/ProjectData/t1"
 
             json_object = json.dumps(multikeys, indent=4)
             

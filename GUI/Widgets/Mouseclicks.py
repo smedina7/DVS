@@ -75,6 +75,7 @@ class First(QTableWidget):
 
                 else:
                     it.setData(QtCore.Qt.DisplayRole, (df[j][ind]))
+                    it.setFlags(QtCore.Qt.ItemIsEnabled)
 
                 self.setItem(ind, c, it)
                 c= c+1     

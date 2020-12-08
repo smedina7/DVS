@@ -168,12 +168,16 @@ class NewProjectDialog(QtWidgets.QWidget):
             self.progress_dialog_overall.show()
 
             
-            # #TRIGGER PACKET COMMENTS PARSER
-            datalinepath = self.project_data_path 
-            commentsParser(datalinepath)
+            try:
+                # #TRIGGER PACKET COMMENTS PARSER
+                datalinepath = self.project_data_path 
+                commentsParser(datalinepath)
 
-            #TAG
-            reloadDataline.addTagColumn(datalinepath)
+                #TAG
+                reloadDataline.addTagColumn(datalinepath)
+
+            except:
+                print('Folder path not found')
 
     def copy_dir(self, dir):
         try:
@@ -197,6 +201,20 @@ class NewProjectDialog(QtWidgets.QWidget):
         self.progress_dialog_overall.update_progress()
         self.progress_dialog_overall.hide()
         self.created.emit(self.new_project_path)
+        # print(self.new_project_path)
+
+        try:
+            # #TRIGGER PACKET COMMENTS PARSER
+            datalinepath = self.new_project_path 
+            commentsParser(datalinepath)
+
+            #TAG
+            reloadDataline.addTagColumn(datalinepath)
+
+        except:
+            print('Folder path not found')
+            
+
         logging.debug("unzip_complete(): Complete") 
 
     def update_progress_bar(self):

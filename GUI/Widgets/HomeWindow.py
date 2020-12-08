@@ -23,6 +23,7 @@ from GUI.Dialogs.ProgressBarDialog import ProgressBarDialog
 from GUI.Dialogs.ExportDialog import ExportDialog
 from GUI.Dialogs.EditTextDialog import EditTextDialog
 from GUI.Dialogs.DateTimePicker import DateTimePicker
+from GUI.Dialogs.AddTag import AddTagDialog
 import time
 import datetime
 
@@ -383,6 +384,7 @@ class MainGUI(QMainWindow):
 
                 self.subK.setWidget(QTextEdit())
                 data = self.key_json
+                print("Keys",data)
 
                 count_row = 0
                 self.tableWidget = QTableWidget (self)
@@ -753,12 +755,55 @@ class MainGUI(QMainWindow):
         menu = QMenu(self)
         addRow = menu.addAction("Add Row")
         delRow = menu.addAction("Delete Row")
+        addTag = menu.addAction ("Add Tag")
 
         action = menu.exec_(event.globalPos())
         if action == addRow:
             self.addRow()
         elif action == delRow:
             self.delRow()
+        elif action == addTag:
+            self.addTagSignal()
+
+    def addTagSignal(self):
+        active = self.mdi.activeSubWindow()
+
+        if active == self.subK:
+            table = self.tableWidget
+        elif active == self.subSC:
+            table = self.tableWidgetSys
+
+        elif active == self.subM:
+            table = self.tableWidgetMou
+        
+        elif active == self.subT:
+           table = self.tableWidgetTime
+        
+        else: 
+            return
+        
+        headercount = table.columnCount()
+        row = table.currentItem().row()
+
+        for x in range(0,headercount,1):
+            headertext = table.horizontalHeaderItem(x).text()
+            if "Tag" == headertext:
+                cell_text = table.item(row, x).text()   # get cell at row, col
+                self.trigger_tag(cell_text, table, row, x)
+            else:
+                pass
+
+    def trigger_tag(self, text_to_edit, table, row, x):
+        self.tableEdit = table
+        self.rowEdit = row
+        self.xEdit = x
+        self.add_tag = AddTagDialog(text_to_edit)
+        self.add_tag.added.connect(self.tag_done)
+        self.add_tag.show()
+
+    @QtCore.pyqtSlot(str)
+    def tag_done(self, edited_text):
+        self.tableEdit.setItem(self.rowEdit, self.xEdit, QTableWidgetItem(edited_text))
 
     def addRow(self):
         active = self.mdi.activeSubWindow()
