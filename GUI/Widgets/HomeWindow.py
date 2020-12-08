@@ -32,6 +32,10 @@ import time
 from GUI.Widgets.commentsParser import commentsParser
 #SAVE
 from GUI.Widgets.save import save
+#sync margin from settings
+margin_selct = 0 #default
+#sync enabled from settings
+enabled_syncM = False
 
 class MainGUI(QMainWindow):
     #Signal for when the user wants to create a new project
