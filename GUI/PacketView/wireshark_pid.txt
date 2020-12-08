@@ -1,3 +1,0 @@
-root      243374  1.1  5.3 1800572 214860 pts/4  Sl+  00:27   0:00 /usr/local/bin/wireshark -r /home/kali/DVS/ProjectData/t0/PCAP/AnnotatedPCAP.pcapng -Xlua_script:/home/kali/DVS/ProjectData/t0/GeneratedDissectors/TimedScreenshots.lua -Xlua_script:/home/kali/DVS/ProjectData/t0/GeneratedDissectors/SystemCalls.lua -Xlua_script:/home/kali/DVS/ProjectData/t0/GeneratedDissectors/MouseClicks.lua -Xlua_script:/home/kali/DVS/ProjectData/t0/GeneratedDissectors/Keypresses.lua
-root      243407  0.0  0.0   2392   704 pts/4    S+   00:28   0:00 sh -c ps aux | grep wireshark > /home/kali/DVS/GUI/PacketView/wireshark_pid.txt
-root      243409  0.0  0.0   6216   828 pts/4    S+   00:28   0:00 grep wireshark
