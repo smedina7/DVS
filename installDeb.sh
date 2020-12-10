@@ -47,7 +47,7 @@ done
 
 ### Install dependencies
 REQUIRED_PROGRAMS="python3-pip virtualenv git" #python3-venv was giving problems, "not found" this might be solution
-REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 dash dash-bootstrap-components==0.10.7rc1 plotly Flask pandas flask_caching PyQtWebEngine virtualenv dash_daq tkcalendar"
+REQUIRED_PYTHON_PACKAGES="PyQt5==5.15.1 dash dash-bootstrap-components==0.10.7rc1 plotly Flask pandas flask_caching PyQtWebEngine dash_daq tkcalendar"
 
 echo "+++++++++++++++++++++++++++++++++"
 echo "installing REQUIRED_PROGRAMS"
