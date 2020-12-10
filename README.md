@@ -20,33 +20,34 @@ DVS runs on both Windows and Linux
 
 #### Windows
 DVS installation steps:
+Open a command prompt in administrator mode and clone the repository. 
 
 ``` bash
 > git clone https://github.com/smedina7/DVS
 > cd dvs
 ```
 
-Install eceld-wireshark using the installer provided. Type the following in the command prompt.
+Run the windows installer script. 
 
 ```bash
-> eceld-wireshark-installer\Wireshark-win64-3.2.5.exe
+> win_installer.bat
 ```
-You will get a prompt to install wireshark. Install using default settings provided.
+You will get a prompt to install wireshark. Install using default settings provided and install in C:\Program Files\Wireshark.
+After wireshark is installed, the script will do the following:
 
 - Install Python’s Virtual Environment Builder:
 - Create and activate virtual environment:
 - Install required dependencies:
-``` bash
-> pip install virtualenv
-> virtualenv dvs-venv 
-> dvs-venv\Scripts\activate
-(dvs-venv) > pip install -r requirements.txt
+After the installation is done you'll see the following message:
+``` bash 
+************************
+All dependencies where installed successfully
+run 'main.py --no-sandbox' to start DVS
 ```
 
 Start the DVS GUI:
-
 ``` bash 
-(dvs-venv) > python3 main.py 
+(dvs-venv) > python3 main.py --no-sandbox
 ```
 
 #### Linux
