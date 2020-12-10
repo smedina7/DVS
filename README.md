@@ -51,12 +51,20 @@ Start the DVS GUI:
 (dvs-venv) > python3 main.py --no-sandbox
 ```
 
+Note: If you are unable to install wireshark through the command above mentioned, please go to this link: 
+[DVS-wireshark installer](https://drive.google.com/drive/folders/1A4n18dsXHc-RHXywYPN-1mOt97gEFNq_?usp=sharing),
+download the eceld-wireshark installer and install using default configurations.
+Alternatively, you can download [eceld-wireshark](https://github.com/ARL-UTEP-OC/eceld-wireshark)
+from their GitHub page, modify the files specified in the [documentation](https://github.com/smedina7/DVS/blob/master/documentation/DVS%20User%20Documentation.pdf), compile and build using the instructions found at the [Wireshark Win32/64: Step-by-Step Guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html). 
+
+
+
 #### Linux
 **Requierements:**
 
 Have Eceld-Wireshark installed: there are many ways you could install this. 
-* Install Eceld-Netsys: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-netsys.git
-* Install Eceld-Wireshark: Refer to the Git-Hub page -> https://github.com/ARL-UTEP-OC/eceld-wireshark
+* Install Eceld-Netsys: Refer to the GitHub page -> https://github.com/ARL-UTEP-OC/eceld-netsys.git
+* Install Eceld-Wireshark: Refer to the GitHub page -> https://github.com/ARL-UTEP-OC/eceld-wireshark
 * Install with the DVS Installer 
 
 DVS installation steps:
