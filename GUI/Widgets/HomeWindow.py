@@ -11,7 +11,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWebEngineWidgets import *
-from GUI.Widgets.AbstractTable import pandasModel
 from GUI.Widgets.textdataline import TextDataline, reloadDataline
 from GUI.Widgets.Mouseclicks import First
 from GUI.Widgets.TimedScreenshots import Timed
@@ -25,8 +24,9 @@ from GUI.Dialogs.ExportDialog import ExportDialog
 from GUI.Dialogs.EditTextDialog import EditTextDialog
 from GUI.Dialogs.DateTimePicker import DateTimePicker
 from GUI.Dialogs.AddTag import AddTagDialog
-from datetime import datetime, timedelta
+from datetime import datetime as dt, timedelta
 import time
+import datetime 
 
 #PARSER
 from GUI.Widgets.commentsParser import commentsParser
@@ -247,16 +247,16 @@ class MainGUI(QMainWindow):
                                 child.item(row, col).setBackground(QtGui.QColor(125,125,125))
                                 child.selectRow(row)
                         if (int(self.margin_selct) == 1 and self.timestamp != ""):
-                            temp = datetime.strptime(self.timestamp,'%Y-%m-%dT%H:%M:%S')
+                            temp = dt.strptime(self.timestamp,'%Y-%m-%dT%H:%M:%S')
                             ts_t1 = temp + timedelta(seconds=1)
-                            ts_1 = datetime.strftime(ts_t1, '%Y-%m-%dT%H:%M:%S')
+                            ts_1 = dt.strftime(ts_t1, '%Y-%m-%dT%H:%M:%S')
                             if ts_1 == indexTimeStamp:
                                 for col in range (child.columnCount()):
                                     child.item(row, col).setBackground(QtGui.QColor(125,125,125))
                                     child.selectRow(row)
 
                             ts_t2 = temp + timedelta(seconds=-1)
-                            ts_2 = datetime.strftime(ts_t2, '%Y-%m-%dT%H:%M:%S')
+                            ts_2 = dt.strftime(ts_t2, '%Y-%m-%dT%H:%M:%S')
                             if ts_2 == indexTimeStamp:
                                 for col in range (child.columnCount()):
                                     child.item(row, col).setBackground(QtGui.QColor(125,125,125))
@@ -638,6 +638,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetMou.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetMou.setObjectName("Mouseclicks")
                 self.tableWidgetMou.cellClicked.connect(self.getCoords)
+                self.tableWidgetMou.doubleClicked.connect(self.table_clicked)
 
                 self.subM.setWidget(self.tableWidgetMou)
                 self.mdi.addSubWindow(self.subM)
@@ -682,6 +683,7 @@ class MainGUI(QMainWindow):
                 self.tableWidgetTime.setSelectionMode(QAbstractItemView.SingleSelection)
                 self.tableWidgetTime.setObjectName("TimedScreenshots")
                 self.tableWidgetTime.cellClicked.connect(self.getCoords)
+                self.tableWidgetTime.doubleClicked.connect(self.table_clicked)
 
                 self.subT.setWidget(self.tableWidgetTime)
                 self.mdi.addSubWindow(self.subT)
@@ -820,9 +822,10 @@ class MainGUI(QMainWindow):
 
     def addRow(self):
         active = self.mdi.activeSubWindow()
-        current = time.time()
-        col_timestamp = datetime.datetime.fromtimestamp(current).strftime('%Y-%m-%dT%H:%M:%S')
+        datepicker = DateTimePicker()
+        col_timestamp = datepicker.get_timestamp()
         cellinfo = QTableWidgetItem(col_timestamp)
+        cellinfo.setFlags(QtCore.Qt.ItemIsEnabled)
 
         if active == self.subK:
             self.tableWidget.insertRow(self.tableWidget.currentRow())

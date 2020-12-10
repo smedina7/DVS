@@ -9,3 +9,5 @@ PyQtWebEngine
 flask_caching
 dash_daq
 dash-bootstrap-components
+numpy==1.19.3
+tkcalendar
