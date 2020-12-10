@@ -1,4 +1,0 @@
-suricata
-===============================
-Commands:# sudo service suricata start
-===============================
