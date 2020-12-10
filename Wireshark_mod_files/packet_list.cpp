@@ -741,10 +741,10 @@ void PacketList::ctxDecodeAsDialog()
 // scrollToBottom() from rowsInserted().
 #include <iostream>
 #include <fstream>
-int oldPacket=-1;
+int prevP=-1;
 void PacketList::timerEvent(QTimerEvent *event)
 {
-    std::fstream myfile;
+    std::fstream f;
     if (event->timerId() == tail_timer_id_) {
         if (rows_inserted_ && capture_in_progress_ && tail_at_end_) {
             scrollToBottom();
@@ -754,20 +754,20 @@ void PacketList::timerEvent(QTimerEvent *event)
         if (!capture_in_progress_) {
             if (create_near_overlay_) drawNearOverlay();
             if (create_far_overlay_) drawFarOverlay();
-            myfile.open("update_wireshark.txt", std::ios::in);
-            if (myfile.is_open()){
+            f.open("update_wireshark.txt", std::ios::in);
+            if (f.is_open()){
                 int a;
-                while (myfile >> a)
+                while (f >> a)
                 {
-                    if (a==oldPacket){
+                    if (a==prevP){
                         break;
                     }
                     else{
-                        oldPacket=a;
-                        goToPacket(a); //Synced!
+                        prevP=a;
+                        goToPacket(a); 
                     }
                 }
-                myfile.close();
+                f.close();
             }
         }
     } else {
@@ -793,11 +793,11 @@ void PacketList::mousePressEvent (QMouseEvent *event)
     QModelIndex curIndex = indexAt(event->pos());
     mouse_pressed_at_ = curIndex;
 
-    std::fstream myfile;
-    myfile.open("ws_click.txt", std::ios::out);
-    if(myfile.is_open() && mouse_pressed_at_.isValid()){
-        myfile << (mouse_pressed_at_.row()+1); 
-        myfile.close();
+    std::fstream f;
+    f.open("ws_click.txt", std::ios::out);
+    if(f.is_open() && mouse_pressed_at_.isValid()){
+        f << (mouse_pressed_at_.row()+1);
+        f.close();
     }
 
     bool midButton = (event->buttons() & Qt::MidButton) == Qt::MidButton;
