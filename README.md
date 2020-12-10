@@ -107,7 +107,7 @@ $ source venv/bin/activate
 Run DVS:
 
 ```
-$ python3 main.py --no-sandbox
+$ sudo python3 main.py --no-sandbox
 ```
 
 
