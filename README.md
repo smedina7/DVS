@@ -35,9 +35,10 @@ Run the windows installer script.
 You will get a prompt to install wireshark. Install using default settings provided and install in C:\Program Files\Wireshark.
 After wireshark is installed, the script will do the following:
 
-- Install Python’s Virtual Environment Builder:
-- Create and activate virtual environment:
-- Install required dependencies:
+- Install Python’s Virtual Environment Builder
+- Create and activate virtual environment
+- Install required dependencies
+
 After the installation is done you'll see the following message:
 ``` bash 
 ************************
