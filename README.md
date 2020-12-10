@@ -95,6 +95,8 @@ DVS depends on : eceld-wireshark would you like to install it [Y/n]
 Input "Y" to install Eceld-Wireshark.
 
 **If you already have Eceld-Wireshark installed, skip installation by inputing "n"**
+NOTE: First time using the DVS System, you must follow the instructions located in the File -> Wireshark_mod_files
+
 
 Activate Environment:
 
