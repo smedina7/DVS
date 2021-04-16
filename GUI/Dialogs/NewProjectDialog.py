@@ -152,6 +152,13 @@ class NewProjectDialog(QtWidgets.QWidget):
                                     "The project name specified and directory already exists",
                                     QMessageBox.Ok)            
             return None
+        
+        elif self.folder_chosen == '':
+            QMessageBox.warning(self,
+                                    "No Folder Selected",
+                                    "The project folder you want to analyze has not been chosen!",
+                                    QMessageBox.Ok)            
+            return None
 
         else:
             #create dir
